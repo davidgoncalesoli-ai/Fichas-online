@@ -1,4 +1,4 @@
-# F&M Ficha Online v0.21
+# F&M Ficha Online v0.22
 
 # F&M Ficha Online v0.16
 
@@ -25,7 +25,12 @@ Ainda há itens com descrição estrutural/resumida. A meta continua ser cadastr
 - Próxima frente: completar textos e pré-requisitos das habilidades oficiais.
 
 
-## v0.21
+## v0.22
 - Armas/equipamentos agora aceitam maldições, encantamentos e modificações.
 - Adicionada biblioteca inicial de encantamentos para armas, escudos e uniformes.
 - Ataques criados a partir de armas consideram bônus simples de acerto/dano das modificações cadastradas.
+
+
+## v0.22
+- Atributos pós-criação agora aumentam apenas por pontos de evolução.
+- Modificadores temporários ficam separados dos atributos permanentes.

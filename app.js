@@ -4142,7 +4142,7 @@ function attributePoolValues(data){ return (data.attributeRolls||[]).map(r=>Numb
 function usedAttributeValues(data, exceptAttr=''){ const used=[]; for(const a of ATTRS){ if(a!==exceptAttr && data.attributeAssignments?.[a] !== undefined && data.attributeAssignments?.[a] !== '') used.push(Number(data.attributeAssignments[a])); } return used; }
 function countValue(list,value){ return list.filter(v=>Number(v)===Number(value)).length; }
 function attributeAssignmentComplete(data){ return ATTRS.every(a=>data.attributeAssignments?.[a] !== undefined && data.attributeAssignments?.[a] !== ''); }
-function syncAttributesFromAssignments(data){ if(attributeAssignmentComplete(data)){ ATTRS.forEach(a=>data.attributes[a]=Number(data.attributeAssignments[a])); } return data; }
+function syncAttributesFromAssignments(data){ if(attributeAssignmentComplete(data)){ data.attributeBase=data.attributeBase||{}; ATTRS.forEach(a=>{ const v=Number(data.attributeAssignments[a]); data.attributeBase[a]=v; data.attributes[a]=v; }); } return data; }
 function trainValue(level, rank){ const bt=trainingBonus(level); if(rank==='master') return Math.ceil(bt*1.5); if(rank==='trained') return bt; return 0; }
 function aptitudePointsTotal(sheet){
   if(sheet.origin==='Restringido' || sheet.specialization==='Restringido') return 0;
@@ -4165,16 +4165,31 @@ function canUseAptitude(sheet, apt){
   if(sheet.aptitudeChoices?.some(x=>x.name===apt.name)) return {ok:false, reason:'Já adicionada.'};
   return {ok:true, reason:'Disponível'};
 }
-function skillTotal(sheet, skill){ const rank=sheet.skillRanks?.[skill.name] || 'none'; const extra=Number(sheet.skillExtras?.[skill.name]||0); return mod(sheet.attributes[skill.attr]) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
+function attributeBaseValue(sheet, attr){
+  const fromBase = sheet.attributeBase?.[attr];
+  if(fromBase !== undefined && fromBase !== '') return Number(fromBase);
+  const fromAssign = sheet.attributeAssignments?.[attr];
+  if(fromAssign !== undefined && fromAssign !== '') return Number(fromAssign);
+  return Number(sheet.attributes?.[attr] || 10);
+}
+function attributeTempValue(sheet, attr){ return Number(sheet.attributeTempMods?.[attr] || 0); }
+function effectiveAttribute(sheet, attr){ return Number(sheet.attributes?.[attr] || 10) + attributeTempValue(sheet, attr); }
+function attrMod(sheet, attr){ return mod(effectiveAttribute(sheet, attr)); }
+function attributePointsTotal(sheet){ return Math.max(0, Math.floor(Number(sheet.level||1)/4) * 2); }
+function attributePointsSpent(sheet){ return ATTRS.reduce((sum,a)=>sum + Math.max(0, Number(sheet.attributes?.[a]||10) - attributeBaseValue(sheet,a)), 0); }
+function attributePointsLeft(sheet){ return attributePointsTotal(sheet) - attributePointsSpent(sheet); }
+function skillTotal(sheet, skill){ const rank=sheet.skillRanks?.[skill.name] || 'none'; const extra=Number(sheet.skillExtras?.[skill.name]||0); return attrMod(sheet, skill.attr) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
 function current(){ return sheets.find(s=>s.id===activeId); }
 function save(){ safeStorage.set('femSheetsV13', JSON.stringify(sheets)); if(activeId) safeStorage.set('femActiveV13', activeId); }
 function blankSheet(){
   const skillRanks={}, skillExtras={}; SKILLS.forEach(([name])=>{ skillRanks[name]='none'; skillExtras[name]=0; });
-  return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], attacks:[], items:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
+  return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeBase:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeTempMods:{'Força':0,'Destreza':0,'Constituição':0,'Inteligência':0,'Sabedoria':0,'Presença':0}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], attacks:[], items:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
 }
 function normalize(sheet){
   const base=blankSheet();
-  sheet = {...base, ...sheet, attributes:{...base.attributes, ...(sheet.attributes||{})}, attributeAssignments:{...base.attributeAssignments, ...(sheet.attributeAssignments||{})}, skillRanks:{...base.skillRanks, ...(sheet.skillRanks||{})}, skillExtras:{...base.skillExtras, ...(sheet.skillExtras||{})}, aptitudeLevels:{...base.aptitudeLevels, ...(sheet.aptitudeLevels||{})}};
+  sheet = {...base, ...sheet, attributes:{...base.attributes, ...(sheet.attributes||{})}, attributeBase:{...base.attributeBase, ...(sheet.attributeBase||{})}, attributeTempMods:{...base.attributeTempMods, ...(sheet.attributeTempMods||{})}, attributeAssignments:{...base.attributeAssignments, ...(sheet.attributeAssignments||{})}, skillRanks:{...base.skillRanks, ...(sheet.skillRanks||{})}, skillExtras:{...base.skillExtras, ...(sheet.skillExtras||{})}, aptitudeLevels:{...base.aptitudeLevels, ...(sheet.aptitudeLevels||{})}};
+  if(!sheet.attributeBase || ATTRS.some(a=>sheet.attributeBase[a]===undefined)){ sheet.attributeBase=sheet.attributeBase||{}; ATTRS.forEach(a=>{ if(sheet.attributeBase[a]===undefined) sheet.attributeBase[a]=attributeAssignmentComplete(sheet)?Number(sheet.attributeAssignments[a]):Number(sheet.attributes[a]||10); }); }
+  if(!sheet.attributeTempMods) sheet.attributeTempMods={}; ATTRS.forEach(a=>{ if(sheet.attributeTempMods[a]===undefined) sheet.attributeTempMods[a]=0; });
   sheet.attributeRolls = Array.isArray(sheet.attributeRolls) ? sheet.attributeRolls : [];
   ['abilities','talents','techniques','domains','attacks','items','aptitudeChoices'].forEach(k=>sheet[k]=Array.isArray(sheet[k])?sheet[k]:[]);
   sheet.domains = sheet.domains.map(d=>({name:d.name||'', type:d.type||'', technique:d.technique||'', level:d.level ?? '', cost:d.cost||'', area:d.area||'', duration:d.duration||'', text:d.text||''}));
@@ -4187,8 +4202,8 @@ function applyAutoValues(sheet, opts={keepCurrent:true}){
   sheet=normalize(sheet);
   const cls=CLASSES[sheet.specialization] || CLASSES.Lutador;
   if(!cls.keys.includes(sheet.keyAttribute)) sheet.keyAttribute = cls.keys[0];
-  const con=mod(sheet.attributes['Constituição']);
-  const key=mod(sheet.attributes[sheet.keyAttribute] || 10);
+  const con=attrMod(sheet,'Constituição');
+  const key=attrMod(sheet, sheet.keyAttribute);
   const hp = Math.max(1, cls.hp1 + con + (Math.max(1, sheet.level)-1)*(cls.hpFixed + con));
   let pe = cls.pe ? cls.pe * sheet.level : (cls.stamina ? cls.stamina * sheet.level : 0);
   if(cls.peKeyOnce) pe += key;
@@ -4198,7 +4213,7 @@ function applyAutoValues(sheet, opts={keepCurrent:true}){
   if(!opts.keepCurrent || !sheet.pe) sheet.pe = sheet.peMax;
   sheet.grade = gradeByLevel(sheet.level);
   sheet.dc = 10 + halfLevel(sheet.level) + trainingBonus(sheet.level) + key;
-  sheet.defense = 10 + mod(sheet.attributes['Destreza']) + (sheet.specialization==='Restringido' ? Math.min(sheet.level, Math.max(mod(sheet.attributes['Força']), mod(sheet.attributes['Constituição']), 0)) : 0);
+  sheet.defense = 10 + attrMod(sheet,'Destreza') + (sheet.specialization==='Restringido' ? Math.min(sheet.level, Math.max(attrMod(sheet,'Força'), attrMod(sheet,'Constituição'), 0)) : 0);
   sheet.attention = 10 + skillTotal(sheet, {name:'Percepção', attr:'Sabedoria'});
   sheet.initiative = skillTotal(sheet, {name:'Reflexos', attr:'Destreza'});
   sheet.movement = sheet.origin==='Restringido' || sheet.specialization==='Restringido' ? 12 : 9;
@@ -4252,9 +4267,41 @@ function renderEditor(){
 }
 function fillSelect(sel, values, selected){ const el=$(sel); if(!el) return; el.innerHTML=values.map(v=>`<option ${v===selected?'selected':''}>${esc(v)}</option>`).join(''); }
 function renderAttributes(sheet){
-  $('#attributes').innerHTML=ATTRS.map(a=>`<div class="attr-box"><strong>${a}</strong><input data-attr="${a}" type="number" value="${sheet.attributes[a]}"><small><span>Mod.</span><b>${sgn(mod(sheet.attributes[a]))}</b></small><button data-roll-attr="${a}">Rolar d20 ${sgn(mod(sheet.attributes[a]))}</button></div>`).join('');
-  $$('[data-attr]').forEach(i=>i.oninput=()=>{ sheet.attributes[i.dataset.attr]=Number(i.value); applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); });
-  $$('[data-roll-attr]').forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.rollAttr; roll(`1d20${sgn(mod(sheet.attributes[a]))}`, a); });
+  const total=attributePointsTotal(sheet), spent=attributePointsSpent(sheet), left=attributePointsLeft(sheet);
+  const rows = ATTRS.map(a=>{
+    const base=attributeBaseValue(sheet,a);
+    const current=Number(sheet.attributes?.[a]||base);
+    const inc=Math.max(0,current-base);
+    const temp=attributeTempValue(sheet,a);
+    const eff=effectiveAttribute(sheet,a);
+    const canUp=left>0;
+    const canDown=current>base;
+    return `<div class="attr-box">
+      <strong>${a}</strong>
+      <div class="attr-main"><span class="attr-score">${eff}</span><small>Mod. <b>${sgn(mod(eff))}</b></small></div>
+      <small>Base ${base} + evolução ${inc}${temp?` + temp. ${sgn(temp)}`:''}</small>
+      <div class="attr-controls"><button data-attr-down="${a}" ${canDown?'':'disabled'}>-</button><button data-attr-up="${a}" ${canUp?'':'disabled'}>+</button></div>
+      <button data-roll-attr="${a}">Rolar d20 ${sgn(mod(eff))}</button>
+    </div>`;
+  }).join('');
+  const mods = ATTRS.map(a=>{
+    const temp=attributeTempValue(sheet,a);
+    return `<label>${a}<input data-temp-attr="${a}" type="number" value="${temp}" step="1"></label>`;
+  }).join('');
+  $('#attributes').innerHTML = `
+    <div class="attribute-points full">
+      <strong>Pontos de atributo:</strong> <span>${Math.max(0,left)} disponíveis</span> <small>(${spent}/${total} usados)</small>
+      <p class="muted">Depois da criação, os atributos só aumentam gastando pontos ganhos por nível. Os valores temporários ficam separados abaixo.</p>
+    </div>
+    ${rows}
+    <div class="temp-mods full">
+      <div class="section-title"><h3>Modificadores temporários</h3><small>Use para bônus/penalidades temporárias de técnica, talento, item, condição ou efeito narrativo.</small></div>
+      <div class="form-grid">${mods}</div>
+    </div>`;
+  $$('[data-attr-up]').forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.attrUp; if(attributePointsLeft(sheet)>0){ sheet.attributes[a]=Number(sheet.attributes[a]||attributeBaseValue(sheet,a))+1; applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); } });
+  $$('[data-attr-down]').forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.attrDown; const base=attributeBaseValue(sheet,a); if(Number(sheet.attributes[a]||base)>base){ sheet.attributes[a]=Number(sheet.attributes[a])-1; applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); } });
+  $$('[data-temp-attr]').forEach(i=>i.oninput=()=>{ sheet.attributeTempMods[i.dataset.tempAttr]=Number(i.value||0); applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); });
+  $$('[data-roll-attr]').forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.rollAttr; roll(`1d20${sgn(attrMod(sheet,a))}`, a); });
 }
 function renderCalcCards(sheet){
   const cls=CLASSES[sheet.specialization]||CLASSES.Lutador;
@@ -4269,7 +4316,7 @@ function renderLevelSummary(sheet){
   const lv=Number(sheet.level||1), bt=trainingBonus(lv), grants=[];
   grants.push(`Bônus de treinamento: +${bt}`);
   grants.push(`Metade do nível em testes: +${halfLevel(lv)}`);
-  if([4,8,12,16,20].some(n=>lv>=n)) grants.push(`${Math.floor(lv/4)*2} pontos de atributo obtidos até aqui.`);
+  if([4,8,12,16,20].some(n=>lv>=n)) grants.push(`${attributePointsTotal(sheet)} pontos de atributo obtidos até aqui; ${Math.max(0, attributePointsLeft(sheet))} disponíveis.`);
   if(lv>=10) grants.push('Pode ter uma perícia mestre por regra geral.');
   grants.push(sheet.specialization==='Restringido'?'Não recebe aptidões amaldiçoadas por padrão.':'Recebe aptidões amaldiçoadas ao subir de nível.');
   $('#levelSummary').innerHTML=grants.map((g,i)=>`<div class="rule-card"><h3>${i+1}</h3><p>${esc(g)}</p></div>`).join('');
@@ -4293,7 +4340,7 @@ function renderAptitudes(sheet){
 function renderSkills(sheet){
   $('#skills').innerHTML=SKILLS.map(([name,attr,req])=>{
     const rank=sheet.skillRanks[name]||'none', extra=sheet.skillExtras[name]||0, total=skillTotal(sheet,{name,attr});
-    return `<div class="skill-row"><strong>${name}${req?' *':''}</strong><span>${attr} ${sgn(mod(sheet.attributes[attr]))}</span><select data-skill-rank="${name}"><option value="none" ${rank==='none'?'selected':''}>Sem treino</option><option value="trained" ${rank==='trained'?'selected':''}>Treinado</option><option value="master" ${rank==='master'?'selected':''}>Mestre</option></select><input data-skill-extra="${name}" type="number" value="${extra}" title="Bônus extra"><span class="skill-total">${sgn(total)}</span><button data-roll-skill="${name}">d20</button></div>`;
+    return `<div class="skill-row"><strong>${name}${req?' *':''}</strong><span>${attr} ${sgn(attrMod(sheet, attr))}</span><select data-skill-rank="${name}"><option value="none" ${rank==='none'?'selected':''}>Sem treino</option><option value="trained" ${rank==='trained'?'selected':''}>Treinado</option><option value="master" ${rank==='master'?'selected':''}>Mestre</option></select><input data-skill-extra="${name}" type="number" value="${extra}" title="Bônus extra"><span class="skill-total">${sgn(total)}</span><button data-roll-skill="${name}">d20</button></div>`;
   }).join('');
   $$('[data-skill-rank]').forEach(el=>el.oninput=()=>{ sheet.skillRanks[el.dataset.skillRank]=el.value; applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); });
   $$('[data-skill-extra]').forEach(el=>el.oninput=()=>{ sheet.skillExtras[el.dataset.skillExtra]=Number(el.value||0); applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); });
@@ -4395,7 +4442,7 @@ function cleanDiceExpression(value){
 function weaponAttackAttribute(item, sheet){
   const text = `${item.name||''} ${item.category||''} ${item.properties||''} ${item.text||''}`.toLowerCase();
   if(/distância|distancia|arremesso|proj[eé]til|arco|besta|arma de fogo|pistola|rifle|rev[oó]lver|metralhadora|shuriken|dardo|azagaia/.test(text)) return 'Destreza';
-  const str=Number(sheet.attributes?.['Força']||10), dex=Number(sheet.attributes?.['Destreza']||10);
+  const str=effectiveAttribute(sheet,'Força'), dex=effectiveAttribute(sheet,'Destreza');
   return mod(dex)>mod(str) ? 'Destreza' : 'Força';
 }
 function itemModificationBonuses(item){
@@ -4405,8 +4452,8 @@ function itemModificationBonuses(item){
 function buildAttackFromItem(sheet,item){
   const attr=weaponAttackAttribute(item,sheet);
   const mods=itemModificationBonuses(item);
-  const attackBonus = mod(sheet.attributes?.[attr]||10) + trainingBonus(sheet.level||1) + mods.attack;
-  const damageBonus = mod(sheet.attributes?.[attr]||10) + mods.damage;
+  const attackBonus = attrMod(sheet, attr) + trainingBonus(sheet.level||1) + mods.attack;
+  const damageBonus = attrMod(sheet, attr) + mods.damage;
   const baseDamage = cleanDiceExpression(item.damage || item.effect || '');
   const damage = baseDamage ? `${baseDamage}${damageBonus>=0?'+':''}${damageBonus}` : `1d4${damageBonus>=0?'+':''}${damageBonus}`;
   const modNames=(item.modifications||[]).map(m=>m.name).filter(Boolean);
@@ -4503,7 +4550,7 @@ function renderRows(sheet){
   syncTechniqueSelectors(sheet);
   $('#attacksList').innerHTML = sheet.attacks.length ? sheet.attacks.map((x,i)=>row('attacks',x,i)).join('') : '<p class="muted">Nenhum ataque cadastrado.</p>';
   $('#itemsList').innerHTML = sheet.items.length ? sheet.items.map((x,i)=>row('items',x,i)).join('') : '<p class="muted">Nenhum item cadastrado.</p>';
-  { const used = sheet.items.reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); const limit = 8 + (mod(sheet.attributes['Força']||10)*2); const max = limit*2; $('#loadView').textContent = `${used} / ${limit} espaços${used>max?' (impossível carregar)':used>limit?' (sobrecarregado)':''}`; }
+  { const used = sheet.items.reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); const limit = 8 + (attrMod(sheet,'Força')*2); const max = limit*2; $('#loadView').textContent = `${used} / ${limit} espaços${used>max?' (impossível carregar)':used>limit?' (sobrecarregado)':''}`; }
   $$('[data-row]').forEach(el=>el.oninput=()=>{ const arr=sheet[el.dataset.row]; arr[Number(el.dataset.i)][el.dataset.field] = (el.dataset.field==='level' && el.value==='') ? '' : (el.type==='number'?Number(el.value):el.value); save(); if(['items','abilities','talents','domains'].includes(el.dataset.row)) renderRows(sheet); });
   $$('[data-del]').forEach(btn=>btn.onclick=()=>{ sheet[btn.dataset.del].splice(Number(btn.dataset.i),1); save(); renderRows(sheet); });
   $$('[data-roll-attack-hit]').forEach(btn=>btn.onclick=()=>{ const atk=sheet.attacks[Number(btn.dataset.rollAttackHit)]; roll(atk.test || '1d20', `${atk.name || 'Ataque'} — acerto`); });
@@ -4684,7 +4731,7 @@ function bindWizardStep(){
   renderWizardSkillPreview();
 }
 function renderWizardSkillPreview(){ const el=$('#wSkillPreview'); if(!el) return; const trained=Object.entries(wizardData.skillRanks||{}).filter(([,v])=>v!=='none').map(([k,v])=>`${k}: ${v==='master'?'Mestre':'Treinado'}`); el.innerHTML=trained.length?trained.map(t=>`<div class="rule-card"><p>${esc(t)}</p></div>`).join(''):'<p class="muted">Nenhuma sugestão aplicada ainda.</p>'; }
-function finishWizard(){ collectWizard(); addBaseAbilities(wizardData); const idx=sheets.findIndex(s=>s.id===wizardData.id); if(idx>=0) sheets[idx]=wizardData; else sheets.push(wizardData); activeId=wizardData.id; save(); $('#wizard').close(); activateTab('fichas'); renderAll(); }
+function finishWizard(){ collectWizard(); syncAttributesFromAssignments(wizardData); wizardData.attributeBase=wizardData.attributeBase||{}; ATTRS.forEach(a=>{ if(wizardData.attributeBase[a]===undefined) wizardData.attributeBase[a]=Number(wizardData.attributes[a]||10); }); wizardData.attributeTempMods=wizardData.attributeTempMods||{}; ATTRS.forEach(a=>{ if(wizardData.attributeTempMods[a]===undefined) wizardData.attributeTempMods[a]=0; }); addBaseAbilities(wizardData); const idx=sheets.findIndex(s=>s.id===wizardData.id); if(idx>=0) sheets[idx]=wizardData; else sheets.push(wizardData); activeId=wizardData.id; save(); $('#wizard').close(); activateTab('fichas'); renderAll(); }
 
 function normalizeDiceExpression(expr){
   return String(expr||'')
