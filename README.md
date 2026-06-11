@@ -1,3 +1,5 @@
+# F&M Ficha Online v0.21
+
 # F&M Ficha Online v0.16
 
 Protótipo local de ficha online para Feiticeiros & Maldições.
@@ -21,3 +23,9 @@ Ainda há itens com descrição estrutural/resumida. A meta continua ser cadastr
 - Biblioteca de habilidades oficiais e equipamentos ampliada com armas simples, armas complexas, uniformes, escudos, kits e itens especiais por custo.
 - Inventário agora trabalha melhor com espaços de carga e alerta sobre sobrecarga.
 - Próxima frente: completar textos e pré-requisitos das habilidades oficiais.
+
+
+## v0.21
+- Armas/equipamentos agora aceitam maldições, encantamentos e modificações.
+- Adicionada biblioteca inicial de encantamentos para armas, escudos e uniformes.
+- Ataques criados a partir de armas consideram bônus simples de acerto/dano das modificações cadastradas.

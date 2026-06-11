@@ -36,3 +36,4 @@
 .progress-card.action button{width:100%}
 @media(max-width:900px){.progress-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.progress-grid{grid-template-columns:1fr}}
+.mod-box{border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:12px;padding:.75rem;margin:.6rem 0}.tag-list{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.5rem}.chip-x{border:0;background:transparent;color:inherit;padding:0 .15rem;margin-left:.3rem;cursor:pointer;font-weight:800}.chip-x:hover{transform:scale(1.1)}

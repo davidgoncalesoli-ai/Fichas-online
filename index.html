@@ -233,7 +233,7 @@
             <section id="inventario" class="subtab">
               <div class="grid two">
                 <article class="card">
-                  <div class="section-title"><h2>Ataques</h2><button data-add="attacks">+ Ataque</button></div>
+                  <div class="section-title"><h2>Ataques</h2><div class="actions-inline tight"><button id="createAttacksFromWeapons">+ Criar ataques das armas</button><button data-add="attacks">+ Ataque</button></div></div>
                   <div id="attacksList" class="stack"></div>
                 </article>
                 <article class="card">
@@ -428,6 +428,30 @@
       </select>
     </div>
     <div id="itemChooser" class="library"></div>
+  </dialog>
+
+
+  <dialog id="itemModDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Ferramentas amaldiçoadas</p>
+        <h2>Adicionar maldição/modificação</h2>
+        <p class="muted" id="itemModTarget">Selecione um item.</p>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="dialog-tools">
+      <input id="itemModSearch" placeholder="Buscar encantamento, modificação, bônus ou pré-requisito...">
+      <select id="itemModTypeFilter">
+        <option value="auto">Tipo do item atual</option>
+        <option value="all">Todas</option>
+        <option value="Arma">Armas</option>
+        <option value="Escudo">Escudos</option>
+        <option value="Uniforme">Uniformes</option>
+        <option value="Geral">Gerais/personalizadas</option>
+      </select>
+    </div>
+    <div id="itemModChooser" class="library"></div>
   </dialog>
 
   <dialog id="domainDialog" class="modal wide-modal">

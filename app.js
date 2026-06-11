@@ -1,5 +1,24 @@
 const $ = (s, root=document) => root.querySelector(s);
 const $$ = (s, root=document) => [...root.querySelectorAll(s)];
+
+const safeStorage = {
+  get(key){ try { return window.localStorage?.getItem(key); } catch { return null; } },
+  set(key,value){ try { window.localStorage?.setItem(key,value); } catch {} }
+};
+function readJsonStorage(keys, fallback){
+  for(const key of keys){
+    const value = safeStorage.get(key);
+    if(!value) continue;
+    try { return JSON.parse(value); } catch {}
+  }
+  return fallback;
+}
+function openDialog(id){
+  const dialog = $('#'+id);
+  if(!dialog) return;
+  if(typeof dialog.showModal === 'function') dialog.showModal();
+  else dialog.setAttribute('open','');
+}
 const esc = (v='') => String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
 const makeId = () => crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random());
 
@@ -58,34 +77,6 @@ const TALENT_LIBRARY = [
 ];
 
 
-const ABILITY_TEXT_PATCHES = {
-  'Lutador|Corpo Treinado': 'Habilidade base automática. Representa o corpo condicionado do Lutador: use como referência para registrar bônus físicos, treino corporal e interações de combate corpo-a-corpo conforme a mesa aplicar o texto oficial.',
-  'Lutador|Empolgação': 'Habilidade base automática. Recurso central do Lutador para entrar no ritmo da luta. Registre aqui efeitos, gatilhos e gastos conforme a ficha do personagem.',
-  'Lutador|Reflexo Evasivo': 'Habilidade automática de evolução do Lutador. Usada como marco de melhoria defensiva/evasiva; não consome escolha de evolução.',
-  'Especialista em Combate|Repertório do Especialista': 'Habilidade base automática. Permite escolher um estilo/repertório de combate. Preencha o estilo escolhido nas observações da habilidade.',
-  'Especialista em Combate|Arte do Combate': 'Habilidade base automática. Recurso central do Especialista em Combate, ligado aos Pontos de Preparo e opções de manobra.',
-  'Especialista em Combate|Golpe Especial': 'Habilidade automática do nível 4. Não consome escolha de evolução; adiciona o marco de golpe especial da especialização.',
-  'Especialista em Técnica|Domínio dos Fundamentos': 'Habilidade base automática. Você aprende Mudanças de Fundamento, começando com duas no 1º nível e recebendo outra no 12º nível. Anote as mudanças escolhidas dentro desta habilidade.',
-  'Especialista em Técnica|Conjuração Aprimorada': 'Habilidade automática da especialização. Marco de melhoria da conjuração; use para registrar o benefício oficial aplicado ao personagem.',
-  'Especialista em Técnica|Adiantar Evolução': 'Habilidade automática do nível 4. Não consome escolha de evolução; registra o avanço estrutural da especialização.',
-  'Controlador|Treinamento em Controle': 'Habilidade base automática. Ponto central do Controlador, usado para registrar regras de invocações, controle e comando.',
-  'Suporte|Suporte em Combate': 'Habilidade base automática. Recurso central do Suporte para auxiliar aliados durante cena e combate.',
-  'Suporte|Presença Inspiradora': 'Habilidade automática do nível 3. Não consome escolha de evolução; registra o marco de inspiração da especialização.',
-  'Suporte|Versatilidade': 'Habilidade automática do nível 5. Não consome escolha de evolução; registra a evolução ampla do Suporte.',
-  'Restringido|Restrito pelos Céus': 'Habilidade base automática. Define o personagem Restringido: foco físico excepcional, sem progressão normal de aptidões amaldiçoadas por padrão.',
-  'Restringido|Ataque Furtivo': 'Habilidade automática do Restringido. Não consome escolha de evolução; registra o marco ofensivo furtivo da especialização.',
-  'Restringido|Esquiva Sobre-humana': 'Habilidade automática do nível 3. Não consome escolha de evolução; registra o marco defensivo/evasivo do Restringido.',
-  'Restringido|Implemento Celeste': 'Habilidade automática do nível 4. Não consome escolha de evolução; registre aqui o implemento escolhido e seus efeitos.',
-  'Restringido|Dádiva do Céu': 'Habilidade automática do nível 4. Não consome escolha de evolução; registra a dádiva física ligada à restrição.'
-};
-ABILITY_LIBRARY.forEach(a=>{
-  const key=`${a.class}|${a.name}`;
-  if(ABILITY_TEXT_PATCHES[key]) a.text = ABILITY_TEXT_PATCHES[key];
-  if(String(a.kind||'').toLowerCase().startsWith('autom')) a.slot = 'automatica';
-  else a.slot = 'escolha';
-});
-
-
 const TECHNIQUE_LIBRARY = [
   {
     name:'Boneco de Palha',
@@ -111,6 +102,43 @@ const TECHNIQUE_LIBRARY = [
     type:'Livre',
     text:'Modelo livre para técnica criada pelo jogador. Use o campo de funcionamento básico para registrar regras, limites e equipamentos.'
   }
+];
+
+const ITEM_ENCHANTMENT_LIBRARY = [
+  {name:'Afiada', applies:['Arma'], grade:'Terceiro+', prereq:'Arma com dano cortante ou perfurante', damageBonus:0, properties:'Fatal d8', text:'A energia amaldiçoada se concentra na lâmina ou ponta. A arma recebe Fatal d8; se já possuir Fatal, aumente o dado em um nível.'},
+  {name:'Amplificadora', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'Após Ataque', text:'Após acertar um ataque com esta arma, o próximo Feitiço de Dano ou Técnica Marcial de Ataque até o fim do próximo turno causa dados extras iguais à metade do BT.'},
+  {name:'Armazenadora', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'Armazena 5 PE', text:'Durante um descanso longo pode armazenar 5 PE na arma. Enquanto a empunhar, o portador pode recuperar essa energia.'},
+  {name:'Balanceada', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'+2 manobras', text:'Enquanto empunhar a arma, recebe +2 em testes de manobras.'},
+  {name:'Canalizadora', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'+2 CD Amaldiçoada', text:'Enquanto empunhar a arma, a sua CD Amaldiçoada aumenta em 2.'},
+  {name:'Cano Alongado', applies:['Arma'], grade:'Terceiro+', prereq:'Apenas armas à distância', damageBonus:0, properties:'+alcance', text:'A arma tem o alcance aumentado em 1/4 do total em metros.'},
+  {name:'Certeira', applies:['Arma'], grade:'Terceiro+', prereq:'Não pode ter Destruidora', damageBonus:0, properties:'Crítico -1', text:'Reduz a margem de crítico da arma em 1. Não pode ser usada junto com Destruidora.'},
+  {name:'Compartimento', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'Óleo/veneno', text:'Cria um compartimento para armazenar uma mistura, óleo ou veneno aplicável na arma. Pode usar em combate como ação livre.'},
+  {name:'Complementar', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'+2 CD Especialização/Estilo', text:'Enquanto empunhar, recebe +2 na CD de Especialização e de Estilo Marcial.'},
+  {name:'Cruel', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:3, properties:'+3 dano', text:'A arma passa a ter partes mais perigosas. Recebe +3 em rolagens de dano.'},
+  {name:'Defensora', applies:['Arma'], grade:'Terceiro+', prereq:'Apenas armas corpo a corpo', damageBonus:0, properties:'Aparar', text:'A arma recebe o traço Aparar. Se já possuir Aparar, o bônus de Defesa fornecido aumenta em 1.'},
+  {name:'Destruidora', applies:['Arma'], grade:'Terceiro+', prereq:'Não pode ter Certeira', damageBonus:0, properties:'+1 dado no crítico', text:'A arma causa um dado de dano adicional em um acerto crítico.'},
+  {name:'Discreta', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'+5 esconder arma', text:'Recebe +5 em Furtividade e Prestidigitação para esconder apenas esta arma.'},
+  {name:'Drenadora', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'PE temporário ao matar', text:'Uma vez por turno, ao matar criatura que utiliza energia amaldiçoada, recebe PE temporário conforme o grau da criatura.'},
+  {name:'Elemental', applies:['Arma'], grade:'Segundo+', prereq:'Ferramenta de Segundo Grau', damageBonus:0, properties:'Troca tipo de dano', text:'Escolha um dano elemental. A arma pode trocar seu tipo de dano para esse elemento escolhido.'},
+  {name:'Harmonizada', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'Crítico reduz custo', text:'Ao acertar crítico, reduz em 1 o custo da próxima habilidade que gaste PE ou Estamina até o fim do próximo turno.'},
+  {name:'Horrenda', applies:['Arma'], grade:'Terceiro+', prereq:'Já possuir outro encantamento', damageBonus:0, properties:'+CD medo', text:'Habilidades que exigem TR e causam Abalado ou Amedrontado têm CD aumentada pelo bônus de ferramenta da arma.'},
+  {name:'Longa', applies:['Arma'], grade:'Terceiro+', prereq:'Apenas armas corpo a corpo', damageBonus:0, properties:'+1,5m alcance', text:'O alcance da arma aumenta em 1,5 metros.'},
+  {name:'Otimizada', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'Saque livre; +2 iniciativa', text:'Sacar esta arma é uma Ação Livre e, enquanto empunhar, recebe +2 em Iniciativa.'},
+  {name:'Penetrante', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'Ignora RD', text:'Ataques com a arma ignoram redução de dano igual ao bônus de treinamento do portador.'},
+  {name:'Poderosa', applies:['Arma'], grade:'Terceiro+', prereq:'Ter Cruel na arma', damageBonus:2, properties:'+2 dano', text:'Adiciona +2 às rolagens de dano da arma.'},
+  {name:'Potente', applies:['Arma'], grade:'Primeiro+', prereq:'Primeiro Grau', damageBonus:0, properties:'+1 dado de dano padrão', text:'Adiciona mais um dado de dano ao dano padrão da arma. Ajuste a fórmula de dano manualmente se necessário.'},
+  {name:'Precisa', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, attackBonus:2, properties:'+2 ataque', text:'Recebe +2 em jogadas de ataque manejando esta arma.'},
+  {name:'Reluzente', applies:['Arma'], grade:'Terceiro+', prereq:'—', damageBonus:0, properties:'Finta/cega; furtividade -5', text:'Recebe +2 para fintar; em crítico pode deixar o alvo Desprevenido ou Cego. Penaliza Furtividade em locais iluminados.'},
+  {name:'Retorno', applies:['Arma'], grade:'Terceiro+', prereq:'Arma de arremesso', damageBonus:0, properties:'Retorna à mão', text:'Ao arremessar, se não estiver completamente presa, retorna para a mão do portador após completar o ataque.'},
+  {name:'Sintonizada', applies:['Arma'], grade:'Segundo+', prereq:'Ferramenta de Segundo Grau', damageBonus:0, properties:'+1d8 elemental situacional', text:'Escolha um dano não físico/não alma. Após causar esse dano com Feitiço ou Aptidão, ataques com a arma causam +1d8 do mesmo tipo até o próximo turno.'},
+  {name:'Avassalador', applies:['Escudo'], grade:'Terceiro+', prereq:'Ter Destruidor no escudo', properties:'Dano +3 níveis', text:'Se usado para atacar, o dano do escudo conta como três níveis acima.'},
+  {name:'Bloqueador', applies:['Escudo'], grade:'Terceiro+', prereq:'—', properties:'Meia cobertura', text:'Criaturas atrás de você a 1,5m recebem efeitos de Meia Cobertura.'},
+  {name:'Espinhoso', applies:['Escudo'], grade:'Terceiro+', prereq:'—', properties:'Dano +1 nível', text:'Caso o escudo seja usado para atacar, o dano conta como um nível acima.'},
+  {name:'Reforçado', applies:['Escudo'], grade:'Terceiro+', prereq:'—', properties:'+2 RD físico', text:'Recebe 2 de RD adicional contra dano físico.'},
+  {name:'Blindado', applies:['Uniforme'], grade:'Quarto+', prereq:'—', properties:'+2 Defesa', text:'A Defesa concedida pelo uniforme aumenta em 2.'},
+  {name:'Furtivo', applies:['Uniforme'], grade:'Quarto+', prereq:'—', properties:'+Furtividade', text:'Recebe bônus em Furtividade igual ao custo do uniforme.'},
+  {name:'Material Pesado', applies:['Uniforme'], grade:'Quarto+', prereq:'Revestimento médio ou robusto', properties:'+2 Fortitude', text:'Concede +2 em TRs de Fortitude.'},
+  {name:'Maldição Personalizada', applies:['Arma','Escudo','Uniforme','Geral'], grade:'Livre', prereq:'Definido pelo narrador', damageBonus:0, properties:'Personalizada', text:'Use para registrar uma maldição, encantamento ou modificação própria da campanha.'}
 ];
 
 const DOMAIN_LIBRARY = [
@@ -4027,6 +4055,35 @@ const ABILITY_LIBRARY = [
   }
 ];
 
+
+const ABILITY_TEXT_PATCHES = {
+  'Lutador|Corpo Treinado': 'Habilidade base automática. Representa o corpo condicionado do Lutador: use como referência para registrar bônus físicos, treino corporal e interações de combate corpo-a-corpo conforme a mesa aplicar o texto oficial.',
+  'Lutador|Empolgação': 'Habilidade base automática. Recurso central do Lutador para entrar no ritmo da luta. Registre aqui efeitos, gatilhos e gastos conforme a ficha do personagem.',
+  'Lutador|Reflexo Evasivo': 'Habilidade automática de evolução do Lutador. Usada como marco de melhoria defensiva/evasiva; não consome escolha de evolução.',
+  'Especialista em Combate|Repertório do Especialista': 'Habilidade base automática. Permite escolher um estilo/repertório de combate. Preencha o estilo escolhido nas observações da habilidade.',
+  'Especialista em Combate|Arte do Combate': 'Habilidade base automática. Recurso central do Especialista em Combate, ligado aos Pontos de Preparo e opções de manobra.',
+  'Especialista em Combate|Golpe Especial': 'Habilidade automática do nível 4. Não consome escolha de evolução; adiciona o marco de golpe especial da especialização.',
+  'Especialista em Técnica|Domínio dos Fundamentos': 'Habilidade base automática. Você aprende Mudanças de Fundamento, começando com duas no 1º nível e recebendo outra no 12º nível. Anote as mudanças escolhidas dentro desta habilidade.',
+  'Especialista em Técnica|Conjuração Aprimorada': 'Habilidade automática da especialização. Marco de melhoria da conjuração; use para registrar o benefício oficial aplicado ao personagem.',
+  'Especialista em Técnica|Adiantar Evolução': 'Habilidade automática do nível 4. Não consome escolha de evolução; registra o avanço estrutural da especialização.',
+  'Controlador|Treinamento em Controle': 'Habilidade base automática. Ponto central do Controlador, usado para registrar regras de invocações, controle e comando.',
+  'Suporte|Suporte em Combate': 'Habilidade base automática. Recurso central do Suporte para auxiliar aliados durante cena e combate.',
+  'Suporte|Presença Inspiradora': 'Habilidade automática do nível 3. Não consome escolha de evolução; registra o marco de inspiração da especialização.',
+  'Suporte|Versatilidade': 'Habilidade automática do nível 5. Não consome escolha de evolução; registra a evolução ampla do Suporte.',
+  'Restringido|Restrito pelos Céus': 'Habilidade base automática. Define o personagem Restringido: foco físico excepcional, sem progressão normal de aptidões amaldiçoadas por padrão.',
+  'Restringido|Ataque Furtivo': 'Habilidade automática do Restringido. Não consome escolha de evolução; registra o marco ofensivo furtivo da especialização.',
+  'Restringido|Esquiva Sobre-humana': 'Habilidade automática do nível 3. Não consome escolha de evolução; registra o marco defensivo/evasivo do Restringido.',
+  'Restringido|Implemento Celeste': 'Habilidade automática do nível 4. Não consome escolha de evolução; registre aqui o implemento escolhido e seus efeitos.',
+  'Restringido|Dádiva do Céu': 'Habilidade automática do nível 4. Não consome escolha de evolução; registra a dádiva física ligada à restrição.'
+};
+ABILITY_LIBRARY.forEach(a=>{
+  const key=`${a.class}|${a.name}`;
+  if(ABILITY_TEXT_PATCHES[key]) a.text = ABILITY_TEXT_PATCHES[key];
+  if(String(a.kind||'').toLowerCase().startsWith('autom')) a.slot = 'automatica';
+  else a.slot = 'escolha';
+});
+
+
 // Entradas estruturais por nível de desbloqueio. Elas seguram a organização por nível
 // até o cadastro oficial completo de cada habilidade do Livro de Regras.
 const ABILITY_UNLOCK_PLACEHOLDERS = [];
@@ -4061,8 +4118,8 @@ const RULES = [
   {title:'Depois', text:'Próxima etapa: completar técnicas/feitiços do livro, textos oficiais das habilidades e iniciar biblioteca real de equipamentos/itens.'}
 ];
 
-let sheets = JSON.parse(localStorage.getItem('femSheetsV13') || localStorage.getItem('femSheetsV10') || localStorage.getItem('femSheetsV09') || localStorage.getItem('femSheetsV08') || localStorage.getItem('femSheetsV07') || localStorage.getItem('femSheetsV06') || localStorage.getItem('femSheetsV05') || localStorage.getItem('femSheetsV04') || '[]');
-let activeId = localStorage.getItem('femActiveV13') || localStorage.getItem('femActiveV10') || localStorage.getItem('femActiveV09') || localStorage.getItem('femActiveV08') || localStorage.getItem('femActiveV07') || localStorage.getItem('femActiveV06') || localStorage.getItem('femActiveV05') || localStorage.getItem('femActiveV04') || null;
+let sheets = readJsonStorage(['femSheetsV13','femSheetsV10','femSheetsV09','femSheetsV08','femSheetsV07','femSheetsV06','femSheetsV05','femSheetsV04'], []);
+let activeId = safeStorage.get('femActiveV13') || safeStorage.get('femActiveV10') || safeStorage.get('femActiveV09') || safeStorage.get('femActiveV08') || safeStorage.get('femActiveV07') || safeStorage.get('femActiveV06') || safeStorage.get('femActiveV05') || safeStorage.get('femActiveV04') || null;
 let wizardData = null;
 let wizardStep = 0;
 let abilitySheetLevelFilter = 'all';
@@ -4070,6 +4127,7 @@ let abilityLibraryLevelFilter = 'all';
 let abilitySearchFilter = '';
 let abilityClassFilter = 'current';
 let abilityKindFilter = 'all';
+let activeItemModIndex = null;
 const wizardSteps = ['Identidade','Origem','Especialização','Atributos','Treinamentos','Resumo'];
 
 function mod(v){ return Math.floor((Number(v||10)-10)/2); }
@@ -4109,7 +4167,7 @@ function canUseAptitude(sheet, apt){
 }
 function skillTotal(sheet, skill){ const rank=sheet.skillRanks?.[skill.name] || 'none'; const extra=Number(sheet.skillExtras?.[skill.name]||0); return mod(sheet.attributes[skill.attr]) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
 function current(){ return sheets.find(s=>s.id===activeId); }
-function save(){ localStorage.setItem('femSheetsV13', JSON.stringify(sheets)); if(activeId) localStorage.setItem('femActiveV13', activeId); }
+function save(){ safeStorage.set('femSheetsV13', JSON.stringify(sheets)); if(activeId) safeStorage.set('femActiveV13', activeId); }
 function blankSheet(){
   const skillRanks={}, skillExtras={}; SKILLS.forEach(([name])=>{ skillRanks[name]='none'; skillExtras[name]=0; });
   return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], attacks:[], items:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
@@ -4122,6 +4180,7 @@ function normalize(sheet){
   sheet.domains = sheet.domains.map(d=>({name:d.name||'', type:d.type||'', technique:d.technique||'', level:d.level ?? '', cost:d.cost||'', area:d.area||'', duration:d.duration||'', text:d.text||''}));
   sheet.techniques = sheet.techniques.map(t=>({name:t.name||'', tech:t.tech || t.technique || '', level:t.level ?? '', action:t.action||'', range:t.range||'', target:t.target||'', duration:t.duration||'', cost:t.cost||'', text:t.text||''}));
   sheet.abilities = sheet.abilities.map(a=>({level:a.level ?? a.nivel ?? '', class:a.class ?? a.classe ?? '', kind:a.kind ?? '', name:a.name||'', text:a.text||''}));
+  sheet.items = sheet.items.map(it=>({name:it.name||'', category:it.category||'Item', cost:it.cost??'', qty:it.qty||1, weight:it.weight||0, damage:it.damage||'', properties:it.properties||'', grade:it.grade||'', enchantmentCharges:it.enchantmentCharges??'', uniqueAbility:it.uniqueAbility||'', modifications:Array.isArray(it.modifications)?it.modifications:[], text:it.text||''}));
   return sheet;
 }
 function applyAutoValues(sheet, opts={keepCurrent:true}){
@@ -4325,9 +4384,108 @@ function canUseAbility(sheet,a){
   return {ok:reasons.length===0, reason:reasons.length?`Bloqueada: ${reasons.join(', ')}`:(isAuto?'Automática disponível':'Disponível como escolha de evolução')};
 }
 
+
+function cleanDiceExpression(value){
+  const raw=String(value||'').trim();
+  if(!raw || raw==='—') return '';
+  const first = raw.split('/')[0].trim();
+  const matches = first.match(/([+-]?\s*\d*d\d+|[+-]?\s*\d+)/gi);
+  return matches ? matches.join(' ').replace(/\+\s*-/g,'-') : first;
+}
+function weaponAttackAttribute(item, sheet){
+  const text = `${item.name||''} ${item.category||''} ${item.properties||''} ${item.text||''}`.toLowerCase();
+  if(/distância|distancia|arremesso|proj[eé]til|arco|besta|arma de fogo|pistola|rifle|rev[oó]lver|metralhadora|shuriken|dardo|azagaia/.test(text)) return 'Destreza';
+  const str=Number(sheet.attributes?.['Força']||10), dex=Number(sheet.attributes?.['Destreza']||10);
+  return mod(dex)>mod(str) ? 'Destreza' : 'Força';
+}
+function itemModificationBonuses(item){
+  const mods=Array.isArray(item.modifications)?item.modifications:[];
+  return mods.reduce((acc,m)=>{ acc.attack += Number(m.attackBonus||0); acc.damage += Number(m.damageBonus||0); return acc; }, {attack:0, damage:0});
+}
+function buildAttackFromItem(sheet,item){
+  const attr=weaponAttackAttribute(item,sheet);
+  const mods=itemModificationBonuses(item);
+  const attackBonus = mod(sheet.attributes?.[attr]||10) + trainingBonus(sheet.level||1) + mods.attack;
+  const damageBonus = mod(sheet.attributes?.[attr]||10) + mods.damage;
+  const baseDamage = cleanDiceExpression(item.damage || item.effect || '');
+  const damage = baseDamage ? `${baseDamage}${damageBonus>=0?'+':''}${damageBonus}` : `1d4${damageBonus>=0?'+':''}${damageBonus}`;
+  const modNames=(item.modifications||[]).map(m=>m.name).filter(Boolean);
+  return {
+    name: item.name || 'Ataque com arma',
+    test: `1d20${attackBonus>=0?'+':''}${attackBonus}`,
+    damage,
+    sourceItem: item.name || '',
+    notes: `Criado automaticamente a partir do inventário. Atributo sugerido: ${attr}.${modNames.length?' Modificações consideradas: '+modNames.join(', ')+'.':''} Ajuste acerto/dano se a mesa usar outro atributo, maestria ou bônus específico.`
+  };
+}
+function createAttackFromInventoryItem(sheet,index){
+  const item = sheet.items?.[Number(index)];
+  if(!item) return;
+  const atk = buildAttackFromItem(sheet,item);
+  sheet.attacks.push(atk);
+  save();
+  renderRows(sheet);
+}
+function createAttacksFromAllWeapons(sheet){
+  const before = sheet.attacks.length;
+  (sheet.items||[]).forEach((item)=>{
+    const hasDamage = cleanDiceExpression(item.damage||'');
+    if(!hasDamage) return;
+    const exists = sheet.attacks.some(a=>a.sourceItem===item.name || a.name===item.name);
+    if(!exists) sheet.attacks.push(buildAttackFromItem(sheet,item));
+  });
+  save();
+  renderRows(sheet);
+  const made = sheet.attacks.length-before;
+  if(made===0) alert('Nenhum novo ataque criado. Adicione equipamentos com dano no inventário ou remova ataques duplicados.');
+}
+
+
+function itemTypeForEnchantments(item){
+  const cat=String(item.category||'');
+  if(/escudo/i.test(cat)) return 'Escudo';
+  if(/uniforme|armadura|roupa/i.test(cat)) return 'Uniforme';
+  if(/arma/i.test(cat) || cleanDiceExpression(item.damage||'')) return 'Arma';
+  return 'Geral';
+}
+function itemModificationSummary(item){
+  const mods=Array.isArray(item.modifications)?item.modifications:[];
+  if(!mods.length) return '<p class="muted">Nenhuma maldição/modificação aplicada.</p>';
+  return `<div class="tag-list">${mods.map((m,idx)=>`<span class="badge soft">${esc(m.name)}${m.damageBonus?` • dano ${m.damageBonus>0?'+':''}${m.damageBonus}`:''}${m.attackBonus?` • acerto ${m.attackBonus>0?'+':''}${m.attackBonus}`:''} <button class="chip-x" title="Remover" data-remove-item-mod="${idx}" data-item-index="__ITEM_INDEX__">×</button></span>`).join('')}</div>`;
+}
+function openItemModificationChooser(index){
+  activeItemModIndex=Number(index);
+  renderItemModificationChooser();
+  openDialog('itemModDialog');
+}
+function renderItemModificationChooser(){
+  const sheet=current(); if(!sheet) return;
+  const item=sheet.items?.[activeItemModIndex];
+  if(!item) return;
+  const q=($('#itemModSearch')?.value||'').toLowerCase();
+  const filter=$('#itemModTypeFilter')?.value || 'auto';
+  const type=filter==='auto'?itemTypeForEnchantments(item):filter;
+  if($('#itemModTarget')) $('#itemModTarget').textContent = `${item.name || 'Item'} • tipo sugerido: ${type}`;
+  const existing=new Set((item.modifications||[]).map(m=>m.name));
+  const data=ITEM_ENCHANTMENT_LIBRARY.map((m,i)=>({m,i})).filter(({m})=>{
+    const matchesType = type==='all' || m.applies?.includes(type) || m.applies?.includes('Geral');
+    const matchesQ = !q || JSON.stringify(m).toLowerCase().includes(q);
+    return matchesType && matchesQ;
+  });
+  $('#itemModChooser').innerHTML = data.map(({m,i})=>`<div class="library-card"><h3>${esc(m.name)}</h3><p class="muted">${esc((m.applies||[]).join(', '))} • ${esc(m.grade||'')} • Pré-req.: ${esc(m.prereq||'—')}</p><p><b>Efeito:</b> ${esc(m.properties||'—')}${m.damageBonus?` • <b>Dano:</b> ${m.damageBonus>0?'+':''}${m.damageBonus}`:''}${m.attackBonus?` • <b>Acerto:</b> ${m.attackBonus>0?'+':''}${m.attackBonus}`:''}</p><p>${esc(m.text||'')}</p><button data-add-item-mod="${i}" ${existing.has(m.name)?'disabled':''}>${existing.has(m.name)?'Já aplicada':'Aplicar neste item'}</button></div>`).join('') || '<p class="muted">Nenhuma maldição/modificação encontrada.</p>';
+  $$('[data-add-item-mod]').forEach(btn=>btn.onclick=()=>{
+    const m=ITEM_ENCHANTMENT_LIBRARY[Number(btn.dataset.addItemMod)];
+    const it=sheet.items?.[activeItemModIndex]; if(!it) return;
+    it.modifications=Array.isArray(it.modifications)?it.modifications:[];
+    it.modifications.push({name:m.name, applies:m.applies||[], grade:m.grade||'', prereq:m.prereq||'', damageBonus:m.damageBonus||0, attackBonus:m.attackBonus||0, properties:m.properties||'', text:m.text||''});
+    if(m.properties && !String(it.properties||'').includes(m.name)) it.properties = [it.properties, `${m.name}: ${m.properties}`].filter(Boolean).join('; ');
+    save(); renderRows(sheet); renderItemModificationChooser();
+  });
+}
+
 function row(kind,x,i){
-  if(kind==='items') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.category||'Item')}</span>${x.cost!==undefined && x.cost!==''?`<span class="badge soft">Custo ${esc(x.cost)}</span>`:''}${x.damage&&x.damage!=='—'?`<span class="badge soft">${esc(x.damage)}</span>`:''}</div><input data-row="items" data-i="${i}" data-field="name" placeholder="Item" value="${esc(x.name)}"><div class="form-grid"><label>Categoria<input data-row="items" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label><label>Custo<input data-row="items" data-i="${i}" data-field="cost" value="${esc(x.cost??'')}"></label><label>Qtd.<input data-row="items" data-i="${i}" data-field="qty" type="number" value="${x.qty||1}"></label><label>Espaços<input data-row="items" data-i="${i}" data-field="weight" type="number" step="0.5" value="${x.weight||0}"></label><label>Dano/efeito<input data-row="items" data-i="${i}" data-field="damage" value="${esc(x.damage||'')}"></label><label>Propriedades<input data-row="items" data-i="${i}" data-field="properties" value="${esc(x.properties||'')}"></label></div><textarea data-row="items" data-i="${i}" data-field="text" placeholder="Descrição, efeitos e observações">${esc(x.text||'')}</textarea><button data-del="items" data-i="${i}">Remover</button></div>`;
-  if(kind==='attacks') return `<div class="mini-row"><input data-row="attacks" data-i="${i}" data-field="name" placeholder="Nome do ataque" value="${esc(x.name)}"><div class="form-grid"><input data-row="attacks" data-i="${i}" data-field="test" placeholder="Teste/acerto" value="${esc(x.test)}"><input data-row="attacks" data-i="${i}" data-field="damage" placeholder="Dano ex.: 1d8+3" value="${esc(x.damage||'1d20')}"></div><textarea data-row="attacks" data-i="${i}" data-field="notes" placeholder="Notas">${esc(x.notes)}</textarea><div class="row-actions"><button data-roll-attack="${i}">Rolar dano</button><button data-del="attacks" data-i="${i}">Remover</button></div></div>`;
+  if(kind==='items') { const modsHtml=itemModificationSummary(x).replaceAll('__ITEM_INDEX__', String(i)); return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.category||'Item')}</span>${x.cost!==undefined && x.cost!==''?`<span class="badge soft">Custo ${esc(x.cost)}</span>`:''}${x.grade?`<span class="badge soft">Grau ${esc(x.grade)}</span>`:''}${x.damage&&x.damage!=='—'?`<span class="badge soft">${esc(x.damage)}</span>`:''}</div><input data-row="items" data-i="${i}" data-field="name" placeholder="Item" value="${esc(x.name)}"><div class="form-grid"><label>Categoria<input data-row="items" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label><label>Custo<input data-row="items" data-i="${i}" data-field="cost" value="${esc(x.cost??'')}"></label><label>Qtd.<input data-row="items" data-i="${i}" data-field="qty" type="number" value="${x.qty||1}"></label><label>Espaços<input data-row="items" data-i="${i}" data-field="weight" type="number" step="0.5" value="${x.weight||0}"></label><label>Grau/Ferramenta amaldiçoada<input data-row="items" data-i="${i}" data-field="grade" placeholder="Ex.: Terceiro, Segundo, Especial" value="${esc(x.grade||'')}"></label><label>Cargas<input data-row="items" data-i="${i}" data-field="enchantmentCharges" placeholder="Ex.: igual ao BT" value="${esc(x.enchantmentCharges??'')}"></label><label>Dano/efeito<input data-row="items" data-i="${i}" data-field="damage" value="${esc(x.damage||'')}"></label><label>Propriedades<input data-row="items" data-i="${i}" data-field="properties" value="${esc(x.properties||'')}"></label></div><div class="mod-box"><strong>Maldições / modificações</strong>${modsHtml}</div><textarea data-row="items" data-i="${i}" data-field="uniqueAbility" placeholder="Habilidade única, caso seja Grau Especial">${esc(x.uniqueAbility||'')}</textarea><textarea data-row="items" data-i="${i}" data-field="text" placeholder="Descrição, efeitos e observações">${esc(x.text||'')}</textarea><div class="row-actions"><button data-open-item-mod="${i}">Adicionar maldição/modificação</button>${cleanDiceExpression(x.damage||'')?`<button data-create-attack-from-item="${i}">Criar ataque</button>`:''}<button data-del="items" data-i="${i}">Remover</button></div></div>`; }
+  if(kind==='attacks') return `<div class="mini-row"><input data-row="attacks" data-i="${i}" data-field="name" placeholder="Nome do ataque" value="${esc(x.name)}"><div class="form-grid"><label>Rolagem de acerto<input data-row="attacks" data-i="${i}" data-field="test" placeholder="Ex.: 1d20+5" value="${esc(x.test||'1d20')}"></label><label>Rolagem de dano<input data-row="attacks" data-i="${i}" data-field="damage" placeholder="Ex.: 1d8+3 ou 1d6 Ct + 1d6 Pf" value="${esc(x.damage||'1d8')}"></label></div><textarea data-row="attacks" data-i="${i}" data-field="notes" placeholder="Notas">${esc(x.notes)}</textarea><div class="row-actions"><button data-roll-attack-hit="${i}">Rolar acerto</button><button data-roll-attack-damage="${i}">Rolar dano</button><button data-del="attacks" data-i="${i}">Remover</button></div></div>`;
   if(kind==='techniques') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.tech || 'Feitiço')}</span>${x.level!==''?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="techniques" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><input data-row="techniques" data-i="${i}" data-field="tech" placeholder="Técnica vinculada" value="${esc(x.tech||'')}"><input data-row="techniques" data-i="${i}" data-field="level" placeholder="Nível" value="${esc(x.level)}"><input data-row="techniques" data-i="${i}" data-field="action" placeholder="Conjuração" value="${esc(x.action||'')}"><input data-row="techniques" data-i="${i}" data-field="range" placeholder="Alcance" value="${esc(x.range||'')}"><input data-row="techniques" data-i="${i}" data-field="target" placeholder="Alvo" value="${esc(x.target||'')}"><input data-row="techniques" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><input data-row="techniques" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"></div><textarea data-row="techniques" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="techniques" data-i="${i}">Remover</button></div>`;
   if(kind==='abilities') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(abilityLevelLabel(x.level))}</span>${x.class?`<span class="badge soft">${esc(x.class)}</span>`:''}${x.kind?`<span class="badge soft">${esc(x.kind)}</span>`:''}</div><input data-row="abilities" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="abilities" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level)}" placeholder="Livre"></label><label>Classe<input data-row="abilities" data-i="${i}" data-field="class" value="${esc(x.class)}" placeholder="Opcional"></label></div><textarea data-row="abilities" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="abilities" data-i="${i}">Remover</button></div>`;
   if(kind==='talents') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.category||'Talento')}</span>${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="talents" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="talents" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label><label>Categoria<input data-row="talents" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label></div><textarea data-row="talents" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="talents" data-i="${i}">Remover</button></div>`;
@@ -4348,8 +4506,13 @@ function renderRows(sheet){
   { const used = sheet.items.reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); const limit = 8 + (mod(sheet.attributes['Força']||10)*2); const max = limit*2; $('#loadView').textContent = `${used} / ${limit} espaços${used>max?' (impossível carregar)':used>limit?' (sobrecarregado)':''}`; }
   $$('[data-row]').forEach(el=>el.oninput=()=>{ const arr=sheet[el.dataset.row]; arr[Number(el.dataset.i)][el.dataset.field] = (el.dataset.field==='level' && el.value==='') ? '' : (el.type==='number'?Number(el.value):el.value); save(); if(['items','abilities','talents','domains'].includes(el.dataset.row)) renderRows(sheet); });
   $$('[data-del]').forEach(btn=>btn.onclick=()=>{ sheet[btn.dataset.del].splice(Number(btn.dataset.i),1); save(); renderRows(sheet); });
-  $$('[data-roll-attack]').forEach(btn=>btn.onclick=()=>roll(sheet.attacks[Number(btn.dataset.rollAttack)].damage || '1d20', sheet.attacks[Number(btn.dataset.rollAttack)].name || 'Ataque'));
+  $$('[data-roll-attack-hit]').forEach(btn=>btn.onclick=()=>{ const atk=sheet.attacks[Number(btn.dataset.rollAttackHit)]; roll(atk.test || '1d20', `${atk.name || 'Ataque'} — acerto`); });
+  $$('[data-roll-attack-damage]').forEach(btn=>btn.onclick=()=>{ const atk=sheet.attacks[Number(btn.dataset.rollAttackDamage)]; roll(atk.damage || '1d8', `${atk.name || 'Ataque'} — dano`); });
+  $$('[data-create-attack-from-item]').forEach(btn=>btn.onclick=()=>createAttackFromInventoryItem(sheet, btn.dataset.createAttackFromItem));
+  $$('[data-open-item-mod]').forEach(btn=>btn.onclick=()=>openItemModificationChooser(btn.dataset.openItemMod));
+  $$('[data-remove-item-mod]').forEach(btn=>btn.onclick=()=>{ const it=sheet.items[Number(btn.dataset.itemIndex)]; if(!it) return; it.modifications.splice(Number(btn.dataset.removeItemMod),1); save(); renderRows(sheet); });
 }
+
 function syncTechniqueSelectors(sheet){
   const select=$('#innateTechniqueSelect');
   if(select){
@@ -4474,7 +4637,7 @@ function renderItemChooser(){
     return catOk && costOk && blob.includes(q);
   });
   $('#itemChooser').innerHTML = data.map(({it,i})=>`<div class="library-card"><h3>${esc(it.name)}</h3><p class="muted">${esc(it.category)} • custo ${esc(it.cost)} • espaços ${esc(it.weight)}${it.damage&&it.damage!=='—'?' • '+esc(it.damage):''}</p><p><b>Propriedades:</b> ${esc(it.properties||'—')}</p><p>${esc(it.text||'')}</p><button data-add-item-lib="${i}">Adicionar equipamento</button></div>`).join('') || '<p class="muted">Nenhum equipamento encontrado neste filtro.</p>';
-  $$('[data-add-item-lib]').forEach(btn=>btn.onclick=()=>{ const it=ITEM_LIBRARY[Number(btn.dataset.addItemLib)]; sheet.items.push({name:it.name, category:it.category, cost:it.cost, qty:it.qty||1, weight:it.weight||0, damage:it.damage||'', properties:it.properties||'', text:it.text||''}); save(); renderRows(sheet); renderItemChooser(); });
+  $$('[data-add-item-lib]').forEach(btn=>btn.onclick=()=>{ const it=ITEM_LIBRARY[Number(btn.dataset.addItemLib)]; sheet.items.push({name:it.name, category:it.category, cost:it.cost, qty:it.qty||1, weight:it.weight||0, damage:it.damage||'', properties:it.properties||'', grade:'', enchantmentCharges:'', uniqueAbility:'', modifications:[], text:it.text||''}); save(); renderRows(sheet); renderItemChooser(); });
 }
 
 function renderDomainChooser(){
@@ -4523,9 +4686,57 @@ function bindWizardStep(){
 function renderWizardSkillPreview(){ const el=$('#wSkillPreview'); if(!el) return; const trained=Object.entries(wizardData.skillRanks||{}).filter(([,v])=>v!=='none').map(([k,v])=>`${k}: ${v==='master'?'Mestre':'Treinado'}`); el.innerHTML=trained.length?trained.map(t=>`<div class="rule-card"><p>${esc(t)}</p></div>`).join(''):'<p class="muted">Nenhuma sugestão aplicada ainda.</p>'; }
 function finishWizard(){ collectWizard(); addBaseAbilities(wizardData); const idx=sheets.findIndex(s=>s.id===wizardData.id); if(idx>=0) sheets[idx]=wizardData; else sheets.push(wizardData); activeId=wizardData.id; save(); $('#wizard').close(); activateTab('fichas'); renderAll(); }
 
-function parseDice(expr){ const clean=expr.replace(/\s+/g,''); const m=clean.match(/^(\d*)d(\d+)([+-]\d+)?$/i); if(!m) throw new Error('Use formatos como 1d20+5 ou 2d8+3.'); return {qty:Number(m[1]||1), sides:Number(m[2]), bonus:Number(m[3]||0)}; }
+function normalizeDiceExpression(expr){
+  return String(expr||'')
+    .replace(/[–—]/g,'-')
+    .replace(/(\d*d\d+)\s*\/\s*(\d*d\d+)/gi,'$1') // quando houver dano alternativo, usa o primeiro valor
+    .replace(/[,;]/g,' + ');
+}
+function parseDice(expr){
+  const original=String(expr||'').trim();
+  const clean=normalizeDiceExpression(original);
+  const terms=[];
+  const re=/([+-]?\s*\d*d\d+|[+-]\s*\d+)/gi;
+  let match;
+  while((match=re.exec(clean))){
+    const raw=match[1].replace(/\s+/g,'');
+    const sign=raw.startsWith('-')?-1:1;
+    const body=raw.replace(/^[+-]/,'');
+    if(/d/i.test(body)){
+      const [q,s]=body.toLowerCase().split('d');
+      const qty=Number(q||1), sides=Number(s);
+      if(!Number.isFinite(qty)||!Number.isFinite(sides)||qty<=0||sides<=0) throw new Error('Expressão de dado inválida.');
+      terms.push({type:'dice', sign, qty, sides, raw});
+    }else{
+      const value=Number(body);
+      if(Number.isFinite(value)) terms.push({type:'flat', sign, value, raw});
+    }
+  }
+  if(!terms.length) throw new Error('Use formatos como 1d20+5, 2d8+3 ou 1d6 Ct + 1d6 Pf.');
+  return {original, terms};
+}
 function roll(expr,label='Rolagem'){
-  try{ const {qty,sides,bonus}=parseDice(expr); const rolls=Array.from({length:qty},()=>Math.floor(Math.random()*sides)+1); const total=rolls.reduce((a,b)=>a+b,0)+bonus; const text=`${label}: ${expr} = ${total} (${rolls.join(', ')}${bonus? (bonus>0?' + ':' - ')+Math.abs(bonus):''})`; $('#rollResult').textContent=text; const div=document.createElement('div'); div.textContent=text; $('#rollHistory').prepend(div); activateTab('rolador'); return total; } catch(e){ $('#rollResult').textContent=e.message; activateTab('rolador'); }
+  try{
+    const parsed=parseDice(expr);
+    let total=0;
+    const parts=[];
+    parsed.terms.forEach(term=>{
+      if(term.type==='dice'){
+        const rolls=Array.from({length:term.qty},()=>Math.floor(Math.random()*term.sides)+1);
+        const subtotal=rolls.reduce((a,b)=>a+b,0)*term.sign;
+        total+=subtotal;
+        parts.push(`${term.sign<0?'- ':''}${term.qty}d${term.sides} [${rolls.join(', ')}]`);
+      }else{
+        total += term.sign*term.value;
+        parts.push(`${term.sign>0?'+ ':'- '}${term.value}`);
+      }
+    });
+    const text=`${label}: ${parsed.original} = ${total} (${parts.join(' ')})`;
+    $('#rollResult').textContent=text;
+    const div=document.createElement('div'); div.textContent=text; $('#rollHistory').prepend(div);
+    activateTab('rolador');
+    return total;
+  } catch(e){ $('#rollResult').textContent=e.message; activateTab('rolador'); }
 }
 
 function init(){
@@ -4538,17 +4749,18 @@ function init(){
   $('#reopenWizard').onclick=()=>openWizard(true);
   $('#wizardBack').onclick=()=>{ collectWizard(); if(wizardStep>0) wizardStep--; renderWizard(); };
   $('#wizardNext').onclick=()=>{ collectWizard(); if(wizardStep===3 && !attributeAssignmentComplete(wizardData)){ alert('Distribua os 6 valores rolados/fixos entre os atributos antes de continuar.'); return; } if(wizardStep<wizardSteps.length-1){ wizardStep++; renderWizard(); } else finishWizard(); };
-  $$('[data-add]').forEach(btn=>btn.onclick=()=>{ const sheet=current(); if(!sheet) return; const t=btn.dataset.add; const obj=t==='attacks'?{name:'',test:'',damage:'1d20',notes:''}:t==='items'?{name:'',category:'Personalizado',cost:'',qty:1,weight:0,damage:'',properties:'',text:''}:t==='techniques'?{name:'',tech:sheet.innateTechnique||'',level:'',action:'',range:'',target:'',duration:'',cost:'',text:''}:t==='domains'?{name:'',type:'',technique:'',level:'',cost:'',area:'',duration:'',text:''}:t==='abilities'?{name:'',level:'',class:'',text:''}:t==='talents'?{name:'',level:'',category:'',text:''}:{name:'',text:''}; sheet[t].push(obj); save(); renderRows(sheet); });
+  $$('[data-add]').forEach(btn=>btn.onclick=()=>{ const sheet=current(); if(!sheet) return; const t=btn.dataset.add; const obj=t==='attacks'?{name:'',test:'1d20',damage:'1d8',notes:''}:t==='items'?{name:'',category:'Personalizado',cost:'',qty:1,weight:0,damage:'',properties:'',grade:'',enchantmentCharges:'',uniqueAbility:'',modifications:[],text:''}:t==='techniques'?{name:'',tech:sheet.innateTechnique||'',level:'',action:'',range:'',target:'',duration:'',cost:'',text:''}:t==='domains'?{name:'',type:'',technique:'',level:'',cost:'',area:'',duration:'',text:''}:t==='abilities'?{name:'',level:'',class:'',text:''}:t==='talents'?{name:'',level:'',category:'',text:''}:{name:'',text:''}; sheet[t].push(obj); save(); renderRows(sheet); });
   $('#recalculate').onclick=()=>{ const sheet=current(); if(!sheet)return; applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); };
   $('#applyClassSkills').onclick=()=>{ const sheet=current(); if(!sheet)return; applyDefaultSkills(sheet); save(); renderEditor(); };
-  $('#openAbilityChooser').onclick=()=>{ renderAbilityChooser(); $('#abilityDialog').showModal(); };
+  $('#openAbilityChooser').onclick=()=>{ renderAbilityChooser(); openDialog('abilityDialog'); };
   $('#abilitySearch')?.addEventListener('input', renderAbilityChooser);
   $('#abilityClassFilter')?.addEventListener('input', renderAbilityChooser);
   $('#abilityKindFilter')?.addEventListener('input', renderAbilityChooser);
-  $('#openTalentChooser')?.addEventListener('click',()=>{ renderTalentChooser(); $('#talentDialog').showModal(); });
-  $('#openDomainChooser')?.addEventListener('click',()=>{ renderDomainChooser(); $('#domainDialog').showModal(); });
-  $('#openItemChooser')?.addEventListener('click',()=>{ renderItemChooser(); $('#itemDialog').showModal(); });
-  if($('#openAptitudeChooser')) $('#openAptitudeChooser').onclick=()=>{ renderAptitudeChooser(); $('#aptitudeDialog').showModal(); };
+  $('#openTalentChooser')?.addEventListener('click',()=>{ renderTalentChooser(); openDialog('talentDialog'); });
+  $('#openDomainChooser')?.addEventListener('click',()=>{ renderDomainChooser(); openDialog('domainDialog'); });
+  $('#openItemChooser')?.addEventListener('click',()=>{ renderItemChooser(); openDialog('itemDialog'); });
+  $('#createAttacksFromWeapons')?.addEventListener('click',()=>{ const sheet=current(); if(sheet) createAttacksFromAllWeapons(sheet); });
+  if($('#openAptitudeChooser')) $('#openAptitudeChooser').onclick=()=>{ renderAptitudeChooser(); openDialog('aptitudeDialog'); };
   if($('#aptitudeFilter')) $('#aptitudeFilter').oninput=renderAptitudeChooser;
   $('#exportSheet').onclick=()=>{ const sheet=current(); if(!sheet)return alert('Selecione uma ficha.'); const blob=new Blob([JSON.stringify(sheet,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(sheet.name||'ficha-fem')+'.json'; a.click(); URL.revokeObjectURL(a.href); };
   $('#importSheet').onchange=e=>{ const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ try{ const imported=normalize(JSON.parse(reader.result)); imported.id=imported.id||makeId(); sheets.push(imported); activeId=imported.id; save(); renderAll(); activateTab('fichas'); }catch{ alert('JSON inválido.'); } }; reader.readAsText(file); };
@@ -4557,7 +4769,7 @@ function init(){
   if($('#techSearch')) $('#techSearch').oninput=renderTechLibrary;
   if($('#spellTechniqueFilter')) $('#spellTechniqueFilter').onchange=renderTechLibrary;
   if($('#spellLevelFilter')) $('#spellLevelFilter').onchange=renderTechLibrary;
-  if($('#openSpellChooser')) $('#openSpellChooser').onclick=()=>{ renderTechLibrary(); $('#spellDialog').showModal(); };
+  if($('#openSpellChooser')) $('#openSpellChooser').onclick=()=>{ renderTechLibrary(); openDialog('spellDialog'); };
   if($('#applyInnateTechnique')) $('#applyInnateTechnique').onclick=()=>{ const sheet=current(); if(!sheet) return; const chosen=$('#innateTechniqueSelect')?.value; if(!chosen) return; const tech=TECHNIQUE_LIBRARY.find(t=>t.name===chosen); sheet.innateTechnique=chosen; if(tech && !sheet.innateTechniqueText) sheet.innateTechniqueText=tech.text; save(); renderAll(); };
   if($('#innateTechniqueSelect')) $('#innateTechniqueSelect').onchange=()=>{ const sheet=current(); if(!sheet) return; const chosen=$('#innateTechniqueSelect').value; const tech=TECHNIQUE_LIBRARY.find(t=>t.name===chosen); if(tech){ sheet.innateTechnique=chosen; if(!sheet.innateTechniqueText) sheet.innateTechniqueText=tech.text; save(); renderAll(); } };
   $('#talentFilter')?.addEventListener('input', renderTalentChooser);
@@ -4567,6 +4779,18 @@ function init(){
   $('#itemSearch')?.addEventListener('input', renderItemChooser);
   $('#itemCategoryFilter')?.addEventListener('input', renderItemChooser);
   $('#itemCostFilter')?.addEventListener('input', renderItemChooser);
+  $('#itemModSearch')?.addEventListener('input', renderItemModificationChooser);
+  $('#itemModTypeFilter')?.addEventListener('input', renderItemModificationChooser);
   save(); renderAll();
 }
-init();
+function boot(){
+  try { init(); }
+  catch(err){
+    console.error(err);
+    const box=document.createElement('div');
+    box.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;background:#2b0f14;color:#ffd8df;border:1px solid #ff6b8a;padding:12px;border-radius:12px;font-family:system-ui';
+    box.innerHTML='<strong>Erro ao iniciar o site.</strong><br>Atualize usando a versão corrigida ou limpe os dados do navegador deste site. Detalhe: '+(err?.message||err);
+    document.body.appendChild(box);
+  }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
