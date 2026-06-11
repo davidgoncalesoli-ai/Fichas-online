@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>F&M Ficha Online - v0.13</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <p class="eyebrow">Feiticeiros & Maldições</p>
+      <h1>Ficha Online</h1>
+      <span class="version">v0.13 — técnicas inatas organizadas</span>
+    </div>
+    <nav class="nav">
+      <button data-tab="home" class="active">Início</button>
+      <button data-tab="fichas">Fichas</button>
+      <button data-tab="biblioteca">Biblioteca</button>
+      <button data-tab="rolador">Rolador</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="home" class="tab active">
+      <article class="hero card">
+        <div>
+          <p class="eyebrow">Projeto pessoal</p>
+          <h2>Agora a ficha começa a ficar compartilhável e organizada.</h2>
+          <p>A v0.13 reorganiza a aba de Técnicas: técnica inata separada, feitiços por biblioteca e base pronta para publicar o site na Vercel ou GitHub Pages.</p>
+          <div class="actions-inline">
+            <button id="startCreate" class="primary">+ Criar ficha</button>
+            <button id="goSheets">Ver fichas</button>
+          </div>
+        </div>
+        <aside class="hero-panel">
+          <strong>v0.13 entrega</strong>
+          <span>✓ Cálculo de PV/PE</span>
+          <span>✓ Perícias automáticas</span>
+          <span>✓ BT por nível</span>
+          <span>✓ CD de especialização</span>
+          <span>✓ Habilidades filtradas por nível ao adicionar</span>
+          <span>✓ Talentos com pré-requisitos automáticos</span>
+          <span>✓ Rolagens de atributos</span>
+          <span>✓ Aba de aptidões</span>
+          <span>✓ Técnica inata separada</span>
+          <span>✓ Feitiços filtrados por técnica</span>
+          <span>✓ Guia de publicação</span>
+          <span>✓ Habilidades com busca e textos ampliados</span>
+        </aside>
+      </article>
+
+      <article class="card">
+        <h2>Ordem de desenvolvimento</h2>
+        <div class="steps-line">
+          <div class="done"><strong>1</strong><span>Ficha por abas</span></div>
+          <div class="done"><strong>2</strong><span>Automação central</span></div>
+          <div class="done"><strong>3</strong><span>Aptidões e rolagens</span></div>
+          <div><strong>4</strong><span>Talentos e domínios</span></div>
+        </div>
+      </article>
+    </section>
+
+    <section id="fichas" class="tab">
+      <div class="layout">
+        <aside class="sidebar card">
+          <div class="section-title">
+            <h2>Fichas</h2>
+            <button id="newSheet">+</button>
+          </div>
+          <div id="sheetList" class="sheet-list"></div>
+          <div class="side-actions">
+            <button id="exportSheet">Exportar JSON</button>
+            <label class="file-button">Importar JSON<input id="importSheet" type="file" accept="application/json"></label>
+            <button id="deleteSheet" class="danger">Excluir ficha</button>
+          </div>
+        </aside>
+
+        <section class="sheet-area">
+          <article id="emptyState" class="card empty-state">
+            <h2>Nenhuma ficha selecionada</h2>
+            <p>Crie uma ficha nova para iniciar pelo assistente de criação.</p>
+            <button id="emptyCreate" class="primary">Criar ficha</button>
+          </article>
+
+          <div id="sheetEditor" class="hidden">
+            <article class="card character-head">
+              <div>
+                <p class="eyebrow">Personagem</p>
+                <h2 id="currentName">Sem nome</h2>
+                <p id="currentSummary" class="muted">Origem e especialização ainda não definidas.</p>
+              </div>
+              <div class="head-values">
+                <span>Nível <strong data-view="level">1</strong></span>
+                <span>BT <strong id="btView">+2</strong></span>
+                <span>CD <strong id="dcView">10</strong></span>
+                <span>Grau <strong id="gradeView">4º Grau</strong></span>
+              </div>
+            </article>
+
+            <nav class="subnav">
+              <button data-subtab="status" class="active">Status</button>
+              <button data-subtab="habilidades">Habilidades</button>
+              <button data-subtab="aptidoes">Aptidões</button>
+              <button data-subtab="pericias">Perícias</button>
+              <button data-subtab="tecnicas">Técnicas</button>
+              <button data-subtab="dominios">Expansão de Domínio</button>
+              <button data-subtab="inventario">Inventário</button>
+              <button data-subtab="notas">Notas</button>
+            </nav>
+
+            <section id="status" class="subtab active">
+              <div class="grid two">
+                <article class="card">
+                  <div class="section-title"><h2>Identidade</h2><button id="reopenWizard">Editar criação</button></div>
+                  <div class="form-grid">
+                    <label>Nome <input data-bind="name"></label>
+                    <label>Jogador <input data-bind="player"></label>
+                    <label>Nível <input data-bind="level" type="number" min="1" max="20"></label>
+                    <label>Grau <input data-bind="grade"></label>
+                    <label>Origem <select data-bind="origin" id="originSelect"></select></label>
+                    <label>Especialização <select data-bind="specialization" id="classSelect"></select></label>
+                    <label>Técnica Inata <input data-bind="innateTechnique" placeholder="Ex.: Boneco de Palha"></label>
+                    <label>Atributo-chave <select data-bind="keyAttribute" id="keyAttributeSelect"></select></label>
+                    <label class="full">Observação da automação <textarea data-bind="automationNotes" readonly></textarea></label>
+                  </div>
+                </article>
+                <article class="card">
+                  <h2>Valores calculados</h2>
+                  <div id="calcCards" class="calc-grid"></div>
+                  <div class="value-grid small-gap">
+                    <label>PV Atual <input data-bind="hp" type="number"></label>
+                    <label>PV Máx. <input data-bind="hpMax" type="number"></label>
+                    <label>PE Atual <input data-bind="pe" type="number"></label>
+                    <label>PE Máx. <input data-bind="peMax" type="number"></label>
+                    <label>Defesa <input data-bind="defense" type="number"></label>
+                    <label>Atenção <input data-bind="attention" type="number"></label>
+                    <label>Iniciativa <input data-bind="initiative" type="number"></label>
+                    <label>Deslocamento <input data-bind="movement" type="number" step="0.5"></label>
+                  </div>
+                  <button id="recalculate" class="wide primary">Recalcular tudo</button>
+                </article>
+              </div>
+              <article class="card">
+                <div class="section-title"><h2>Atributos</h2><small>Modificadores recalculados em tempo real. Use d20 para testes de status.</small></div>
+                <div id="attributes" class="attribute-grid"></div>
+              </article>
+              <article class="card">
+                <div class="section-title"><h2>Resumo de evolução</h2><small>Mostra o que desbloqueia conforme o nível.</small></div>
+                <div id="levelSummary" class="rule-grid"></div>
+              </article>
+            </section>
+
+            <section id="habilidades" class="subtab">
+              <div class="grid two">
+                <article class="card">
+                  <div class="section-title"><h2>Habilidades na ficha</h2><div class="actions-inline tight"><button id="openAbilityChooser">+ Adicionar habilidade disponível</button><button data-add="abilities">+ Criar personalizada</button></div></div>
+                  <p class="muted">Aqui ficam somente as habilidades já adicionadas na ficha. O filtro por nível necessário fica na janela de adicionar habilidade.</p>
+                  <div id="abilityProgress" class="progress-grid"></div>
+                  <div id="abilitiesList" class="stack"></div>
+                </article>
+                <article class="card">
+                  <div class="section-title"><h2>Talentos</h2><div class="actions-inline tight"><button id="openTalentChooser">+ Adicionar talento</button><button data-add="talents">+ Criar personalizado</button></div></div>
+                  <p class="muted">Talentos são opções gerais: qualquer especialização pode usar, respeitando nível e pré-requisitos.</p>
+                  <div id="talentsList" class="stack"></div>
+                </article>
+              </div>
+            </section>
+
+            <section id="aptidoes" class="subtab">
+              <div class="grid two">
+                <article class="card">
+                  <div class="section-title">
+                    <h2>Níveis de Aptidão</h2>
+                    <span class="badge">Pontos restantes: <strong id="aptitudePointsView">0</strong></span>
+                  </div>
+                  <p class="muted">Por padrão, personagens não restringidos podem aumentar 1 nível de aptidão em todo nível par. Cada aumento custa 1 ponto e cada aptidão vai de 0 a 5.</p>
+                  <div id="aptitudeLevels" class="aptitude-grid"></div>
+                </article>
+                <article class="card">
+                  <div class="section-title">
+                    <h2>Aptidões escolhidas</h2>
+                    <button id="openAptitudeChooser">+ Adicionar aptidão</button>
+                  </div>
+                  <div id="aptitudeChoicesList" class="stack"></div>
+                </article>
+              </div>
+            </section>
+
+            <section id="pericias" class="subtab">
+              <article class="card">
+                <div class="section-title"><h2>Perícias</h2><button id="applyClassSkills">Aplicar sugestões da classe</button></div>
+                <p class="muted">Fórmula usada: atributo-chave da perícia + metade do nível + bônus de treinamento se treinado/mestre + bônus extra.</p>
+                <div id="skills" class="skill-list"></div>
+              </article>
+            </section>
+
+            <section id="tecnicas" class="subtab">
+              <div class="grid two">
+                <article class="card">
+                  <div class="section-title"><h2>Técnica Inata</h2><button id="applyInnateTechnique">Aplicar técnica escolhida</button></div>
+                  <p class="muted">Escolha uma técnica da biblioteca ou escreva uma própria. Os feitiços abaixo podem ser filtrados pela técnica selecionada.</p>
+                  <div class="form-grid">
+                    <label class="full">Técnica da biblioteca<select id="innateTechniqueSelect"></select></label>
+                    <label class="full">Técnica inata atual<input data-bind="innateTechnique" placeholder="Ex.: Boneco de Palha"></label>
+                    <label class="full">Funcionamento básico<textarea data-bind="innateTechniqueText" placeholder="Resumo da técnica, equipamentos, regra base e observações."></textarea></label>
+                  </div>
+                </article>
+                <article class="card">
+                  <div class="section-title"><h2>Feitiços / Habilidades de Técnica</h2><div class="actions-inline tight"><button id="openSpellChooser">+ Adicionar da biblioteca</button><button data-add="techniques">+ Criar feitiço</button></div></div>
+                  <p class="muted">Aqui ficam os feitiços e habilidades da técnica do personagem. A biblioteca agora filtra pela técnica inata escolhida.</p>
+                  <div id="techniquesList" class="stack"></div>
+                </article>
+              </div>
+            </section>
+
+
+            <section id="dominios" class="subtab">
+              <div class="grid two">
+                <article class="card">
+                  <div class="section-title"><h2>Expansões na ficha</h2><div class="actions-inline tight"><button id="openDomainChooser">+ Adicionar expansão existente</button><button data-add="domains">+ Criar expansão</button></div></div>
+                  <p class="muted">Use esta aba para registrar a expansão de domínio do personagem. Dá para adicionar uma existente da biblioteca ou criar uma própria.</p>
+                  <div id="domainsList" class="stack"></div>
+                </article>
+                <article class="card">
+                  <h2>Resumo de domínio</h2>
+                  <div class="rule-card"><h3>Campos recomendados</h3><p>Nome, tipo, técnica vinculada, custo, área, duração, acerto garantido, efeitos internos, efeitos externos, condições e observações do narrador.</p></div>
+                  <div class="rule-card"><h3>Observação</h3><p>O cadastro completo das expansões do livro será ampliado aos poucos; esta versão já separa a área correta da ficha.</p></div>
+                </article>
+              </div>
+            </section>
+
+            <section id="inventario" class="subtab">
+              <div class="grid two">
+                <article class="card">
+                  <div class="section-title"><h2>Ataques</h2><button data-add="attacks">+ Ataque</button></div>
+                  <div id="attacksList" class="stack"></div>
+                </article>
+                <article class="card">
+                  <div class="section-title"><h2>Inventário</h2><div class="actions-inline tight"><button id="openItemChooser">+ Adicionar equipamento</button><button data-add="items">+ Criar item</button></div></div>
+                  <div id="itemsList" class="stack"></div>
+                  <p class="muted">Carga: <strong id="loadView">0</strong></p>
+                </article>
+              </div>
+            </section>
+
+            <section id="notas" class="subtab">
+              <article class="card">
+                <h2>Aspectos pessoais e notas</h2>
+                <div class="form-grid">
+                  <label>Traços de personalidade <textarea data-bind="traits"></textarea></label>
+                  <label>Ideais <textarea data-bind="ideals"></textarea></label>
+                  <label>Ligações <textarea data-bind="bonds"></textarea></label>
+                  <label>Complicações <textarea data-bind="complications"></textarea></label>
+                  <label class="full">Domínio inato <textarea data-bind="innateDomain"></textarea></label>
+                  <label class="full">Notas livres <textarea data-bind="notes"></textarea></label>
+                </div>
+              </article>
+            </section>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <section id="biblioteca" class="tab">
+      <article class="card">
+        <h2>Biblioteca do projeto</h2>
+        <p>A biblioteca agora tem equipamentos ampliados e uma primeira revisão de textos/pré-requisitos das habilidades oficiais de especialização.</p>
+        <div id="rulesSummary" class="rule-grid"></div>
+      </article>
+    </section>
+
+    <section id="rolador" class="tab">
+      <article class="card roller-card">
+        <h2>Rolador de dados</h2>
+        <div class="roller-line">
+          <input id="diceExpression" value="1d20+2" placeholder="Ex.: 1d20+5, 2d8+3">
+          <button id="rollDice" class="primary">Rolar</button>
+        </div>
+        <div id="rollResult" class="roll-result">Nenhuma rolagem ainda.</div>
+        <div id="rollHistory" class="roll-history"></div>
+      </article>
+    </section>
+  </main>
+
+  <dialog id="wizard" class="modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Criador de ficha</p>
+        <h2 id="wizardTitle">1. Identidade</h2>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="progress"><span id="wizardProgress"></span></div>
+    <div id="wizardBody" class="wizard-body"></div>
+    <div class="modal-actions">
+      <button id="wizardBack">Voltar</button>
+      <button id="wizardNext" class="primary">Próximo</button>
+    </div>
+  </dialog>
+
+  <dialog id="abilityDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Habilidades disponíveis</p>
+        <h2>Adicionar habilidade</h2>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="dialog-tools">
+      <span class="muted">Filtre por nível necessário para desbloquear a habilidade.</span>
+      <div id="abilityLibraryTabs" class="level-tabs compact"></div>
+    </div>
+    <div id="abilityChooser" class="library"></div>
+  </dialog>
+
+
+  <dialog id="aptitudeDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Aptidões</p>
+        <h2>Adicionar aptidão disponível</h2>
+      </div>
+      <button onclick="document.getElementById('aptitudeDialog').close()">Fechar</button>
+    </div>
+    <div class="wizard-body">
+      <div class="section-title">
+        <p class="muted">As bloqueadas aparecem com o motivo. A biblioteca completa do livro entra na próxima rodada de cadastro; esta versão já deixa a lógica pronta.</p>
+        <select id="aptitudeFilter">
+          <option value="todas">Todas</option>
+          <option>Aura</option>
+          <option>Controle e Leitura</option>
+          <option>Barreira</option>
+          <option>Domínio</option>
+          <option>Energia Reversa</option>
+          <option>Especial</option>
+        </select>
+      </div>
+      <div id="aptitudeChooser" class="library"></div>
+    </div>
+  </dialog>
+
+  <dialog id="talentDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Talentos gerais</p>
+        <h2>Adicionar talento</h2>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="dialog-tools">
+      <input id="talentSearch" placeholder="Buscar talento, pré-requisito ou efeito...">
+      <select id="talentFilter">
+        <option value="available">Disponíveis agora</option>
+        <option value="locked">Bloqueados</option>
+        <option value="all">Todos</option>
+      </select>
+      <select id="talentCategory">
+        <option value="all">Todas as categorias</option>
+        <option value="Geral">Geral</option>
+        <option value="Combate">Combate</option>
+        <option value="Percepção">Percepção</option>
+        <option value="Recursos">Recursos</option>
+        <option value="Sorte">Sorte</option>
+        <option value="Adepto">Adepto</option>
+        <option value="Defesa">Defesa</option>
+        <option value="Aptidão">Aptidão</option>
+        <option value="Domínio">Domínio</option>
+        <option value="Origem">Origem</option>
+        <option value="Livre">Livre</option>
+      </select>
+    </div>
+    <div id="talentChooser" class="library"></div>
+  </dialog>
+
+
+  <dialog id="spellDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Feitiços e habilidades de técnica</p>
+        <h2>Adicionar da biblioteca</h2>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="dialog-tools">
+      <input id="techSearch" placeholder="Buscar por nome, técnica, nível, alcance ou texto...">
+      <select id="spellTechniqueFilter"></select>
+      <select id="spellLevelFilter">
+        <option value="all">Todos os níveis</option>
+        <option value="0">Nível 0</option>
+        <option value="1">Nível 1</option>
+        <option value="2">Nível 2</option>
+        <option value="3">Nível 3</option>
+        <option value="4">Nível 4+</option>
+      </select>
+    </div>
+    <div id="techLibrary" class="library"></div>
+  </dialog>
+
+  <dialog id="itemDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Equipamentos e inventário</p>
+        <h2>Adicionar equipamento</h2>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="dialog-tools">
+      <input id="itemSearch" placeholder="Buscar arma, uniforme, escudo, kit ou item especial...">
+      <select id="itemCategoryFilter">
+        <option value="all">Todas as categorias</option>
+        <option value="Arma simples">Armas simples</option>
+        <option value="Arma complexa">Armas complexas</option>
+        <option value="Uniforme">Uniformes</option>
+        <option value="Escudo">Escudos</option>
+        <option value="Kit">Kits de ferramentas</option>
+        <option value="Item especial">Itens especiais</option>
+        <option value="Ferramenta amaldiçoada">Ferramentas amaldiçoadas</option>
+      </select>
+      <select id="itemCostFilter">
+        <option value="all">Qualquer custo</option>
+        <option value="0">Custo 0</option>
+        <option value="1">Custo 1</option>
+        <option value="2">Custo 2</option>
+        <option value="3">Custo 3</option>
+        <option value="4">Custo 4</option>
+        <option value="especial">Grau especial</option>
+      </select>
+    </div>
+    <div id="itemChooser" class="library"></div>
+  </dialog>
+
+  <dialog id="domainDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Expansões de Domínio</p>
+        <h2>Adicionar expansão existente</h2>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="dialog-tools">
+      <input id="domainSearch" placeholder="Buscar expansão, técnica ou tipo...">
+    </div>
+    <div id="domainChooser" class="library"></div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
