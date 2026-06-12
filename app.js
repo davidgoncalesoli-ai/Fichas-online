@@ -91,6 +91,9 @@ const TECHNIQUE_LIBRARY = [
   {name:'Boneco de Palha', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica baseada em martelo, pregos e boneca de palha. Permite disparar pregos, explodi-los e criar ligações por vestígios para refletir dano.'},
   {name:'Boogie Woogie', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica de troca de posição. Permite trocar lugares entre criaturas e objetos válidos ao cumprir o gatilho da técnica.'},
   {name:'Cópia', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica voltada para copiar e utilizar técnicas alheias sob condições definidas pelo narrador e pela ficha.'},
+  {name:'Ilimitado', source:'Herança de Clã Gojo', type:'Técnica herdada', text:'Técnica herdada do Clã Gojo, voltada para manipulação de distância, defesa, atração, repulsão e efeitos espaciais conforme a campanha.'},
+  {name:'Seis Olhos', source:'Herança de Clã Gojo', type:'Jujutsu herdado', text:'Jujutsu herdado do Clã Gojo, usado para percepção refinada, leitura de energia e eficiência no uso de energia amaldiçoada.'},
+  {name:'Projeção', source:'Herança de Clã Zenin', type:'Técnica herdada', text:'Técnica herdada do Clã Zenin, voltada para movimento em quadros, velocidade, reposicionamento e punição contra alvos que quebram a sequência.'},
   {name:'Fala Amaldiçoada', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica baseada em comandos verbais. Registre aqui comandos conhecidos, custo, risco de retorno no usuário e limitações definidas pela mesa.'},
   {name:'Dez Sombras', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica de invocação por sombras. Use para registrar shikigamis, intermediários, fusões, perdas e efeitos da sombra.'},
   {name:'Manipulação de Sangue', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica voltada para controlar sangue como projétil, reforço corporal, ligação e manipulação ofensiva/defensiva.'},
@@ -148,6 +151,30 @@ const DOMAIN_LIBRARY = [
   {name:'Aposta Mortal Indolente', type:'Não-letal', technique:'Trem do Puro Amor', level:4, cost:'10 PE', area:'Conforme técnica', duration:'Conforme resultado', text:'Expansão vinculada à técnica Trem do Puro Amor, baseada no jogo de pachinko e em recompensas.'},
   {name:'Expansão Personalizada', type:'Livre', technique:'Técnica própria', level:1, cost:'Definir', area:'Definir', duration:'Definir', text:'Modelo livre para criar uma expansão original da campanha.'}
 ];
+
+
+const INVOCATION_LIBRARY = [
+  {name:'Shikigami Simples', type:'Shikigami', grade:'4º Grau', cost:'1 PE', hp:'Baixo', defense:'Definir', movement:'9m', actions:'1 ação simples/complexa conforme comando', traits:'Familiar espiritual básico criado por talismã ou técnica.', text:'Modelo inicial para shikigami comum. Use como base para cães, aves, insetos ou familiares pequenos. Ajuste atributos, ataques e características conforme a técnica.'},
+  {name:'Shikigami Guardião', type:'Shikigami', grade:'3º Grau', cost:'2 PE', hp:'Médio', defense:'Definir', movement:'9m', actions:'Ação de ataque, proteger ou apoiar', traits:'Invocação defensiva para proteger o usuário ou aliados próximos.', text:'Modelo para invocação focada em interceptar ataques, bloquear passagem e usar Apoiar/Proteger em combate.'},
+  {name:'Shikigami Predador', type:'Shikigami', grade:'2º Grau', cost:'3 PE', hp:'Médio/alto', defense:'Definir', movement:'12m', actions:'Ataque corpo a corpo ou perseguição', traits:'Invocação agressiva com mobilidade e dano físico.', text:'Modelo para lobos, feras, aves de rapina, criaturas de caça ou invocações de flanco.'},
+  {name:'Cão Divino', type:'Shikigami', grade:'Inicial', cost:'Conforme técnica', hp:'Definir', defense:'Definir', movement:'12m', actions:'Mordida, rastrear, apoiar', traits:'Shikigami associado à técnica Dez Sombras.', text:'Modelo inicial para Cão Divino. Use junto da técnica Dez Sombras; ajuste estatísticas conforme o nível, habilidade e decisão do narrador.'},
+  {name:'Nue', type:'Shikigami', grade:'Intermediário', cost:'Conforme técnica', hp:'Definir', defense:'Definir', movement:'Voo', actions:'Ataque elétrico, voo, transporte curto', traits:'Shikigami voador associado à técnica Dez Sombras.', text:'Modelo para Nue. Útil para mobilidade aérea, reconhecimento e ataques à distância/eletricidade.'},
+  {name:'Sapo', type:'Shikigami', grade:'Inicial', cost:'Conforme técnica', hp:'Definir', defense:'Definir', movement:'9m', actions:'Agarrar, puxar, proteger', traits:'Shikigami associado à técnica Dez Sombras.', text:'Modelo para Sapo. Use para agarrar, puxar aliados/inimigos e criar controle de campo.'},
+  {name:'Coelho Fugitivo', type:'Shikigami', grade:'Inicial', cost:'Conforme técnica', hp:'Baixo', defense:'Definir', movement:'9m', actions:'Distração, ocupação de área', traits:'Enxame de shikigamis associado à técnica Dez Sombras.', text:'Modelo para múltiplas invocações pequenas usadas para confundir, distrair ou bloquear visão.'},
+  {name:'Marionete Simples', type:'Marionete', grade:'4º Grau', cost:'1 PE / ativação', hp:'Baixo', defense:'Definir', movement:'9m', actions:'Ataque simples ou uso de item', traits:'Corpo artificial controlado por energia.', text:'Modelo de marionete criada por Ofício (Canalizador). Boa para reconhecimento, auxílio e combate leve.'},
+  {name:'Marionete de Combate', type:'Marionete', grade:'2º Grau', cost:'3 PE / ativação', hp:'Médio/alto', defense:'Definir', movement:'9m', actions:'Ataques armados, bloqueio, ferramenta interna', traits:'Marionete preparada para combate direto.', text:'Modelo para marionete com armas, compartimentos ou ferramentas amaldiçoadas embutidas.'},
+  {name:'Corpo Amaldiçoado Artificial', type:'Corpo Amaldiçoado', grade:'2º Grau', cost:'Definir', hp:'Alto', defense:'Definir', movement:'9m', actions:'Ataque, proteger, característica especial', traits:'Corpo artificial com núcleo e comportamento mais autônomo.', text:'Modelo para corpo amaldiçoado com núcleo. Pode possuir características próprias, limitações e comando especial.'},
+  {name:'Maldição Absorvida', type:'Maldição Controlada', grade:'Variável', cost:'Conforme grau', hp:'Converter da ficha de inimigo', defense:'Converter', movement:'Converter', actions:'Ações da maldição como ações de invocação', traits:'Usada principalmente com Manipulação de Maldições.', text:'Modelo para converter uma maldição derrotada em invocação. A Enciclopédia orienta adaptar a ficha de inimigo para o modelo de invocação ao absorver a maldição.'},
+  {name:'Invocação Personalizada', type:'Modelo Livre', grade:'Livre', cost:'Definir', hp:'Definir', defense:'Definir', movement:'Definir', actions:'Definir', traits:'Modelo livre.', text:'Use para criar uma invocação própria da campanha, incluindo shikigami, marionete, corpo amaldiçoado ou maldição controlada.'}
+];
+
+function controllerInvocationSlots(sheet){
+  const lvl=Number(sheet.level||1);
+  if(sheet.specialization!=='Controlador') return {initial:0, gained:0, maxActive:0, commands:0};
+  const extra=[3,6,9,10,12,15,18].filter(n=>lvl>=n).length;
+  const commandBonus=[6,12,18].filter(n=>lvl>=n).length;
+  return {initial:2, gained:2+extra, maxActive:2, commands:1+commandBonus};
+}
 
 
 const ITEM_LIBRARY = [
@@ -1365,10 +1392,10 @@ const ORIGINS = [
 
 
 const CLANS = {
-  'Clã Gojo': {attrs:['Inteligência','Sabedoria'], trainingOptions:['Feitiçaria','Percepção','Intuição'], trainings:'Treinado em 2 entre Feitiçaria, Percepção e Intuição, ou especialista em 1.', techniques:'Seis Olhos, Ilimitado', feature:'Potencial Lendário: +1 PE em todo nível par. Recebe 1 Feitiço adicional no 1º nível e nos níveis 5, 10, 15 e 20.'},
-  'Clã Inumaki': {attrs:['Inteligência','Presença'], trainingOptions:['Feitiçaria','Percepção','Intuição'], trainings:'Treinado em 2 entre Feitiçaria, Percepção e Intuição, ou especialista em 1.', techniques:'Fala Amaldiçoada', feature:'Olhos de Cobra e Presas: usos iguais ao BT para comandar uma ação bônus de aliado como reação; recupera no descanso longo.'},
-  'Clã Kamo': {attrs:['Constituição','Sabedoria'], trainingOptions:['Atletismo','Medicina','Persuasão'], trainings:'Treinado em 2 entre Atletismo, Medicina e Persuasão, ou especialista em 1.', techniques:'Manipulação Sanguínea', feature:'Valor do Sangue: +1 PV máximo por nível; a partir do nível 10 soma CON ao total de vida. Ao rolar vida abaixo da média, pode rerrolar e ficar com o maior.'},
-  'Clã Zenin': {attrs:['Qualquer'], trainingOptions:'any', trainings:'Treinado em 2 perícias quaisquer, ou especialista em 1.', techniques:'Dez Sombras, Projeção', feature:'Foco no Poder: escolha Feitiços Focados no nível 1 e nos níveis 5, 10, 15 e 20; cada um recebe melhoria de dano, cura, alcance ou CD.'}
+  'Clã Gojo': {attrs:['Inteligência','Sabedoria'], trainingOptions:['Feitiçaria','Percepção','Intuição'], trainings:'Treinado em 2 entre Feitiçaria, Percepção e Intuição, ou especialista em 1.', techniques:'Seis Olhos, Ilimitado', techniqueOptions:['Ilimitado','Seis Olhos'], featureName:'Potencial Lendário', feature:'Potencial Lendário: +1 PE em todo nível par. Recebe 1 Feitiço adicional no 1º nível e nos níveis 5, 10, 15 e 20.'},
+  'Clã Inumaki': {attrs:['Inteligência','Presença'], trainingOptions:['Feitiçaria','Percepção','Intuição'], trainings:'Treinado em 2 entre Feitiçaria, Percepção e Intuição, ou especialista em 1.', techniques:'Fala Amaldiçoada', techniqueOptions:['Fala Amaldiçoada'], featureName:'Olhos de Cobra e Presas', feature:'Olhos de Cobra e Presas: usos iguais ao BT para comandar uma ação bônus de aliado como reação; recupera no descanso longo.'},
+  'Clã Kamo': {attrs:['Constituição','Sabedoria'], trainingOptions:['Atletismo','Medicina','Persuasão'], trainings:'Treinado em 2 entre Atletismo, Medicina e Persuasão, ou especialista em 1.', techniques:'Manipulação de Sangue', techniqueOptions:['Manipulação de Sangue'], featureName:'Valor do Sangue', feature:'Valor do Sangue: +1 PV máximo por nível; a partir do nível 10 soma CON ao total de vida. Ao rolar vida abaixo da média, pode rerrolar e ficar com o maior.'},
+  'Clã Zenin': {attrs:['Qualquer'], trainingOptions:'any', trainings:'Treinado em 2 perícias quaisquer, ou especialista em 1.', techniques:'Dez Sombras, Projeção', techniqueOptions:['Dez Sombras','Projeção'], featureName:'Foco no Poder', feature:'Foco no Poder: escolha Feitiços Focados no nível 1 e nos níveis 5, 10, 15 e 20; cada um recebe melhoria de dano, cura, alcance ou CD.'}
 };
 const ANATOMY_FEATURES = [
   {name:'Alma Maldita', text:'Reduz pela metade dano na alma antes do teste de Integridade; no nível 15, anula. Usos por dia aumentam nos níveis 6, 12 e 18.'},
@@ -1387,7 +1414,7 @@ const ANATOMY_FEATURES = [
   {name:'Presença Nefasta', text:'Hostis que o veem pela primeira vez fazem TR de Vontade contra CD Amaldiçoada; falha amedronta por 1 rodada, sucesso abala por 1 rodada.'},
   {name:'Sangue Tóxico', text:'Ao sofrer dano corpo a corpo, atacante perde vida igual ao modificador de Constituição.'}
 ];
-function originChoicesDefault(){ return { plus2:'', plus1:'', physicalA:'', physicalB:'', clan:'Clã Gojo', auraAptitude:'', originAttrAlloc:{}, trainingMode:'trained2', originTrained:['',''], originMaster:'', anatomy:[], anatomySkill:'', semTecnicaNotes:'', semTecnicaBenefit1:'', semTecnicaBenefit10:'', corePrimary:'Núcleo 1', coreActive:'Núcleo 1', cores:[{name:'Núcleo 1', concept:'Primário', specialization:''},{name:'Núcleo 2', concept:'', specialization:''},{name:'Núcleo 3', concept:'', specialization:''}] }; }
+function originChoicesDefault(){ return { plus2:'', plus1:'', physicalA:'', physicalB:'', clan:'Clã Gojo', clanTechnique:'', originTalent:'', auraAptitude:'', originAttrAlloc:{}, trainingMode:'trained2', originTrained:['',''], originMaster:'', anatomy:[], anatomySkill:'', semTecnicaNotes:'', semTecnicaBenefit1:'', semTecnicaBenefit10:'', corePrimary:'Núcleo 1', coreActive:'Núcleo 1', cores:[{name:'Núcleo 1', concept:'Primário', specialization:''},{name:'Núcleo 2', concept:'', specialization:''},{name:'Núcleo 3', concept:'', specialization:''}] }; }
 function clampOriginAlloc(sheet){
   sheet.originChoices = sheet.originChoices || originChoicesDefault();
   const oc = sheet.originChoices;
@@ -1614,8 +1641,85 @@ function addBaseAbilitiesIfWanted(sheet){
   if(cc.applyBaseAbilities!==false) addBaseAbilities(sheet);
   return sheet;
 }
+
+function requirementFreeTalents(){ return TALENT_LIBRARY.filter(talentHasNoRequirement); }
+function addOriginTalentByName(sheet, name){
+  if(!name) return;
+  if((sheet.talents||[]).some(t=>t.name===name)) return;
+  const t=TALENT_LIBRARY.find(x=>x.name===name);
+  if(!t) return;
+  sheet.talents.push({name:t.name, level:talentReqLevel(t), category:t.category||'Geral', text:`Talento adicional da origem ${sheet.origin}.\nPré-requisito: ${t.prereq||'—'}\n\n${t.text||''}`});
+}
+function addOriginClanAbility(sheet){
+  if(sheet.origin!=='Herdado') return;
+  const oc=sheet.originChoices||originChoicesDefault();
+  const clan=CLANS[oc.clan]||CLANS['Clã Gojo'];
+  const name=`Herança de Clã — ${oc.clan||'Clã'}`;
+  if(!(sheet.abilities||[]).some(a=>a.name===name)){
+    sheet.abilities.push({name, class:'Origem', level:1, kind:'Automática', text:`Técnicas/Jujutsus herdados: ${clan.techniques}.\n\n${clan.feature}`});
+  }
+  if(oc.clanTechnique){
+    const chosen=canonicalTechniqueName(oc.clanTechnique);
+    sheet.innateTechnique=chosen;
+    const tech=TECHNIQUE_LIBRARY.find(t=>canonicalTechniqueName(t.name)===chosen);
+    if(tech && !sheet.innateTechniqueText) sheet.innateTechniqueText=tech.text;
+    const added=addTechniqueZeroDefaultsToSheet(sheet, chosen, {prepared:true});
+    if(added && !(sheet.notes||'').includes('Fundamentos iniciais da herança')){
+      sheet.notes = `${sheet.notes||''}${sheet.notes?'\n\n':''}Fundamentos iniciais da herança ${chosen} adicionados automaticamente na criação.`;
+    }
+  }
+}
+function applyOriginCreationBenefits(sheet){
+  const oc=sheet.originChoices||originChoicesDefault();
+  if(sheet.origin==='Herdado'){
+    addOriginClanAbility(sheet);
+    addOriginTalentByName(sheet, oc.originTalent);
+  }
+  if(sheet.origin==='Inato' || sheet.origin==='Sem Técnica') addOriginTalentByName(sheet, oc.originTalent);
+  return sheet;
+}
+function wizardOriginDetailsHtml(){
+  const sheet=wizardData;
+  const oc=sheet.originChoices ||= originChoicesDefault();
+  const attrSelect=(field,label,opts=ATTRS)=>`<label>${label}<select data-w-origin-choice="${field}"><option value="">Escolha...</option>${opts.map(a=>`<option value="${esc(a)}" ${oc[field]===a?'selected':''}>${esc(a)}</option>`).join('')}</select></label>`;
+  const noReqTalents=requirementFreeTalents();
+  const talentSelect=(label='Talento adicional')=>`<label>${label}<select data-w-origin-choice="originTalent"><option value="">Escolha um talento sem requisito...</option>${noReqTalents.map(t=>`<option value="${esc(t.name)}" ${oc.originTalent===t.name?'selected':''}>${esc(t.name)} — ${esc(t.category||'Geral')}</option>`).join('')}</select></label>`;
+  if(sheet.origin==='Herdado'){
+    const clan=CLANS[oc.clan] || CLANS['Clã Gojo'];
+    const allowed=clanAllowedAttributes(sheet);
+    const techs=clan.techniqueOptions || String(clan.techniques||'').split(',').map(x=>x.trim()).filter(Boolean);
+    const cfg=originTrainingConfig(sheet);
+    const opts=cfg?.options || [];
+    const trained=(oc.originTrained||['','']);
+    const trainMode=oc.trainingMode || 'trained2';
+    return `<div class="rule-card accent full"><h3>Herança de Clã</h3><p class="muted">Escolha o clã, seus bônus, treinamentos e a herança inicial.</p><div class="form-grid"><label>Clã<select data-w-origin-choice="clan">${Object.keys(CLANS).map(c=>`<option value="${esc(c)}" ${oc.clan===c?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label>Técnica/Jujutsu herdado<select data-w-origin-choice="clanTechnique"><option value="">Escolha...</option>${techs.map(t=>`<option value="${esc(t)}" ${oc.clanTechnique===t?'selected':''}>${esc(t)}</option>`).join('')}</select></label>${attrSelect('plus2','Bônus +2 do clã',allowed)}${attrSelect('plus1','Bônus +1 do clã',allowed)}${talentSelect('Talento adicional do Herdado')}</div><div class="rule-grid"><div class="rule-card"><h3>${esc(clan.featureName||'Herança')}</h3><p>${esc(clan.feature)}</p></div><div class="rule-card"><h3>Treinamentos de Clã</h3><p>${esc(clan.trainings)}</p></div></div><div class="rule-card"><h3>Perícias do clã</h3><div class="actions-inline"><label class="checkline"><input type="radio" name="wClanTrainingMode" data-w-origin-training-mode value="trained2" ${trainMode!=='master1'?'checked':''}> Treinado em 2 perícias</label><label class="checkline"><input type="radio" name="wClanTrainingMode" data-w-origin-training-mode value="master1" ${trainMode==='master1'?'checked':''}> Especialista/Mestre em 1 perícia</label></div>${trainMode==='master1' ? `<label>Perícia especialista/mestre<select data-w-origin-choice="originMaster"><option value="">Escolha...</option>${opts.map(sk=>`<option value="${esc(sk)}" ${oc.originMaster===sk?'selected':''}>${esc(sk)}</option>`).join('')}</select></label>` : `<div class="form-grid"><label>Perícia treinada 1<select data-w-origin-trained="0"><option value="">Escolha...</option>${opts.map(sk=>`<option value="${esc(sk)}" ${trained[0]===sk?'selected':''}>${esc(sk)}</option>`).join('')}</select></label><label>Perícia treinada 2<select data-w-origin-trained="1"><option value="">Escolha...</option>${opts.map(sk=>`<option value="${esc(sk)}" ${trained[1]===sk?'selected':''}>${esc(sk)}</option>`).join('')}</select></label></div>`}</div></div>`;
+  }
+  if(sheet.origin==='Inato'){
+    return `<div class="rule-card accent full"><h3>Escolhas de Inato</h3><div class="form-grid">${attrSelect('plus2','Bônus +2')}${attrSelect('plus1','Bônus +1')}${talentSelect('Talento Natural')}</div><p class="muted">O talento natural mostra apenas talentos sem pré-requisitos.</p></div>`;
+  }
+  return `<div class="rule-card full"><h3>${esc(sheet.origin)}</h3><p class="muted">As escolhas detalhadas desta origem também podem ser ajustadas depois no painel de Status.</p></div>`;
+}
+function validateWizardOriginStep(){
+  const oc=wizardData.originChoices||originChoicesDefault();
+  if(wizardData.origin==='Herdado'){
+    if(!oc.clan) return 'Escolha o clã do personagem Herdado.';
+    if(!oc.clanTechnique) return 'Escolha a técnica ou jujutsu herdado do clã.';
+    if(!oc.plus2 || !oc.plus1 || oc.plus2===oc.plus1) return 'Escolha os bônus +2 e +1 do clã em atributos diferentes.';
+    const allowed=clanAllowedAttributes(wizardData);
+    if(!allowed.includes(oc.plus2) || !allowed.includes(oc.plus1)) return 'Os atributos escolhidos não são válidos para esse clã.';
+    if(!oc.originTalent) return 'Escolha o talento adicional do Herdado.';
+    if(oc.trainingMode==='master1') { if(!oc.originMaster) return 'Escolha a perícia especialista/mestre do clã.'; }
+    else { const picked=[...new Set((oc.originTrained||[]).filter(Boolean))]; if(picked.length<2) return 'Escolha as 2 perícias treinadas do clã.'; }
+  }
+  if(wizardData.origin==='Inato'){
+    if(!oc.plus2 || !oc.plus1 || oc.plus2===oc.plus1) return 'Escolha os bônus +2 e +1 de Inato em atributos diferentes.';
+  }
+  return '';
+}
+
 function validateWizardStep(){
   if(wizardStep===0 && !String(wizardData.name||'').trim()) return 'Dê um nome para a ficha antes de continuar.';
+  if(wizardStep===1){ const originErr=validateWizardOriginStep(); if(originErr) return originErr; }
   if(wizardStep===2 && !wizardData.specialization) return 'Escolha uma especialização.';
   if(wizardStep===3){
     const cc=ensureCreationChoices(wizardData), saves=classSaveOptions(wizardData.specialization), cfg=classSkillOptions(wizardData.specialization);
@@ -4394,6 +4498,17 @@ const TECH_LIBRARY = [
   {tech:'Cópia', name:'Técnica Copiada', level:1, action:'Conforme técnica', range:'Conforme técnica', target:'Conforme técnica', duration:'Conforme técnica', cost:'Conforme técnica', damage:'', resistance:'Conforme técnica', text:'Modelo para colar uma técnica copiada específica dentro da ficha.'},
   {tech:'Cópia', name:'Reserva de Cópias', level:2, action:'Passiva', range:'—', target:'Técnicas copiadas', duration:'Permanente', cost:'—', damage:'', resistance:'—', text:'Modelo para organizar técnicas copiadas ativas, armazenadas, expiradas ou limitadas por condição.'},
 
+  {tech:'Ilimitado', name:'Infinito', level:0, action:'Passiva/Defensiva', range:'Pessoal', target:'Você', duration:'Sustentada/Conforme mesa', cost:'Definir', damage:'', resistance:'—', text:'Fundamento do Ilimitado. Registre aqui como a mesa trata defesa, aproximação, bloqueio de ataques e custo de manutenção.'},
+  {tech:'Ilimitado', name:'Azul', level:1, action:'Ação Comum', range:'Médio', target:'Criatura/área', duration:'Imediata', cost:'Definir', damage:'3d8 força', resistance:'Fortitude/Reflexos', text:'Modelo para atração/colapso espacial. Use para puxar, mover ou esmagar alvos conforme os limites da campanha.'},
+  {tech:'Ilimitado', name:'Vermelho', level:2, action:'Ação Comum', range:'Médio', target:'Criatura/área', duration:'Imediata', cost:'Definir', damage:'6d8 força', resistance:'Reflexos reduz metade', text:'Modelo para repulsão espacial. Use para empurrar, arremessar ou causar dano explosivo.'},
+  {tech:'Ilimitado', name:'Roxo', level:4, action:'Ação Completa', range:'Longo', target:'Linha/área', duration:'Imediata', cost:'Alto/Definir', damage:'12d8 força', resistance:'Reflexos/Fortitude', text:'Modelo avançado para combinação de atração e repulsão. Ajuste custo, requisito e disponibilidade com o narrador.'},
+
+  {tech:'Seis Olhos', name:'Leitura Absoluta', level:0, action:'Passiva', range:'Pessoal', target:'Você', duration:'Permanente', cost:'—', damage:'', resistance:'—', text:'Fundamento do Seis Olhos. Registre percepção refinada, leitura de energia, bônus situacionais e limites definidos pela mesa.'},
+  {tech:'Seis Olhos', name:'Eficiência de Energia', level:0, action:'Passiva', range:'Pessoal', target:'Você', duration:'Permanente', cost:'—', damage:'', resistance:'—', text:'Modelo para anotar redução, recuperação ou otimização de PE vinculada ao jujutsu herdado do clã.'},
+
+  {tech:'Projeção', name:'Movimento em Quadros', level:0, action:'Ação de Movimento/Especial', range:'Pessoal', target:'Você', duration:'Turno', cost:'Definir', damage:'', resistance:'—', text:'Fundamento da Projeção. Registre deslocamento em sequência, quadros, condição para manter a rota e penalidade por quebrar a sequência.'},
+  {tech:'Projeção', name:'Quadro Punitivo', level:1, action:'Reação', range:'Curto', target:'Uma criatura', duration:'Imediata/1 rodada', cost:'Definir', damage:'', resistance:'Reflexos/Astúcia', text:'Modelo para punir alvo que falha em acompanhar a sequência de movimento, aplicando lentidão, imobilização ou abertura.'},
+
   {tech:'Fala Amaldiçoada', name:'Comando Simples', level:0, action:'Ação Comum', range:'Curto', target:'Uma criatura que ouça', duration:'Imediata', cost:'Definir', damage:'', resistance:'Vontade/Fortitude conforme comando', text:'Emite uma ordem curta. Registre a palavra usada, o teste de resistência e o efeito aprovado pelo narrador.'},
   {tech:'Fala Amaldiçoada', name:'Pare', level:1, action:'Ação Comum', range:'Curto', target:'Uma criatura', duration:'1 rodada', cost:'Definir', damage:'', resistance:'Vontade', text:'Modelo para comando de imobilização/interrupção. Ajuste duração, custo e consequência de falha/sucesso.'},
   {tech:'Fala Amaldiçoada', name:'Exploda', level:2, action:'Ação Comum', range:'Curto', target:'Uma criatura/objeto', duration:'Imediata', cost:'Alto/Definir', damage:'6d8', resistance:'Fortitude reduz metade', text:'Modelo ofensivo de comando destrutivo. Registre retorno no usuário e limites contra alvos superiores.'},
@@ -4435,6 +4550,7 @@ const RULES = [
   {title:'v0.11', text:'Talentos gerais e de origem receberam biblioteca ampliada, busca, categorias e bloqueios por nível, origem, atributo, perícia e domínio.'},
   {title:'v0.13', text:'Técnica inata ganhou área própria; feitiços são adicionados em janela com filtro por técnica e nível. Inclui guia de publicação.'},
   {title:'v0.27', text:'Biblioteca de técnicas ampliada; feitiços agora têm dano/cura, resistência, marca registrada, preparado, rolagem de dano e botão para adicionar fundamentos nível 0 da técnica inata.'},
+  {title:'v0.37', text:'Técnicas herdadas agora puxam fundamentos de nível 0 automaticamente ao criar Herdado; adicionados modelos iniciais para Ilimitado, Seis Olhos e Projeção.'},
   {title:'Depois', text:'Próxima etapa: completar técnicas/feitiços do livro com mais precisão e iniciar criador guiado de feitiços personalizados.'}
 ];
 
@@ -4508,7 +4624,7 @@ function current(){ return sheets.find(s=>s.id===activeId); }
 function save(){ safeStorage.set('femSheetsV13', JSON.stringify(sheets)); if(activeId) safeStorage.set('femActiveV13', activeId); }
 function blankSheet(){
   const skillRanks={}, skillExtras={}; SKILLS.forEach(([name])=>{ skillRanks[name]='none'; skillExtras[name]=0; });
-  return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeBase:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeTempMods:{'Força':0,'Destreza':0,'Constituição':0,'Inteligência':0,'Sabedoria':0,'Presença':0}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, originChoices:originChoicesDefault(), skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], attacks:[], items:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
+  return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeBase:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeTempMods:{'Força':0,'Destreza':0,'Constituição':0,'Inteligência':0,'Sabedoria':0,'Presença':0}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, originChoices:originChoicesDefault(), skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], invocations:[], attacks:[], items:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
 }
 function normalize(sheet){
   const base=blankSheet();
@@ -4520,13 +4636,16 @@ function normalize(sheet){
   while(sheet.originChoices.originTrained.length<2) sheet.originChoices.originTrained.push('');
   if(sheet.originChoices.trainingMode===undefined) sheet.originChoices.trainingMode='trained2';
   if(sheet.originChoices.originMaster===undefined) sheet.originChoices.originMaster='';
+  if(sheet.originChoices.clanTechnique===undefined) sheet.originChoices.clanTechnique='';
+  if(sheet.originChoices.originTalent===undefined) sheet.originChoices.originTalent='';
   if(sheet.originChoices.anatomySkill===undefined) sheet.originChoices.anatomySkill='';
   clampOriginAlloc(sheet); cleanOriginTrainingChoices(sheet);
   if(!Array.isArray(sheet.originChoices.cores)) sheet.originChoices.cores=originChoicesDefault().cores;
   sheet.originChoices.cores = sheet.originChoices.cores.slice(0,3); while(sheet.originChoices.cores.length<3) sheet.originChoices.cores.push({name:`Núcleo ${sheet.originChoices.cores.length+1}`, concept:'', specialization:''});
   sheet.attributeRolls = Array.isArray(sheet.attributeRolls) ? sheet.attributeRolls : [];
-  ['abilities','talents','techniques','domains','attacks','items','aptitudeChoices'].forEach(k=>sheet[k]=Array.isArray(sheet[k])?sheet[k]:[]);
+  ['abilities','talents','techniques','domains','invocations','attacks','items','aptitudeChoices'].forEach(k=>sheet[k]=Array.isArray(sheet[k])?sheet[k]:[]);
   sheet.domains = sheet.domains.map(d=>({name:d.name||'', type:d.type||'', technique:d.technique||'', level:d.level ?? '', cost:d.cost||'', area:d.area||'', duration:d.duration||'', text:d.text||''}));
+  sheet.invocations = sheet.invocations.map(v=>({name:v.name||'', type:v.type||'', grade:v.grade||'', cost:v.cost||'', hp:v.hp||'', hpCurrent:v.hpCurrent||'', defense:v.defense||'', movement:v.movement||'', active:!!v.active, companion:!!v.companion, actions:v.actions||'', traits:v.traits||'', text:v.text||''}));
   sheet.techniques = sheet.techniques.map(t=>({name:t.name||'', tech:t.tech || t.technique || '', level:t.level ?? '', action:t.action||'', range:t.range||'', target:t.target||'', duration:t.duration||'', cost:t.cost||'', damage:t.damage||'', resistance:t.resistance||'', prepared:!!t.prepared, signature:!!t.signature, text:t.text||''}));
   sheet.abilities = sheet.abilities.map(a=>({level:a.level ?? a.nivel ?? '', class:a.class ?? a.classe ?? '', kind:a.kind ?? '', name:a.name||'', text:a.text||'', options:Array.isArray(a.options)?a.options:[], selectedOptions:Array.isArray(a.selectedOptions)?a.selectedOptions:[]}));
   sheet.items = sheet.items.map(it=>({name:it.name||'', category:it.category||'Item', cost:it.cost??'', qty:it.qty||1, weight:it.weight||0, damage:it.damage||'', properties:it.properties||'', grade:it.grade||'', enchantmentCharges:it.enchantmentCharges??'', uniqueAbility:it.uniqueAbility||'', modifications:Array.isArray(it.modifications)?it.modifications:[], text:it.text||''}));
@@ -5009,6 +5128,7 @@ function row(kind,x,i){
   if(kind==='techniques') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.tech || 'Feitiço')}</span>${x.level!==''?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}${x.prepared?`<span class="badge good">Preparado</span>`:''}${x.signature?`<span class="badge soft">Marca registrada</span>`:''}</div><input data-row="techniques" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><input data-row="techniques" data-i="${i}" data-field="tech" placeholder="Técnica vinculada" value="${esc(x.tech||'')}"><input data-row="techniques" data-i="${i}" data-field="level" placeholder="Nível" value="${esc(x.level)}"><input data-row="techniques" data-i="${i}" data-field="action" placeholder="Conjuração" value="${esc(x.action||'')}"><input data-row="techniques" data-i="${i}" data-field="range" placeholder="Alcance" value="${esc(x.range||'')}"><input data-row="techniques" data-i="${i}" data-field="target" placeholder="Alvo" value="${esc(x.target||'')}"><input data-row="techniques" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><input data-row="techniques" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="techniques" data-i="${i}" data-field="damage" placeholder="Dano/cura. Ex.: 4d8+3" value="${esc(x.damage||'')}"><input data-row="techniques" data-i="${i}" data-field="resistance" placeholder="Teste de resistência" value="${esc(x.resistance||'')}"></div><div class="actions-inline tight"><label class="checkline"><input data-tech-toggle="prepared" data-i="${i}" type="checkbox" ${x.prepared?'checked':''}> Preparado</label><label class="checkline"><input data-tech-toggle="signature" data-i="${i}" type="checkbox" ${x.signature?'checked':''}> Marca registrada</label>${x.damage?`<button data-roll-tech-damage="${i}">Rolar dano/cura</button>`:''}<button data-roll-tech-cd="${i}">Mostrar CD</button></div><textarea data-row="techniques" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="techniques" data-i="${i}">Remover</button></div>`;
   if(kind==='abilities') { const opts=Array.isArray(x.options)?x.options:[]; const selected=Array.isArray(x.selectedOptions)?x.selectedOptions:[]; const optsHtml=opts.length?`<div class="option-box"><strong>Escolhas desta habilidade</strong><p class="muted">Marque as opções/efeitos escolhidos para esta habilidade.</p>${opts.map((op,oi)=>`<button class="choice-pill ${selected.includes(op)?'active':''}" data-ability-option="${i}" data-option-index="${oi}">${esc(op)}</button>`).join('')}</div>`:''; return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(abilityLevelLabel(x.level))}</span>${x.class?`<span class="badge soft">${esc(x.class)}</span>`:''}${x.kind?`<span class="badge soft">${esc(x.kind)}</span>`:''}</div><input data-row="abilities" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="abilities" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level)}" placeholder="Livre"></label><label>Classe<input data-row="abilities" data-i="${i}" data-field="class" value="${esc(x.class)}" placeholder="Opcional"></label></div>${optsHtml}<textarea data-row="abilities" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="abilities" data-i="${i}">Remover</button></div>`; }
   if(kind==='talents') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.category||'Talento')}</span>${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="talents" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="talents" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label><label>Categoria<input data-row="talents" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label></div><textarea data-row="talents" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="talents" data-i="${i}">Remover</button></div>`;
+  if(kind==='invocations') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.type||'Invocação')}</span>${x.grade?`<span class="badge soft">${esc(x.grade)}</span>`:''}${x.active?`<span class="badge good">Ativa</span>`:''}${x.companion?`<span class="badge soft">Companheira</span>`:''}</div><input data-row="invocations" data-i="${i}" data-field="name" placeholder="Nome da invocação" value="${esc(x.name)}"><div class="form-grid"><input data-row="invocations" data-i="${i}" data-field="type" placeholder="Tipo: Shikigami, Marionete..." value="${esc(x.type||'')}"><input data-row="invocations" data-i="${i}" data-field="grade" placeholder="Grau" value="${esc(x.grade||'')}"><input data-row="invocations" data-i="${i}" data-field="cost" placeholder="Custo de invocação/manutenção" value="${esc(x.cost||'')}"><input data-row="invocations" data-i="${i}" data-field="hp" placeholder="PV máximo" value="${esc(x.hp||'')}"><input data-row="invocations" data-i="${i}" data-field="hpCurrent" placeholder="PV atual" value="${esc(x.hpCurrent||'')}"><input data-row="invocations" data-i="${i}" data-field="defense" placeholder="Defesa" value="${esc(x.defense||'')}"><input data-row="invocations" data-i="${i}" data-field="movement" placeholder="Deslocamento" value="${esc(x.movement||'')}"><input data-row="invocations" data-i="${i}" data-field="actions" placeholder="Ações/comandos" value="${esc(x.actions||'')}"></div><div class="actions-inline tight"><label class="checkline"><input data-invocation-toggle="active" data-i="${i}" type="checkbox" ${x.active?'checked':''}> Ativa em campo</label><label class="checkline"><input data-invocation-toggle="companion" data-i="${i}" type="checkbox" ${x.companion?'checked':''}> Companheira amaldiçoada</label></div><textarea data-row="invocations" data-i="${i}" data-field="traits" placeholder="Características, resistências, sentidos, habilidades passivas">${esc(x.traits||'')}</textarea><textarea data-row="invocations" data-i="${i}" data-field="text" placeholder="Ataques, ações, regras especiais e observações">${esc(x.text||'')}</textarea><button data-del="invocations" data-i="${i}">Remover</button></div>`;
   if(kind==='domains') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.type||'Domínio')}</span>${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="domains" data-i="${i}" data-field="name" placeholder="Nome da expansão" value="${esc(x.name)}"><div class="form-grid"><input data-row="domains" data-i="${i}" data-field="technique" placeholder="Técnica vinculada" value="${esc(x.technique||'')}"><input data-row="domains" data-i="${i}" data-field="type" placeholder="Tipo" value="${esc(x.type||'')}"><input data-row="domains" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="domains" data-i="${i}" data-field="area" placeholder="Área" value="${esc(x.area||'')}"><input data-row="domains" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><label>Nível necessário<input data-row="domains" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label></div><textarea data-row="domains" data-i="${i}" data-field="text" placeholder="Efeitos, acerto garantido, regras e observações">${esc(x.text)}</textarea><button data-del="domains" data-i="${i}">Remover</button></div>`;
   return `<div class="mini-row"><input data-row="${kind}" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><textarea data-row="${kind}" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="${kind}" data-i="${i}">Remover</button></div>`;
 }
@@ -5106,15 +5226,18 @@ function renderRows(sheet){
   if($('#aptitudeChoicesList')) $('#aptitudeChoicesList').innerHTML = sheet.aptitudeChoices.length ? sheet.aptitudeChoices.map((x,i)=>row('aptitudeChoices',x,i)).join('') : '<p class="muted">Nenhuma aptidão escolhida ainda.</p>';
   $('#talentsList').innerHTML = sheet.talents.length ? sheet.talents.map((x,i)=>row('talents',x,i)).join('') : '<p class="muted">Nenhum talento cadastrado.</p>';
   if($('#domainsList')) $('#domainsList').innerHTML = sheet.domains.length ? sheet.domains.map((x,i)=>row('domains',x,i)).join('') : '<p class="muted">Nenhuma expansão de domínio cadastrada.</p>';
+  if($('#invocationsList')) $('#invocationsList').innerHTML = sheet.invocations.length ? sheet.invocations.map((x,i)=>row('invocations',x,i)).join('') : '<p class="muted">Nenhuma invocação cadastrada.</p>';
+  if($('#invocationSummary')){ const slots=controllerInvocationSlots(sheet); const active=(sheet.invocations||[]).filter(v=>v.active).length; const comp=(sheet.invocations||[]).filter(v=>v.companion).length; $('#invocationSummary').innerHTML = sheet.specialization==='Controlador' ? `<div class="rule-card"><h3>Invocações do Controlador</h3><p>Recebidas pelo nível: <b>${slots.gained}</b> • Ativas marcadas: <b>${active}</b> • Comandos por ação: <b>${slots.commands}</b></p><p class="muted">Marque “ativa” nas invocações em campo. O limite exato pode variar por habilidade, técnica e decisão do narrador.</p></div>` : `<div class="rule-card"><h3>Invocações</h3><p class="muted">Personagens sem Controlador também podem registrar invocações vindas de técnica, item, acordo ou regra da mesa.</p></div>`; }
   $('#techniquesList').innerHTML = sheet.techniques.length ? sheet.techniques.map((x,i)=>row('techniques',x,i)).join('') : '<p class="muted">Nenhum feitiço/habilidade de técnica adicionada.</p>';
   syncTechniqueSelectors(sheet);
   $('#attacksList').innerHTML = sheet.attacks.length ? sheet.attacks.map((x,i)=>row('attacks',x,i)).join('') : '<p class="muted">Nenhum ataque cadastrado.</p>';
   $('#itemsList').innerHTML = sheet.items.length ? sheet.items.map((x,i)=>row('items',x,i)).join('') : '<p class="muted">Nenhum item cadastrado.</p>';
   { const load=loadState(sheet); const status=load.impossible?'Impossível carregar':load.overloaded?'Sobrecarregado':'Dentro do limite'; $('#loadView').textContent = `${load.used} / ${load.limit} espaços`; const details=$('#loadDetails'); if(details){ details.innerHTML = `<div class="load-meter"><span style="width:${Math.min(100, load.limit ? (load.used/load.limit)*100 : 100)}%"></span></div><div class="row-head"><span class="badge ${load.overloaded?'bad':'good'}">${esc(status)}</span><span class="badge soft">Máximo absoluto: ${esc(load.max)} espaços</span>${load.overloaded?'<span class="badge bad">-5 Defesa</span><span class="badge bad">-4,5m Deslocamento</span>':''}</div>`; } }
   renderOriginTalentGrant(sheet);
-  $$('[data-row]').forEach(el=>el.oninput=()=>{ const arr=sheet[el.dataset.row]; arr[Number(el.dataset.i)][el.dataset.field] = (el.dataset.field==='level' && el.value==='') ? '' : (el.type==='number'?Number(el.value):el.value); save(); if(['items','abilities','talents','domains'].includes(el.dataset.row)) renderRows(sheet); });
+  $$('[data-row]').forEach(el=>el.oninput=()=>{ const arr=sheet[el.dataset.row]; arr[Number(el.dataset.i)][el.dataset.field] = (el.dataset.field==='level' && el.value==='') ? '' : (el.type==='number'?Number(el.value):el.value); save(); if(['items','abilities','talents','domains','invocations'].includes(el.dataset.row)) renderRows(sheet); });
   $$('[data-del]').forEach(btn=>btn.onclick=()=>{ sheet[btn.dataset.del].splice(Number(btn.dataset.i),1); save(); renderRows(sheet); });
   $$('[data-tech-toggle]').forEach(el=>el.onchange=()=>{ const t=sheet.techniques[Number(el.dataset.i)]; if(!t) return; t[el.dataset.techToggle]=el.checked; save(); renderRows(sheet); });
+  $$('[data-invocation-toggle]').forEach(el=>el.onchange=()=>{ const v=sheet.invocations[Number(el.dataset.i)]; if(!v) return; v[el.dataset.invocationToggle]=el.checked; save(); renderRows(sheet); });
   $$('[data-roll-tech-damage]').forEach(btn=>btn.onclick=()=>{ const t=sheet.techniques[Number(btn.dataset.rollTechDamage)]; roll(t.damage || '1d8', `${t.name || 'Feitiço'} — dano/cura`); });
   $$('[data-roll-tech-cd]').forEach(btn=>btn.onclick=()=>{ const t=sheet.techniques[Number(btn.dataset.rollTechCd)]; { const text=`${t.name || 'Feitiço'} — CD atual: ${sheet.dc}. Resistência: ${t.resistance || 'não definida'}.`; $('#rollResult').textContent=text; const div=document.createElement('div'); div.textContent=text; $('#rollHistory').prepend(div); activateTab('rolador'); } });
   $$('[data-roll-attack-hit]').forEach(btn=>btn.onclick=()=>{ const atk=sheet.attacks[Number(btn.dataset.rollAttackHit)]; roll(atk.test || '1d20', `${atk.name || 'Ataque'} — acerto`); });
@@ -5136,16 +5259,32 @@ function syncTechniqueSelectors(sheet){
   const spellFilter=$('#spellTechniqueFilter');
   if(spellFilter){
     const techs=[...new Set(TECH_LIBRARY.map(t=>t.tech))];
-    const preferred=sheet.innateTechnique && techs.includes(sheet.innateTechnique) ? sheet.innateTechnique : 'current';
+    const preferred=sheet.innateTechnique && techs.includes(canonicalTechniqueName(sheet.innateTechnique)) ? canonicalTechniqueName(sheet.innateTechnique) : 'current';
     spellFilter.innerHTML = `<option value="current">Técnica atual</option><option value="all">Todas as técnicas</option>` + techs.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('');
     if(!spellFilter.value) spellFilter.value=preferred;
   }
 }
+function canonicalTechniqueName(name){
+  const n=String(name||'').trim();
+  const aliases={
+    'Manipulação Sanguínea':'Manipulação de Sangue',
+    'Manipulação Sanguinea':'Manipulação de Sangue'
+  };
+  return aliases[n] || n;
+}
+function addTechniqueZeroDefaultsToSheet(sheet, techniqueName, options={}){
+  if(!sheet) return 0;
+  const techName=canonicalTechniqueName(techniqueName || sheet.innateTechnique);
+  if(!techName) return 0;
+  sheet.techniques = sheet.techniques || [];
+  const existing=new Set(sheet.techniques.map(t=>`${canonicalTechniqueName(t.tech)}::${t.name}`));
+  const defaults=TECH_LIBRARY.filter(t=>canonicalTechniqueName(t.tech)===techName && Number(t.level)===0 && !existing.has(`${canonicalTechniqueName(t.tech)}::${t.name}`));
+  defaults.forEach(t=>sheet.techniques.push({name:t.name, tech:t.tech, level:t.level, action:t.action, range:t.range, target:t.target, duration:t.duration, cost:t.cost||'', damage:t.damage||'', resistance:t.resistance||'', text:t.text, prepared:options.prepared!==false, signature:false, source:'Fundamento inicial'}));
+  return defaults.length;
+}
 function addTechniqueZeroDefaults(){
   const sheet=current(); if(!sheet || !sheet.innateTechnique) return;
-  const existing=new Set((sheet.techniques||[]).map(t=>`${t.tech}::${t.name}`));
-  const defaults=TECH_LIBRARY.filter(t=>t.tech===sheet.innateTechnique && Number(t.level)===0 && !existing.has(`${t.tech}::${t.name}`));
-  defaults.forEach(t=>sheet.techniques.push({name:t.name, tech:t.tech, level:t.level, action:t.action, range:t.range, target:t.target, duration:t.duration, cost:t.cost||'', damage:t.damage||'', resistance:t.resistance||'', text:t.text, prepared:true, signature:false}));
+  addTechniqueZeroDefaultsToSheet(sheet, sheet.innateTechnique);
   save(); renderRows(sheet); renderTechLibrary();
 }
 
@@ -5270,6 +5409,22 @@ function renderDomainChooser(){
   $$('[data-add-domain-lib]').forEach(btn=>btn.onclick=()=>{ const d=DOMAIN_LIBRARY[Number(btn.dataset.addDomainLib)]; sheet.domains.push({name:d.name, type:d.type, technique:d.technique, level:d.level, cost:d.cost, area:d.area, duration:d.duration, text:d.text}); save(); renderRows(sheet); renderDomainChooser(); });
 }
 
+
+function renderInvocationChooser(){
+  const sheet=current(); if(!sheet) return;
+  const q=($('#invocationSearch')?.value||'').toLowerCase();
+  const type=$('#invocationTypeFilter')?.value||'all';
+  const grade=$('#invocationGradeFilter')?.value||'all';
+  const data=INVOCATION_LIBRARY.map((v,i)=>({v,i})).filter(({v})=>{
+    const blob=JSON.stringify(v).toLowerCase();
+    const typeOk=type==='all' || v.type===type;
+    const gradeOk=grade==='all' || v.grade===grade;
+    return typeOk && gradeOk && (!q || blob.includes(q));
+  });
+  $('#invocationChooser').innerHTML = data.map(({v,i})=>`<div class="library-card"><h3>${esc(v.name)}</h3><p class="muted">${esc(v.type)} • ${esc(v.grade)} • custo: ${esc(v.cost||'—')}</p><p><b>PV:</b> ${esc(v.hp||'—')} • <b>Defesa:</b> ${esc(v.defense||'—')} • <b>Deslocamento:</b> ${esc(v.movement||'—')}</p><p><b>Ações:</b> ${esc(v.actions||'—')}</p><p>${esc(v.text||'')}</p><button data-add-invocation-lib="${i}">Adicionar invocação</button></div>`).join('') || '<p class="muted">Nenhuma invocação encontrada.</p>';
+  $$('[data-add-invocation-lib]').forEach(btn=>btn.onclick=()=>{ const v=INVOCATION_LIBRARY[Number(btn.dataset.addInvocationLib)]; sheet.invocations.push({name:v.name,type:v.type,grade:v.grade,cost:v.cost,hp:v.hp,hpCurrent:'',defense:v.defense,movement:v.movement,active:false,companion:false,actions:v.actions,traits:v.traits,text:v.text}); save(); renderRows(sheet); renderInvocationChooser(); });
+}
+
 function renderRules(){ $('#rulesSummary').innerHTML = RULES.map(r=>`<div class="rule-card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p></div>`).join(''); }
 function renderAll(){ renderSheetList(); renderEditor(); renderRules(); }
 
@@ -5282,7 +5437,7 @@ function renderWizard(){
   ensureCreationChoices(wizardData);
   let html='';
   if(wizardStep===0) html=`<div class="form-grid"><label>Nome do personagem<input id="wName" value="${esc(wizardData.name)}" placeholder="Ex.: Aoi Nakamura"></label><label>Nome do jogador<input id="wPlayer" value="${esc(wizardData.player)}"></label><label>Nível inicial<input id="wLevel" type="number" min="1" max="20" value="${wizardData.level||1}"></label><label>Técnica inata, se já souber<input id="wTechnique" value="${esc(wizardData.innateTechnique)}" placeholder="Pode deixar em branco"></label></div>`;
-  if(wizardStep===1) html=`<p class="muted">Escolha a origem. As escolhas detalhadas da origem continuam ajustáveis no painel de Status.</p><div class="choice-grid">${ORIGINS.map(o=>`<div class="choice ${wizardData.origin===o.name?'active':''}" data-w-origin="${o.name}"><strong>${o.name}</strong><span>${o.desc}</span></div>`).join('')}</div>`;
+  if(wizardStep===1) html=`<p class="muted">Escolha a origem. Se a origem tiver escolhas obrigatórias, elas aparecem abaixo antes de continuar.</p><div class="choice-grid">${ORIGINS.map(o=>`<div class="choice ${wizardData.origin===o.name?'active':''}" data-w-origin="${o.name}"><strong>${o.name}</strong><span>${o.desc}</span></div>`).join('')}</div>${wizardOriginDetailsHtml()}`;
   if(wizardStep===2){
     const cls=CLASSES[wizardData.specialization]||CLASSES.Lutador;
     html=`<p class="muted">A especialização define PV, PE/Estamina, treinamentos, atributo-chave e habilidades automáticas iniciais.</p><div class="choice-grid">${Object.entries(CLASSES).map(([name,c])=>`<div class="choice ${wizardData.specialization===name?'active':''}" data-w-class="${name}"><strong>${name}</strong><span>PV ${c.hp1} + CON • ${c.stamina?'Estamina '+c.stamina+'/nível':'PE '+c.pe+'/nível'} • ${c.keys.join(' ou ')}</span></div>`).join('')}</div><label style="margin-top:1rem">Atributo-chave<select id="wKey">${(cls.keys||[]).map(k=>`<option ${wizardData.keyAttribute===k?'selected':''}>${k}</option>`).join('')}</select></label><div class="rule-grid" style="margin-top:1rem">${(cls.baseAbilities||[]).map(n=>{ const lib=ABILITY_LIBRARY.find(a=>a.name===n); return `<div class="rule-card"><h3>${esc(n)}</h3><p class="muted">Automática inicial</p><p>${esc(lib?.text||'Habilidade automática da especialização.')}</p></div>`; }).join('')}</div><label class="switch-line"><input id="wApplyBaseAbilities" type="checkbox" ${ensureCreationChoices(wizardData).applyBaseAbilities!==false?'checked':''}> Adicionar habilidades automáticas iniciais ao finalizar</label>`;
@@ -5305,6 +5460,13 @@ function renderWizard(){
 function collectWizard(){
   ensureCreationChoices(wizardData);
   if(wizardStep===0){ wizardData.name=$('#wName').value; wizardData.player=$('#wPlayer').value; wizardData.level=Number($('#wLevel').value||1); wizardData.innateTechnique=$('#wTechnique').value; }
+  if(wizardStep===1){
+    const oc=wizardData.originChoices ||= originChoicesDefault();
+    $$('[data-w-origin-choice]').forEach(el=>{ oc[el.dataset.wOriginChoice]=el.value; });
+    $$('[data-w-origin-trained]').forEach(el=>{ const idx=Number(el.dataset.wOriginTrained); oc.originTrained=Array.isArray(oc.originTrained)?oc.originTrained:['','']; oc.originTrained[idx]=el.value; });
+    const mode=$('[data-w-origin-training-mode]:checked'); if(mode) oc.trainingMode=mode.value;
+    cleanOriginTrainingChoices(wizardData);
+  }
   if(wizardStep===2){ wizardData.keyAttribute=$('#wKey')?.value || wizardData.keyAttribute; wizardData.creationChoices.applyBaseAbilities = !!$('#wApplyBaseAbilities')?.checked; }
   if(wizardStep===4){ const cc=ensureCreationChoices(wizardData); cc.equipmentA=$('#wEquipA')?.value||''; cc.equipmentB=$('#wEquipB')?.value||''; cc.uniform=$('#wUniform')?.value||''; cc.kit=$('#wKit')?.value||''; }
   if(wizardStep===5){ $$('.wAttrSelect').forEach(i=>{ wizardData.attributeAssignments[i.dataset.wAttr]=i.value===''?'':Number(i.value); }); syncAttributesFromAssignments(wizardData); }
@@ -5312,7 +5474,10 @@ function collectWizard(){
 }
 function bindWizardStep(){
   ensureCreationChoices(wizardData);
-  $$('[data-w-origin]').forEach(c=>c.onclick=()=>{ wizardData.origin=c.dataset.wOrigin; if(wizardData.origin==='Restringido') wizardData.specialization='Restringido'; renderWizard(); });
+  $$('[data-w-origin]').forEach(c=>c.onclick=()=>{ wizardData.origin=c.dataset.wOrigin; wizardData.originChoices={...originChoicesDefault(), ...(wizardData.originChoices||{})}; if(wizardData.origin==='Restringido') wizardData.specialization='Restringido'; renderWizard(); });
+  $$('[data-w-origin-choice]').forEach(el=>el.oninput=()=>{ const oc=wizardData.originChoices ||= originChoicesDefault(); oc[el.dataset.wOriginChoice]=el.value; if(el.dataset.wOriginChoice==='clan'){ const clan=CLANS[oc.clan]||CLANS['Clã Gojo']; const allowed=clanAllowedAttributes(wizardData); if(!allowed.includes(oc.plus2)) oc.plus2=''; if(!allowed.includes(oc.plus1)) oc.plus1=''; if(!(clan.techniqueOptions||[]).includes(oc.clanTechnique)) oc.clanTechnique=''; oc.originTrained=['','']; oc.originMaster=''; } cleanOriginTrainingChoices(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); renderWizard(); });
+  $$('[data-w-origin-training-mode]').forEach(el=>el.onchange=()=>{ const oc=wizardData.originChoices ||= originChoicesDefault(); oc.trainingMode=el.value; cleanOriginTrainingChoices(wizardData); renderWizard(); });
+  $$('[data-w-origin-trained]').forEach(el=>el.oninput=()=>{ const oc=wizardData.originChoices ||= originChoicesDefault(); const idx=Number(el.dataset.wOriginTrained); oc.originTrained=Array.isArray(oc.originTrained)?oc.originTrained:['','']; oc.originTrained[idx]=el.value; cleanOriginTrainingChoices(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); renderWizard(); });
   $$('[data-w-class]').forEach(c=>c.onclick=()=>{ wizardData.specialization=c.dataset.wClass; wizardData.keyAttribute=(CLASSES[wizardData.specialization]||CLASSES.Lutador).keys[0]; wizardData.creationChoices.saves=[]; wizardData.creationChoices.trained=[]; renderWizard(); });
   $('#wKey')?.addEventListener('input',e=>wizardData.keyAttribute=e.target.value);
   $('#wApplyBaseAbilities')?.addEventListener('change',e=>{ wizardData.creationChoices.applyBaseAbilities=e.target.checked; });
@@ -5326,7 +5491,7 @@ function bindWizardStep(){
   renderWizardSkillPreview();
 }
 function renderWizardSkillPreview(){ const el=$('#wSkillPreview'); if(!el) return; const trained=Object.entries(wizardData.skillRanks||{}).filter(([,v])=>v!=='none').map(([k,v])=>`${k}: ${v==='master'?'Mestre':'Treinado'}`); el.innerHTML=trained.length?trained.map(t=>`<div class="rule-card"><p>${esc(t)}</p></div>`).join(''):'<p class="muted">Nenhuma sugestão aplicada ainda.</p>'; }
-function finishWizard(){ collectWizard(); syncAttributesFromAssignments(wizardData); wizardData.attributeBase=wizardData.attributeBase||{}; ATTRS.forEach(a=>{ if(wizardData.attributeBase[a]===undefined) wizardData.attributeBase[a]=Number(wizardData.attributes[a]||10); }); wizardData.attributeTempMods=wizardData.attributeTempMods||{}; ATTRS.forEach(a=>{ if(wizardData.attributeTempMods[a]===undefined) wizardData.attributeTempMods[a]=0; }); applyCreationTrainingChoices(wizardData); addBaseAbilitiesIfWanted(wizardData); applyCreationEquipment(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); const idx=sheets.findIndex(s=>s.id===wizardData.id); if(idx>=0) sheets[idx]=wizardData; else sheets.push(wizardData); activeId=wizardData.id; save(); $('#wizard').close(); activateTab('fichas'); renderAll(); }
+function finishWizard(){ collectWizard(); syncAttributesFromAssignments(wizardData); wizardData.attributeBase=wizardData.attributeBase||{}; ATTRS.forEach(a=>{ if(wizardData.attributeBase[a]===undefined) wizardData.attributeBase[a]=Number(wizardData.attributes[a]||10); }); wizardData.attributeTempMods=wizardData.attributeTempMods||{}; ATTRS.forEach(a=>{ if(wizardData.attributeTempMods[a]===undefined) wizardData.attributeTempMods[a]=0; }); applyCreationTrainingChoices(wizardData); applyOriginCreationBenefits(wizardData); addBaseAbilitiesIfWanted(wizardData); applyCreationEquipment(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); const idx=sheets.findIndex(s=>s.id===wizardData.id); if(idx>=0) sheets[idx]=wizardData; else sheets.push(wizardData); activeId=wizardData.id; save(); $('#wizard').close(); activateTab('fichas'); renderAll(); }
 
 function normalizeDiceExpression(expr){
   return String(expr||'')
@@ -5480,7 +5645,7 @@ function init(){
   $('#reopenWizard').onclick=()=>openWizard(true);
   $('#wizardBack').onclick=()=>{ collectWizard(); if(wizardStep>0) wizardStep--; renderWizard(); };
   $('#wizardNext').onclick=()=>{ collectWizard(); const err=validateWizardStep(); if(err){ alert(err); return; } if(wizardStep<wizardSteps.length-1){ wizardStep++; renderWizard(); } else finishWizard(); };
-  $$('[data-add]').forEach(btn=>btn.onclick=()=>{ const sheet=current(); if(!sheet) return; const t=btn.dataset.add; const obj=t==='attacks'?{name:'',test:'1d20',damage:'1d8',notes:''}:t==='items'?{name:'',category:'Personalizado',cost:'',qty:1,weight:0,damage:'',properties:'',grade:'',enchantmentCharges:'',uniqueAbility:'',modifications:[],text:''}:t==='techniques'?{name:'',tech:sheet.innateTechnique||'',level:'',action:'',range:'',target:'',duration:'',cost:'',damage:'',resistance:'',prepared:false,signature:false,text:''}:t==='domains'?{name:'',type:'',technique:'',level:'',cost:'',area:'',duration:'',text:''}:t==='abilities'?{name:'',level:'',class:'',text:''}:t==='talents'?{name:'',level:'',category:'',text:''}:{name:'',text:''}; sheet[t].push(obj); save(); renderRows(sheet); });
+  $$('[data-add]').forEach(btn=>btn.onclick=()=>{ const sheet=current(); if(!sheet) return; const t=btn.dataset.add; const obj=t==='attacks'?{name:'',test:'1d20',damage:'1d8',notes:''}:t==='items'?{name:'',category:'Personalizado',cost:'',qty:1,weight:0,damage:'',properties:'',grade:'',enchantmentCharges:'',uniqueAbility:'',modifications:[],text:''}:t==='techniques'?{name:'',tech:sheet.innateTechnique||'',level:'',action:'',range:'',target:'',duration:'',cost:'',damage:'',resistance:'',prepared:false,signature:false,text:''}:t==='domains'?{name:'',type:'',technique:'',level:'',cost:'',area:'',duration:'',text:''}:t==='invocations'?{name:'',type:'Shikigami',grade:'',cost:'',hp:'',hpCurrent:'',defense:'',movement:'9m',active:false,companion:false,actions:'',traits:'',text:''}:t==='abilities'?{name:'',level:'',class:'',text:''}:t==='talents'?{name:'',level:'',category:'',text:''}:{name:'',text:''}; sheet[t].push(obj); save(); renderRows(sheet); });
   $('#recalculate').onclick=()=>{ const sheet=current(); if(!sheet)return; applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); };
   $('#applyClassSkills').onclick=()=>{ const sheet=current(); if(!sheet)return; applyDefaultSkills(sheet); save(); renderEditor(); };
   $('#openAbilityChooser').onclick=()=>{ renderAbilityChooser(); openDialog('abilityDialog'); };
@@ -5489,6 +5654,10 @@ function init(){
   $('#abilityKindFilter')?.addEventListener('input', renderAbilityChooser);
   $('#openTalentChooser')?.addEventListener('click',()=>{ renderTalentChooser(); openDialog('talentDialog'); });
   $('#openDomainChooser')?.addEventListener('click',()=>{ renderDomainChooser(); openDialog('domainDialog'); });
+  $('#openInvocationChooser')?.addEventListener('click',()=>{ renderInvocationChooser(); openDialog('invocationDialog'); });
+  $('#invocationSearch')?.addEventListener('input', renderInvocationChooser);
+  $('#invocationTypeFilter')?.addEventListener('input', renderInvocationChooser);
+  $('#invocationGradeFilter')?.addEventListener('input', renderInvocationChooser);
   $('#openItemChooser')?.addEventListener('click',()=>{ renderItemChooser(); openDialog('itemDialog'); });
   $('#createAttacksFromWeapons')?.addEventListener('click',()=>{ const sheet=current(); if(sheet) createAttacksFromAllWeapons(sheet); });
   if($('#openAptitudeChooser')) $('#openAptitudeChooser').onclick=()=>{ renderAptitudeChooser(); openDialog('aptitudeDialog'); };

@@ -50,3 +50,11 @@
 ## Próximo
 - Refinar treinamentos automáticos por origem/clã.
 - Aplicar escolhas de origem em perícias, talentos e técnicas iniciais.
+
+
+## v0.37
+
+- Técnicas herdadas do assistente de criação agora definem a técnica inata da ficha.
+- Ao criar um Herdado, os fundamentos de nível 0 da técnica herdada são adicionados automaticamente.
+- Adicionados modelos iniciais de Ilimitado, Seis Olhos e Projeção.
+- Ajuste de nome para Manipulação de Sangue, mantendo compatibilidade com Manipulação Sanguínea.

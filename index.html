@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>F&M Ficha Online - v0.35</title>
+  <title>F&M Ficha Online - v0.36</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -11,7 +11,7 @@
     <div class="brand">
       <p class="eyebrow">Feiticeiros & Maldições</p>
       <h1>Ficha Online</h1>
-      <span class="version">v0.35 — criação guiada por classe, treinamentos e equipamento inicial</span>
+      <span class="version">v0.36 — criação de Herdado com clãs, perícias e heranças</span>
     </div>
     <nav class="nav">
       <button data-tab="home" class="active">Início</button>
@@ -27,14 +27,14 @@
         <div>
           <p class="eyebrow">Projeto pessoal</p>
           <h2>Agora a ficha começa a ficar compartilhável e organizada.</h2>
-          <p>A v0.35 melhora o assistente de criação com escolhas iniciais de especialização, perícias, habilidades automáticas e equipamentos.</p>
+          <p>A v0.36 melhora a criação de personagens Herdados com seleção de clã, bônus, perícias, técnica herdada e talento adicional.</p>
           <div class="actions-inline">
             <button id="startCreate" class="primary">+ Criar ficha</button>
             <button id="goSheets">Ver fichas</button>
           </div>
         </div>
         <aside class="hero-panel">
-          <strong>v0.35 entrega</strong>
+          <strong>v0.36 entrega</strong>
           <span>✓ Cálculo de PV/PE</span>
           <span>✓ Perícias automáticas</span>
           <span>✓ BT por nível</span>
@@ -107,6 +107,7 @@
               <button data-subtab="pericias">Perícias</button>
               <button data-subtab="tecnicas">Técnicas</button>
               <button data-subtab="dominios">Expansão de Domínio</button>
+              <button data-subtab="invocacoes">Invocações</button>
               <button data-subtab="inventario">Inventário</button>
               <button data-subtab="notas">Notas</button>
             </nav>
@@ -231,6 +232,21 @@
                   <h2>Resumo de domínio</h2>
                   <div class="rule-card"><h3>Campos recomendados</h3><p>Nome, tipo, técnica vinculada, custo, área, duração, acerto garantido, efeitos internos, efeitos externos, condições e observações do narrador.</p></div>
                   <div class="rule-card"><h3>Observação</h3><p>O cadastro completo das expansões do livro será ampliado aos poucos; esta versão já separa a área correta da ficha.</p></div>
+                </article>
+              </div>
+            </section>
+            <section id="invocacoes" class="subtab">
+              <div class="grid two">
+                <article class="card">
+                  <div class="section-title"><h2>Invocações na ficha</h2><div class="actions-inline tight"><button id="openInvocationChooser">+ Adicionar invocação existente</button><button data-add="invocations">+ Criar invocação</button></div></div>
+                  <p class="muted">Registre shikigamis, marionetes, corpos amaldiçoados e maldições controladas. Controladores podem usar esta aba para acompanhar invocações ativas, custo, ações e ficha resumida.</p>
+                  <div id="invocationSummary" class="progress-grid"></div>
+                  <div id="invocationsList" class="stack"></div>
+                </article>
+                <article class="card">
+                  <h2>Regras rápidas</h2>
+                  <div class="rule-card"><h3>Controlador</h3><p>Controladores começam com duas invocações iniciais e recebem novas invocações em níveis específicos. A ficha calcula um resumo informativo conforme o nível.</p></div>
+                  <div class="rule-card"><h3>Criação livre</h3><p>Use “Criar invocação” para montar uma ficha própria ou “Adicionar existente” para puxar modelos prontos como shikigami, marionete ou maldição controlada.</p></div>
                 </article>
               </div>
             </section>
@@ -518,6 +534,37 @@
       <input id="domainSearch" placeholder="Buscar expansão, técnica ou tipo...">
     </div>
     <div id="domainChooser" class="library"></div>
+  </dialog>
+
+
+  <dialog id="invocationDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Invocações</p>
+        <h2>Adicionar invocação existente</h2>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="dialog-tools">
+      <input id="invocationSearch" placeholder="Buscar shikigami, marionete, maldição, grau ou tipo...">
+      <select id="invocationTypeFilter">
+        <option value="all">Todos os tipos</option>
+        <option value="Shikigami">Shikigami</option>
+        <option value="Marionete">Marionete</option>
+        <option value="Corpo Amaldiçoado">Corpo Amaldiçoado</option>
+        <option value="Maldição Controlada">Maldição Controlada</option>
+        <option value="Modelo Livre">Modelo Livre</option>
+      </select>
+      <select id="invocationGradeFilter">
+        <option value="all">Todos os graus</option>
+        <option value="4º Grau">4º Grau</option>
+        <option value="3º Grau">3º Grau</option>
+        <option value="2º Grau">2º Grau</option>
+        <option value="1º Grau">1º Grau</option>
+        <option value="Especial">Especial</option>
+      </select>
+    </div>
+    <div id="invocationChooser" class="library"></div>
   </dialog>
 
   <script src="app.js"></script>

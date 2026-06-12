@@ -67,3 +67,11 @@ Ainda há itens com descrição estrutural/resumida. A meta continua ser cadastr
 - Restringido aplica bônus físicos e pontos físicos extras.
 - Sem Técnica e Corpo Amaldiçoado Mutante possuem distribuição própria de pontos de origem.
 - A aba Status mostra Base + Evolução + Origem + Temporário, evitando somar bônus duas vezes.
+
+
+## v0.37
+
+- Técnicas herdadas do assistente de criação agora definem a técnica inata da ficha.
+- Ao criar um Herdado, os fundamentos de nível 0 da técnica herdada são adicionados automaticamente.
+- Adicionados modelos iniciais de Ilimitado, Seis Olhos e Projeção.
+- Ajuste de nome para Manipulação de Sangue, mantendo compatibilidade com Manipulação Sanguínea.
