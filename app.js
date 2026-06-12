@@ -4541,6 +4541,195 @@ const TECH_LIBRARY = [
   {tech:'Técnica própria', name:'Feitiço Passivo Personalizado', level:0, action:'Passiva', range:'—', target:'Você', duration:'Permanente', cost:'—', damage:'', resistance:'—', text:'Modelo para efeito passivo da técnica.'}
 ];
 
+
+
+function enrichLibraryDescriptionsV39() {
+  const abilityPatches = {
+  "Lutador|Corpo Treinado": "Você possui preparo corporal acima do comum para combate direto. Use esta habilidade como marcador da base do Lutador: resistência, condicionamento físico e aplicação do corpo como arma. Ela não consome escolha de evolução.",
+  "Lutador|Empolgação": "Você luta melhor quando entra no ritmo do combate. Use esta habilidade para controlar efeitos ligados à pressão, sequência de golpes e vantagens que dependam de permanecer ativo na luta. Ela é uma habilidade automática do Lutador.",
+  "Lutador|Reflexo Evasivo": "Seu corpo reage mais rápido ao perigo. Registre aqui melhorias defensivas, bônus contra ataques ou efeitos de evasão recebidos pela progressão do Lutador.",
+  "Lutador|Implemento Marcial": "Você aprofunda o uso de armas, corpo e implementos marciais. Use esta habilidade para registrar o implemento, arma dedicada ou melhoria marcial liberada pela progressão.",
+  "Especialista em Combate|Repertório do Especialista": "Você escolhe um repertório/estilo de combate que define sua forma de lutar. Registre dentro desta habilidade o estilo escolhido e os efeitos que ele libera.",
+  "Especialista em Combate|Arte do Combate": "Você recebe recursos de preparo e técnicas de combate para executar manobras. Use esta habilidade como centro de controle dos seus Pontos de Preparo e das opções de arte escolhidas.",
+  "Especialista em Técnica|Domínio dos Fundamentos": "Você aprende mudanças de fundamento para alterar a forma como conjura seus feitiços. Registre aqui quais mudanças conhece, seus custos e quando podem ser aplicadas.",
+  "Especialista em Técnica|Conjuração Aprimorada": "Sua conjuração se torna mais eficiente e flexível. Use esta habilidade para registrar melhorias oficiais de conjuração, redução de custo, alcance, ação ou ajustes obtidos pela especialização.",
+  "Controlador|Treinamento em Controle": "Você é treinado para comandar invocações. Recebe invocações iniciais, aumenta o número de invocações ativas e melhora a quantidade de comandos conforme o nível. Use a aba Invocações para cadastrar cada criatura.",
+  "Suporte|Suporte em Combate": "Você atua fortalecendo aliados, criando aberturas e sustentando o grupo. Use esta habilidade como centro das opções de auxílio, reação, cura, inspiração ou proteção concedidas pela especialização.",
+  "Suporte|Presença Inspiradora": "Sua presença em combate ajuda aliados a manterem o foco. Registre aqui bônus, inspirações ou benefícios automáticos concedidos ao grupo conforme a progressão do Suporte.",
+  "Suporte|Versatilidade": "Você amplia seu repertório de apoio. Quando esta habilidade permitir escolhas internas, marque as opções escolhidas na própria ficha para lembrar quais efeitos estão ativos.",
+  "Restringido|Restrito pelos Céus": "Sua restrição troca o desenvolvimento amaldiçoado normal por capacidade física anormal. Use esta habilidade para registrar que a progressão do personagem segue as regras de Restringido, com foco em atributos físicos, mobilidade e resistência.",
+  "Restringido|Ataque Furtivo": "Você aproveita brechas e momentos de descuido para causar dano extra. Registre aqui as condições exigidas para aplicar o dano furtivo e a progressão do valor conforme o nível.",
+  "Restringido|Esquiva Sobre-humana": "Seus reflexos físicos superam o normal. Use esta habilidade para controlar bônus defensivos, esquivas, reações ou reduções de dano ligadas ao corpo restringido.",
+  "Restringido|Implemento Celeste": "Você recebe ou aprimora um implemento ligado à sua restrição. Escolha o efeito interno quando a habilidade permitir e registre o item correspondente no inventário.",
+  "Restringido|Dádiva do Céu": "Sua restrição concede uma dádiva física especial. Quando a habilidade oferecer várias opções, escolha uma e deixe marcada na ficha para não confundir com outros bônus."
+};
+  const talentPatches = {
+  "Afinidade com Técnica": "Você aprofunda o vínculo com sua técnica amaldiçoada. Na prática, este talento serve para ganhar feitiços adicionais ao longo da progressão; use-o quando quiser que a técnica tenha mais aplicações próprias sem trocar de especialização.",
+  "Artesão Amaldiçoado": "Você sabe trabalhar energia amaldiçoada em equipamentos. Use este talento para justificar criação, manutenção e melhoria de ferramentas amaldiçoadas, normalmente exigindo Ofício adequado, tempo, recursos e aprovação do narrador.",
+  "Ataque Infalível": "Talento ofensivo simples: ajuda a tornar ataques armados ou desarmados mais confiáveis. Use quando o personagem quer consistência em dano sem depender de técnica amaldiçoada.",
+  "Atenção Infalível": "Talento de percepção constante. Ele representa prontidão, leitura de ambiente e dificuldade maior de ser pego desprevenido.",
+  "Dedicação Recompensadora": "Talento de recursos. Use para controlar itens extras recebidos por grau, sem confundir com equipamento inicial normal.",
+  "Favorecido pela Sorte": "Talento de sorte. Registre os pontos disponíveis e gaste-os para melhorar rolagens importantes, escolhendo o melhor resultado quando a regra permitir.",
+  "Adepto de Combate": "Você aprende parte do repertório de combate de outra especialização. É bom para personagens que querem uma ferramenta marcial específica sem mudar sua classe principal.",
+  "Adepto de Feitiçaria": "Você acessa uma mudança de fundamento do Especialista em Técnica. Use para personagens que conjuram, mas querem mais refinamento sem serem especialistas totais em técnica.",
+  "Alma Inquebrável": "Talento defensivo contra dano ou efeitos que afetam a alma. Marque aqui a redução e qualquer treino relacionado à Integridade.",
+  "Apaziguador de Técnica": "Talento reativo para pressionar conjuradores. Quando uma técnica é usada perto de você, registre aqui a reação, o ataque de oportunidade e o teste exigido para atrapalhar a conjuração.",
+  "Aptidão Desenvolvida": "Aumenta uma aptidão amaldiçoada. Depois de pegar este talento, vá na aba Aptidões e aumente o nível correspondente, respeitando limitações de origem.",
+  "Expansão Maestral": "Melhora o uso de expansão de domínio. Use quando o personagem já possui uma expansão completa e quer conjurá-la com mais domínio, menos abertura ou melhor controle.",
+  "Familiaridade com Técnica": "Talento de origem Inato. Ele reforça a intimidade natural com a técnica, especialmente marca registrada e redução de custo em feitiços escolhidos.",
+  "Manual de Técnica": "Talento de origem Herdado. Representa acesso a registros, manuais e tradição do clã, permitindo antecipar ou desenvolver feitiços com base no conhecimento herdado.",
+  "Expansão de Reserva": "Talento de origem Derivado. Melhora a reserva de energia incomum do personagem, criando recuperação ou PE temporário conforme a regra usada.",
+  "Quebra de Limites": "Talento de origem Restringido. Aumenta atributos físicos além do normal e deve ser anotado separadamente dos aumentos de atributo por nível."
+};
+  const techniquePatches = {
+  "Boneco de Palha": "Técnica centrada em martelo, pregos e boneca de palha. O funcionamento básico gira em atacar com pregos, deixá-los presos ou posicionados, e usar vestígios para criar ligação com o alvo. Na ficha, use os campos de pregos, vestígios e boneca para controlar recursos.",
+  "Boogie Woogie": "Técnica de troca de posição. O núcleo é alterar instantaneamente a posição de criaturas ou objetos válidos, criando defesa, reposicionamento e combos com aliados. Registre na ficha o gatilho aceito pela mesa, alcance e alvos permitidos.",
+  "Cópia": "Técnica que permite copiar habilidades ou funcionamentos de outras técnicas, normalmente com uma condição específica de contato, vínculo ou invocação. Use a ficha para anotar técnica copiada, duração, custo, limite de memorização e se a invocação necessária está ativa.",
+  "Ilimitado": "Técnica espacial de manipulação de aproximação, atração, repulsão e distorção. Na ficha, separe bem efeitos defensivos, Azul, Vermelho e combinações avançadas para não misturar custo e requisito.",
+  "Seis Olhos": "Herança ocular voltada a leitura e eficiência de energia. Use como suporte para percepção amaldiçoada, análise de técnicas e controle fino de custo/uso de energia.",
+  "Projeção": "Técnica de movimento em sequência, dividindo ações em quadros ou etapas. Registre a rota prevista, o que quebra a sequência e quais penalidades atingem quem não acompanha o ritmo.",
+  "Fala Amaldiçoada": "Técnica baseada em comandos carregados de energia. Cada comando deve registrar palavra/frase, alvo que consegue ouvir, teste de resistência, custo e possível retorno no usuário.",
+  "Dez Sombras": "Técnica de invocação por sombras. Use junto da aba Invocações para cadastrar cada shikigami, marcar quais estão disponíveis, destruídos, fundidos ou ativos em campo.",
+  "Manipulação de Sangue": "Técnica de controle e reforço usando sangue. Registre fonte de sangue, custo, perda/recuperação e quais feitiços usam sangue próprio ou externo.",
+  "Construção": "Técnica de materialização. A ficha deve separar objetos temporários, armas criadas, custo de energia e duração, porque a utilidade muda muito conforme o item construído.",
+  "Chamas do Desastre": "Técnica ofensiva de fogo e calor. Organize dano queimante, áreas, condições aplicadas e sustentação de zonas perigosas.",
+  "Transfiguração Ociosa": "Técnica de alteração corporal/alma. Por ser muito forte narrativamente, use descrições claras de alvo, resistência, duração e limites aprovados pelo narrador.",
+  "Técnica do Julgamento": "Técnica baseada em julgamento, acusação e sentença. Registre acusação, evidência, veredito, penalidade e relação com expansão de domínio."
+};
+  const invocationPatches = {
+  "Shikigami Simples": "Invocação básica para utilidade ou combate leve. Use como modelo quando a técnica permite criar um familiar pequeno, com poucos recursos e ações simples.",
+  "Shikigami Guardião": "Invocação defensiva. Boa para proteger o usuário, bloquear passagem, interpor-se contra ataques ou conceder cobertura conforme a mesa permitir.",
+  "Shikigami Predador": "Invocação agressiva. Use para criaturas focadas em caçar, morder, perseguir e pressionar um alvo marcado.",
+  "Cão Divino": "Shikigami rastreador e atacante ligado às Dez Sombras. Registre faro, perseguição, mordida e qualquer variação/fusão existente na campanha.",
+  "Nue": "Shikigami voador, útil para mobilidade, alcance e ataques elétricos. Marque se está ativo em campo e quais ações aéreas ele pode executar.",
+  "Sapo": "Shikigami de controle e movimentação. Use para puxar, agarrar, carregar ou reposicionar criaturas com língua/aderência, conforme a regra definida.",
+  "Coelho Fugitivo": "Invocação de distração e volume. Use para criar confusão, bloquear visão, atrapalhar movimentação e comprar tempo.",
+  "Marionete Simples": "Modelo para boneco ou corpo controlado por energia. Registre alcance de controle, custo para manter e comandos disponíveis.",
+  "Marionete de Combate": "Marionete mais ofensiva. Use para ataques, proteção e ações táticas, principalmente se o personagem tiver habilidades de Controlador.",
+  "Corpo Amaldiçoado Artificial": "Criatura artificial com núcleo. Registre núcleo, personalidade/função, combustível, autonomia e condições para ser destruído ou desativado.",
+  "Maldição Absorvida": "Modelo para maldição convertida em recurso de invocação. Registre origem, grau, ações herdadas, limitações e se a ficha veio de inimigo.",
+  "Invocação Personalizada": "Modelo livre para invocação criada pela técnica, talento ou decisão do narrador. Preencha função, custo, PV, defesa, ataques e comandos."
+};
+  const enchantPatches = {
+  "Afiada": "Encantamento/modificação Afiada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Amplificadora": "Encantamento/modificação Amplificadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Armazenadora": "Encantamento/modificação Armazenadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Balanceada": "Encantamento/modificação Balanceada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Canalizadora": "Encantamento/modificação Canalizadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Cano Alongado": "Encantamento/modificação Cano Alongado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Certeira": "Encantamento/modificação Certeira. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Compartimento": "Encantamento/modificação Compartimento. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Complementar": "Encantamento/modificação Complementar. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Cruel": "Aumenta letalidade do golpe. Na ficha, já pode ser tratado como bônus direto de dano se a mesa permitir.",
+  "Defensora": "Encantamento/modificação Defensora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Destruidora": "Encantamento/modificação Destruidora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Discreta": "Encantamento/modificação Discreta. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Drenadora": "Encantamento/modificação Drenadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Elemental": "Adiciona dano ou efeito elemental. Registre o elemento escolhido e se ele troca ou soma dano.",
+  "Harmonizada": "Encantamento/modificação Harmonizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Horrenda": "Encantamento/modificação Horrenda. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Longa": "Encantamento/modificação Longa. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Otimizada": "Encantamento/modificação Otimizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Penetrante": "Encantamento/modificação Penetrante. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Poderosa": "Aumenta força geral do ataque. Na ficha pode ser bônus direto de dano quando aplicável.",
+  "Potente": "Encantamento/modificação Potente. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Precisa": "Aumenta precisão. Na ficha pode entrar como bônus direto de acerto se a regra da mesa permitir.",
+  "Reluzente": "Encantamento/modificação Reluzente. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Retorno": "Permite a arma voltar ao usuário ou ser recuperada com facilidade. Registre ação, alcance e condição para retornar.",
+  "Sintonizada": "Encantamento/modificação Sintonizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Avassalador": "Encantamento/modificação Avassalador. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Bloqueador": "Encantamento/modificação Bloqueador. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Espinhoso": "Encantamento/modificação Espinhoso. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Reforçado": "Encantamento/modificação Reforçado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Blindado": "Encantamento/modificação Blindado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Furtivo": "Encantamento/modificação Furtivo. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Material Pesado": "Encantamento/modificação Material Pesado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Maldição Personalizada": "Encantamento/modificação Maldição Personalizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso."
+};
+  const domainPatches = {
+  "Expansão de Domínio Incompleta": "Forma inicial ou instável de domínio. Registre área, custo, efeito principal e quais limitações impedem acerto garantido completo.",
+  "Expansão de Domínio Completa": "Manifestação completa do domínio interno. Registre aparência, área, técnica vinculada, efeito de acerto garantido, custo e condições para sustentar.",
+  "Expansão de Domínio Sem Barreiras": "Domínio avançado sem fechamento tradicional. Registre raio, alvo, condição de fuga, custo e como o efeito se mantém sem barreira.",
+  "Puro Amor Mútuo": "Expansão ligada à técnica de Cópia/Rika. Use para registrar cópias disponíveis, armas/técnicas manifestadas e condição de uso durante o domínio.",
+  "Sentença de Morte": "Domínio de julgamento. Registre acusação, prova, veredito e penalidade aplicada, como confisco, condenação ou execução.",
+  "Caixão da Montanha de Ferro": "Domínio de calor e ambiente vulcânico. Registre dano/pressão ambiental, teste de resistência e efeito de acerto garantido.",
+  "Aposta Mortal Indolente": "Domínio baseado em aposta/probabilidade. Registre rodada, jackpot, bônus temporários e estado atual do ciclo.",
+  "Expansão Personalizada": "Modelo livre para criar domínio próprio. Preencha conceito, técnica, área, custo, acerto garantido, resistência e efeitos narrativos."
+};
+  const genericBad = /placeholder|texto completo|revisão|espaço reservado|modelo para|definir conforme mesa|habilidade base automática|ganho automático/i;
+  const addNote = (base, note) => String(base||'').trim() ? String(base).trim() + '\n\n' + note : note;
+
+  TALENT_LIBRARY.forEach(t => {
+    if(talentPatches[t.name]) t.text = talentPatches[t.name];
+    t.text = addNote(t.text, 'Resumo de ficha: confira o pré-requisito antes de adicionar; depois registre usos, cargas ou escolhas internas no próprio talento.');
+  });
+
+  TECHNIQUE_LIBRARY.forEach(t => {
+    if(techniquePatches[t.name]) t.text = techniquePatches[t.name];
+    t.text = addNote(t.text, 'Como usar na ficha: mantenha o funcionamento básico separado dos feitiços. O funcionamento define o que a técnica permite; os feitiços são aplicações específicas com ação, alcance, alvo, custo e efeito.');
+  });
+
+  TECH_LIBRARY.forEach(sp => {
+    const parts = [];
+    if(sp.action) parts.push('Conjuração: ' + sp.action);
+    if(sp.range) parts.push('Alcance: ' + sp.range);
+    if(sp.target) parts.push('Alvo: ' + sp.target);
+    if(sp.duration) parts.push('Duração: ' + sp.duration);
+    if(sp.cost) parts.push('Custo: ' + sp.cost);
+    if(sp.damage) parts.push('Dano/Cura: ' + sp.damage);
+    if(sp.resistance) parts.push('Resistência: ' + sp.resistance);
+    const prefix = parts.length ? parts.join(' • ') + '.\n\n' : '';
+    let body = String(sp.text||'').replace(genericBad, '').trim();
+    if(!body) body = 'Feitiço vinculado à técnica ' + (sp.tech || 'selecionada') + '. Use este registro para controlar ação, custo, alcance, teste de resistência, dano/cura e efeitos adicionais aprovados pelo narrador.';
+    sp.text = prefix + body + '\n\nResumo de mesa: antes de usar, confira se o alvo é válido, se o custo pode ser pago e se há teste de resistência ou rolagem de ataque.';
+  });
+
+  INVOCATION_LIBRARY.forEach(v => {
+    if(invocationPatches[v.name]) v.text = invocationPatches[v.name];
+    const stat = ['Tipo: '+(v.type||'—'), 'Grau: '+(v.grade||'—'), 'PV: '+(v.hp||'—'), 'Defesa: '+(v.defense||'—'), 'Deslocamento: '+(v.movement||'—')].join(' • ');
+    v.text = stat + '.\n\n' + String(v.text||'').trim() + '\n\nComo usar na ficha: marque se está ativa em campo, registre ações/comandos disponíveis e anote características especiais separadas dos ataques.';
+  });
+
+  ITEM_ENCHANTMENT_LIBRARY.forEach(m => {
+    if(enchantPatches[m.name]) m.text = enchantPatches[m.name];
+    const meta = ['Tipo: '+(m.type||'geral'), m.prereq ? 'Pré-requisito: '+m.prereq : '', m.attackBonus ? 'Bônus de acerto: '+(m.attackBonus>0?'+':'')+m.attackBonus : '', m.damageBonus ? 'Bônus de dano: '+(m.damageBonus>0?'+':'')+m.damageBonus : ''].filter(Boolean).join(' • ');
+    m.text = (meta ? meta + '.\n\n' : '') + String(m.text||'').trim() + '\n\nAplicação: adicione ao item, confira se o tipo de equipamento é compatível e ajuste ataques derivados se o efeito alterar acerto, dano, alcance ou propriedade.';
+  });
+
+  DOMAIN_LIBRARY.forEach(d => {
+    if(domainPatches[d.name]) d.text = domainPatches[d.name];
+    const meta = ['Tipo: '+(d.type||'—'), 'Técnica: '+(d.technique||'—'), 'Custo: '+(d.cost||'—'), 'Área: '+(d.area||'—'), 'Duração: '+(d.duration||'—')].join(' • ');
+    d.text = meta + '.\n\n' + String(d.text||'').trim() + '\n\nNa ficha: registre também efeito de acerto garantido, condição de resistência e qualquer limitação imposta pelo narrador.';
+  });
+
+  ITEM_LIBRARY.forEach(it => {
+    const cat = String(it.category||'').toLowerCase();
+    const meta = ['Categoria: '+(it.category||'—'), 'Custo: '+(it.cost||'—'), 'Espaços: '+(it.weight ?? '—'), it.damage ? 'Dano: '+it.damage : '', it.properties ? 'Propriedades: '+it.properties : ''].filter(Boolean).join(' • ');
+    let guide = '';
+    if(cat.includes('arma')) guide = 'Use como equipamento ofensivo. Ao criar ataque a partir dela, confira atributo usado, maestria, propriedade, crítico e modificações aplicadas.';
+    else if(cat.includes('uniforme')) guide = 'Use como proteção vestível. Registre modificações, espaço ocupado, defesa/efeito e possíveis penalidades de carga.';
+    else if(cat.includes('escudo')) guide = 'Use como proteção ativa. Registre bônus defensivo, reação, mão ocupada e encantamentos defensivos.';
+    else if(cat.includes('kit')) guide = 'Use como ferramenta de Ofício ou atividade específica. Registre em quais testes o kit é necessário e se há consumo de material.';
+    else if(cat.includes('item especial')) guide = 'Use como recurso consumível, utilitário ou narrativo. Marque quantidade, carga, duração e condição de uso.';
+    else guide = 'Use como item de inventário. Registre quantidade, espaços e efeito principal.';
+    const base = String(it.text||'').trim();
+    it.text = meta + '.\n\n' + base + '\n\nResumo de uso: ' + guide;
+  });
+
+  ABILITY_LIBRARY.forEach(a => {
+    const key = `${a.class}|${a.name}`;
+    if(abilityPatches[key]) a.text = abilityPatches[key];
+    else if(genericBad.test(a.text||'')) {
+      const level = a.level || a.reqLevel || '—';
+      const kind = a.kind || 'Habilidade';
+      a.text = `${kind} de ${a.class||'especialização'} desbloqueada no nível ${level}. Use este campo para registrar o efeito oficial da habilidade, pré-requisitos, custo, ação e limitações. Se a habilidade tiver escolhas internas, marque as opções dentro da ficha.`;
+    }
+    const req = a.prereq ? 'Pré-requisito: ' + a.prereq + '.\n\n' : '';
+    if(!String(a.text||'').includes('Resumo de ficha:')) a.text = req + String(a.text||'').trim() + '\n\nResumo de ficha: confira nível, especialização e pré-requisitos antes de usar; registre custo, ação, gatilho e usos por descanso/cena quando existirem.';
+  });
+}
+enrichLibraryDescriptionsV39();
+
 const RULES = [
   {title:'Automação atual', text:'PV, PE/Estamina, Defesa, Atenção, Iniciativa, CD e perícias são calculados a partir de nível, atributos, classe e treinamento.'},
   {title:'v0.7', text:'Habilidades separadas por abas de nível.'},
@@ -4551,7 +4740,7 @@ const RULES = [
   {title:'v0.13', text:'Técnica inata ganhou área própria; feitiços são adicionados em janela com filtro por técnica e nível. Inclui guia de publicação.'},
   {title:'v0.27', text:'Biblioteca de técnicas ampliada; feitiços agora têm dano/cura, resistência, marca registrada, preparado, rolagem de dano e botão para adicionar fundamentos nível 0 da técnica inata.'},
   {title:'v0.37', text:'Técnicas herdadas agora puxam fundamentos de nível 0 automaticamente ao criar Herdado; adicionados modelos iniciais para Ilimitado, Seis Olhos e Projeção.'},
-  {title:'Depois', text:'Próxima etapa: completar técnicas/feitiços do livro com mais precisão e iniciar criador guiado de feitiços personalizados.'}
+  {title:'v0.39', text:'Descrições de habilidades, talentos, feitiços, itens, encantamentos, expansões e invocações foram enriquecidas para leitura clara em mesa.'}
 ];
 
 let sheets = readJsonStorage(['femSheetsV13','femSheetsV10','femSheetsV09','femSheetsV08','femSheetsV07','femSheetsV06','femSheetsV05','femSheetsV04'], []);

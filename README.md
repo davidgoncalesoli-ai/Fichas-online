@@ -75,3 +75,8 @@ Ainda há itens com descrição estrutural/resumida. A meta continua ser cadastr
 - Ao criar um Herdado, os fundamentos de nível 0 da técnica herdada são adicionados automaticamente.
 - Adicionados modelos iniciais de Ilimitado, Seis Olhos e Projeção.
 - Ajuste de nome para Manipulação de Sangue, mantendo compatibilidade com Manipulação Sanguínea.
+
+
+## v0.39
+- Descrições de bibliotecas enriquecidas: habilidades, talentos, feitiços, itens, encantamentos, domínios e invocações agora exibem resumos mais claros para uso em mesa.
+- O texto foi organizado em formato de ficha, evitando blocos confusos e destacando custo, ação, requisito, efeito e observações.
