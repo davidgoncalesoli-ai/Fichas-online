@@ -30,8 +30,11 @@ const SKILLS = [
   ['Intuição','Sabedoria',false], ['Investigação','Inteligência',false], ['Medicina','Sabedoria',true], ['Ocultismo','Sabedoria',false],
   ['Ofício','Inteligência',true], ['Percepção','Sabedoria',false], ['Performance','Presença',false], ['Persuasão','Presença',false],
   ['Prestidigitação','Destreza',true], ['Sobrevivência','Sabedoria',false], ['Tecnologia','Inteligência',false], ['Teologia','Inteligência',false],
-  ['Luta','Força',false], ['Pontaria','Destreza',false], ['Fortitude','Constituição',false], ['Reflexos','Destreza',false], ['Astúcia','Inteligência',false], ['Vontade','Sabedoria',false]
+  ['Luta','Força',false], ['Pontaria','Destreza',false], ['Fortitude','Constituição',false], ['Reflexos','Destreza',false], ['Astúcia','Inteligência',false], ['Vontade','Sabedoria',false], ['Integridade','Presença',false]
 ];
+const SAFEGUARD_NAMES = ['Fortitude','Reflexos','Vontade','Astúcia','Integridade'];
+const NORMAL_SKILLS = SKILLS.filter(([name])=>!SAFEGUARD_NAMES.includes(name));
+const SAFEGUARD_SKILLS = SKILLS.filter(([name])=>SAFEGUARD_NAMES.includes(name));
 
 
 const RANK_ORDER = {none:0, trained:1, master:2};
@@ -79,6 +82,8 @@ const APTITUDE_LIBRARY = [
   {category:'Energia Reversa', req:{reversa:3}, name:'Regeneração Aprimorada', text:'Aprimora recuperação de ferimentos graves. Use para registrar regeneração de membro, ferida interna ou efeitos similares se a mesa permitir.'},
   {category:'Energia Reversa', req:{reversa:4}, name:'Aplicação Externa', text:'Você consegue aplicar energia reversa fora de si mesmo, normalmente em alvos tocados ou próximos, conforme custo e limite definidos pelo narrador.'},
   {category:'Energia Reversa', req:{reversa:5}, name:'Técnica Reversa', text:'Permite inverter ou reinterpretar uma técnica por energia reversa. Registre o efeito revertido, custo e limitações.'},
+  {category:'Especial', req:{controle:3}, name:'Raio Negro', text:'Kokusen/Raio Negro. Ao tirar 20 em ataque corpo-a-corpo, o golpe recebe raios negros: causa dano adicional igual à metade do dano total, ignora resistência/redução e ativa o Estado de Consciência Absoluta por 1 rodada. Após o primeiro Raio Negro, aumenta a compreensão da energia: registre +1 em Aura ou converta o excedente conforme a regra de aptidão. Pré-requisito: Controle e Leitura 3, Força ou Destreza 16 e nível 10.'},
+  {category:'Especial', req:{controle:4,aura:3}, name:'Abençoado pelas Faíscas Negras', text:'Você passa a usar Kokusen por padrão em 19 ou 20 no d20. Em Estado de Consciência Absoluta, pode reduzir o valor necessário para Kokusen uma vez adicional. Após acertar um Kokusen, recebe bônus igual à metade de CL em ataques e CL completo em dano pelo resto da cena. Pré-requisito: Raio Negro, CL 4, Aura 3 e nível 15.'},
   {category:'Especial', req:{}, name:'Aptidão Personalizada', text:'Modelo livre para registrar aptidões próprias, adaptações do narrador ou efeitos de campanha.'}
 ];
 
@@ -4912,7 +4917,7 @@ const RULES = [
   {title:'v0.37', text:'Técnicas herdadas agora puxam fundamentos de nível 0 automaticamente ao criar Herdado; adicionados modelos iniciais para Ilimitado, Seis Olhos e Projeção.'},
   {title:'v0.39', text:'Descrições de habilidades, talentos, feitiços, itens, encantamentos, expansões e invocações foram enriquecidas para leitura clara em mesa.'},
   {title:'v0.41', text:'Biblioteca de técnicas e feitiços ampliada com Proporção, Manipulação de Maldições, Trem do Puro Amor, Comediante, Mímica Corporal e Bestas Auspiciosas.'},
-  {title:'v0.43', text:'Visual Exorcizados em vermelho e preto, notas de atualização separadas, talentos naturais com todos os talentos, aptidões ampliadas e equipamento inicial organizado por abas.'}
+  {title:'v0.44', text:'Visual Exorcizados em vermelho e preto, notas de atualização separadas, talentos naturais com todos os talentos, aptidões ampliadas e equipamento inicial organizado por abas.'}
 ];
 
 let sheets = readJsonStorage(['femSheetsV13','femSheetsV10','femSheetsV09','femSheetsV08','femSheetsV07','femSheetsV06','femSheetsV05','femSheetsV04'], []);
@@ -5074,6 +5079,25 @@ function renderSheetList(){
   wrap.innerHTML=sheets.map(s=>`<button class="sheet-item ${s.id===activeId?'active':''}" data-sheet="${s.id}"><strong>${esc(s.name||'Sem nome')}</strong><span>${esc(s.origin)} • ${esc(s.specialization)} • Nv. ${esc(s.level)}</span></button>`).join('');
   $$('[data-sheet]').forEach(b=>b.onclick=()=>{ activeId=b.dataset.sheet; save(); renderAll(); activateTab('fichas'); });
 }
+function updateRestrictedUi(sheet){
+  const restricted = sheet.origin==='Restringido' || sheet.specialization==='Restringido';
+  const classSelect=$('#classSelect');
+  if(classSelect){
+    if(restricted){ sheet.specialization='Restringido'; classSelect.value='Restringido'; classSelect.disabled=true; }
+    else classSelect.disabled=false;
+  }
+  const peNow=document.querySelector('[data-bind="pe"]')?.closest('label');
+  const peMax=document.querySelector('[data-bind="peMax"]')?.closest('label');
+  if(peNow && peNow.childNodes[0]) peNow.childNodes[0].textContent = restricted ? 'Estamina Atual ' : 'PE Atual ';
+  if(peMax && peMax.childNodes[0]) peMax.childNodes[0].textContent = restricted ? 'Estamina Máx. ' : 'PE Máx. ';
+  const navMap = {aptidoes:'Aptidões', dominios:'Expansão de Domínio', invocacoes:'Invocações'};
+  Object.keys(navMap).forEach(id=>{ const btn=document.querySelector(`.subnav button[data-subtab="${id}"]`); if(btn) btn.classList.toggle('hidden', restricted); });
+  const techBtn=document.querySelector('.subnav button[data-subtab="tecnicas"]'); if(techBtn) techBtn.textContent = restricted ? 'Estilo Marcial' : 'Técnicas';
+  const techTitle=document.querySelector('#tecnicas h2'); if(techTitle) techTitle.textContent = restricted ? 'Estilo Marcial' : 'Técnica Inata';
+  const techInputLabel=document.querySelector('#tecnicas [data-bind="innateTechnique"]')?.closest('label'); if(techInputLabel && techInputLabel.childNodes[0]) techInputLabel.childNodes[0].textContent = restricted ? 'Estilo marcial atual' : 'Técnica inata atual';
+  const techText=document.querySelector('#tecnicas [data-bind="innateTechniqueText"]')?.closest('label'); if(techText && techText.childNodes[0]) techText.childNodes[0].textContent = restricted ? 'Funcionamento do estilo marcial' : 'Funcionamento básico';
+  if(restricted && ['aptidoes','dominios','invocacoes'].some(id=>document.getElementById(id)?.classList.contains('active'))) activateSubtab('status');
+}
 function renderEditor(){
   const sheet=current();
   $('#emptyState').classList.toggle('hidden', !!sheet);
@@ -5081,15 +5105,17 @@ function renderEditor(){
   if(!sheet) return;
   applyAutoValues(sheet); save();
   $('#currentName').textContent=sheet.name || 'Sem nome';
-  $('#currentSummary').textContent=`${sheet.origin || 'Sem origem'} • ${sheet.specialization || 'Sem especialização'} • ${sheet.innateTechnique || 'Sem técnica inata definida'}`;
+  $('#currentSummary').textContent=`${sheet.origin || 'Sem origem'} • ${sheet.specialization || 'Sem especialização'} • ${sheet.innateTechnique || (sheet.origin==='Restringido'?'Sem estilo marcial definido':'Sem técnica inata definida')}`;
   $('[data-view="level"]').textContent=sheet.level;
   $('#btView').textContent='+'+trainingBonus(sheet.level);
   $('#gradeView').textContent=sheet.grade;
   $('#dcView').textContent=sheet.dc;
   fillSelect('#originSelect', ORIGINS.map(o=>o.name), sheet.origin);
+  if(sheet.origin==='Restringido') sheet.specialization='Restringido';
   fillSelect('#classSelect', Object.keys(CLASSES), sheet.specialization);
   fillSelect('#keyAttributeSelect', (CLASSES[sheet.specialization]||CLASSES.Lutador).keys, sheet.keyAttribute);
-  $$('[data-bind]').forEach(el=>{ const key=el.dataset.bind; if(el.value !== String(sheet[key] ?? '')) el.value = sheet[key] ?? ''; el.oninput=()=>{ const oldLevel=Number(sheet.level||1); sheet[key] = el.type==='number' ? Number(el.value) : el.value; if(key==='level'){ const newLevel=Number(sheet.level||1); if(newLevel>oldLevel) ensureHpRolls(sheet,true); } if(['level','origin','specialization','keyAttribute'].includes(key)){ applyAutoValues(sheet,{keepCurrent:false}); } save(); renderEditor(); }; });
+  updateRestrictedUi(sheet);
+  $$('[data-bind]').forEach(el=>{ const key=el.dataset.bind; if(el.value !== String(sheet[key] ?? '')) el.value = sheet[key] ?? ''; el.oninput=()=>{ const oldLevel=Number(sheet.level||1); sheet[key] = el.type==='number' ? Number(el.value) : el.value; if(key==='origin' && sheet.origin==='Restringido') sheet.specialization='Restringido'; if(key==='specialization' && sheet.origin==='Restringido') sheet.specialization='Restringido'; if(key==='level'){ const newLevel=Number(sheet.level||1); if(newLevel>oldLevel) ensureHpRolls(sheet,true); } if(['level','origin','specialization','keyAttribute'].includes(key)){ applyAutoValues(sheet,{keepCurrent:false}); } save(); renderEditor(); }; });
   renderAttributes(sheet); renderOriginRefinement(sheet); renderCalcCards(sheet); renderLevelSummary(sheet); renderAptitudes(sheet); renderSkills(sheet); renderRows(sheet); renderTechLibrary();
 }
 function fillSelect(sel, values, selected){ const el=$(sel); if(!el) return; el.innerHTML=values.map(v=>`<option ${v===selected?'selected':''}>${esc(v)}</option>`).join(''); }
@@ -5167,12 +5193,13 @@ function renderAptitudes(sheet){
 }
 
 function renderSkills(sheet){
-  $('#skills').innerHTML=SKILLS.map(([name,attr,req])=>{
+  const buildRows = (list) => list.map(([name,attr,req])=>{
     const manualRank=sheet.skillRanks[name]||'none', effRank=effectiveSkillRank(sheet,name), originRank=originSkillRank(sheet,name);
     const manualExtra=sheet.skillExtras[name]||0, oExtra=originSkillExtra(sheet,name), total=skillTotal(sheet,{name,attr});
     const originTag = originRank!=='none' || oExtra ? `<small class="pill">Origem: ${rankLabel(originRank)}${oExtra?` ${sgn(oExtra)}`:''}</small>` : '';
     return `<div class="skill-row"><strong>${name}${req?' *':''}${originTag}</strong><span>${attr} ${sgn(attrMod(sheet, attr))}</span><select data-skill-rank="${name}"><option value="none" ${manualRank==='none'?'selected':''}>Sem treino</option><option value="trained" ${manualRank==='trained'?'selected':''}>Treinado</option><option value="master" ${manualRank==='master'?'selected':''}>Mestre</option></select><input data-skill-extra="${name}" type="number" value="${manualExtra}" title="Bônus extra manual"><span class="skill-total" title="Rank efetivo: ${rankLabel(effRank)}${oExtra?` • bônus de origem ${sgn(oExtra)}`:''}">${sgn(total)}</span><button data-roll-skill="${name}">d20</button></div>`;
   }).join('');
+  $('#skills').innerHTML = `<div class="section-title inner"><h3>Perícias comuns</h3><small>Usadas para ações, conhecimento, interação e combate.</small></div>${buildRows(NORMAL_SKILLS)}<div class="section-title inner safeguard-title"><h3>Salva-guardas</h3><small>Fortitude, Reflexos, Vontade, Astúcia e Integridade são testes de resistência/salva-guarda. Não trate como perícias comuns.</small></div>${buildRows(SAFEGUARD_SKILLS)}`;
   $$('[data-skill-rank]').forEach(el=>el.oninput=()=>{ sheet.skillRanks[el.dataset.skillRank]=el.value; applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); });
   $$('[data-skill-extra]').forEach(el=>el.oninput=()=>{ sheet.skillExtras[el.dataset.skillExtra]=Number(el.value||0); applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); });
   $$('[data-roll-skill]').forEach(btn=>btn.onclick=()=>{ const name=btn.dataset.rollSkill; const def=SKILLS.find(s=>s[0]===name); roll(`1d20${sgn(skillTotal(sheet,{name,attr:def[1]}))}`, name); });
@@ -5588,7 +5615,13 @@ function renderRows(sheet){
   $('#abilitiesList').innerHTML = filteredAbilities.length ? filteredAbilities.map(({x,i})=>row('abilities',x,i)).join('') : '<p class="muted">Nenhuma habilidade adicionada.</p>';
   if($('#aptitudeChoicesList')) $('#aptitudeChoicesList').innerHTML = sheet.aptitudeChoices.length ? sheet.aptitudeChoices.map((x,i)=>row('aptitudeChoices',x,i)).join('') : '<p class="muted">Nenhuma aptidão escolhida ainda.</p>';
   $('#talentsList').innerHTML = sheet.talents.length ? sheet.talents.map((x,i)=>row('talents',x,i)).join('') : '<p class="muted">Nenhum talento cadastrado.</p>';
-  if($('#domainsList')) $('#domainsList').innerHTML = sheet.domains.length ? sheet.domains.map((x,i)=>row('domains',x,i)).join('') : '<p class="muted">Nenhuma expansão de domínio cadastrada.</p>';
+  if($('#domainsList')){
+    const domainBlocked = sheet.origin==='Restringido' || sheet.specialization==='Restringido' || Number(sheet.aptitudeLevels?.dominio||0)<1;
+    const domainMsg = (sheet.origin==='Restringido'||sheet.specialization==='Restringido') ? 'Restringido não usa Expansão de Domínio nesta ficha.' : 'A aba de Expansão de Domínio fica bloqueada até possuir pelo menos 1 nível de Aptidão em Domínio.';
+    $('#domainsList').innerHTML = domainBlocked ? `<div class="warn-panel"><strong>Expansão bloqueada</strong><p>${esc(domainMsg)}</p></div>` : (sheet.domains.length ? sheet.domains.map((x,i)=>row('domains',x,i)).join('') : '<p class="muted">Nenhuma expansão de domínio cadastrada.</p>');
+    const od=$('#openDomainChooser'); if(od) od.disabled=domainBlocked;
+    const addDomain=[...document.querySelectorAll('[data-add="domains"]')]; addDomain.forEach(b=>b.disabled=domainBlocked);
+  }
   if($('#invocationsList')) $('#invocationsList').innerHTML = sheet.invocations.length ? sheet.invocations.map((x,i)=>row('invocations',x,i)).join('') : '<p class="muted">Nenhuma invocação cadastrada.</p>';
   if($('#invocationSummary')){ const slots=controllerInvocationSlots(sheet); const active=(sheet.invocations||[]).filter(v=>v.active).length; const comp=(sheet.invocations||[]).filter(v=>v.companion).length; const techCan=/dez sombras|manipula.*maldi|bestas auspiciosas/i.test(String(sheet.innateTechnique||'')); $('#invocationSummary').innerHTML = sheet.specialization==='Controlador' ? `<div class="rule-card invocation-panel"><div class="section-title"><h3>Invocações do Controlador</h3><small>Resumo automático</small></div><div class="stat-grid compact"><div><span>Recebidas</span><b>${slots.gained}</b></div><div><span>Cadastradas</span><b>${(sheet.invocations||[]).length}</b></div><div><span>Faltando</span><b>${slots.missing}</b></div><div><span>Ativas</span><b>${active}</b></div><div><span>Companheiras</span><b>${comp}</b></div><div><span>Comandos/ação</span><b>${slots.commands}</b></div></div><p class="muted">Controle aqui shikigamis, marionetes, corpos amaldiçoados e maldições. Limites finais ainda podem mudar por técnica, habilidade e decisão do narrador.</p><div class="actions-inline tight"><button id="addControllerInvocations" ${slots.missing>0?'':'disabled'}>Adicionar faltantes</button><button id="addTechniqueInvocations" ${techCan?'':'disabled'}>Gerar pela técnica atual</button></div>${slots.missing>0?`<p class="reason">Faltam ${slots.missing} invocação(ões) para o nível atual.</p>`:'<p class="reason good">Quantidade cadastrada suficiente para o nível atual.</p>'}</div>` : `<div class="rule-card invocation-panel"><h3>Invocações</h3><p class="muted">Personagens sem Controlador também podem registrar invocações vindas de técnica, item, acordo ou regra da mesa.</p><div class="actions-inline tight"><button id="addTechniqueInvocations" ${techCan?'':'disabled'}>Gerar pela técnica atual</button></div></div>`; }
   $('#techniquesList').innerHTML = sheet.techniques.length ? sheet.techniques.map((x,i)=>row('techniques',x,i)).join('') : '<p class="muted">Nenhum feitiço/habilidade de técnica adicionada.</p>';
@@ -5768,6 +5801,11 @@ function renderItemChooser(){
 
 function renderDomainChooser(){
   const sheet=current(); if(!sheet) return;
+  const domainBlocked = sheet.origin==='Restringido' || sheet.specialization==='Restringido' || Number(sheet.aptitudeLevels?.dominio||0)<1;
+  if(domainBlocked){
+    $('#domainChooser').innerHTML = '<div class="warn-panel"><strong>Expansão bloqueada</strong><p>Suba a Aptidão em Domínio para pelo menos 1 para liberar esta biblioteca. Restringidos não usam esta aba nesta ficha.</p></div>';
+    return;
+  }
   const q=($('#domainSearch')?.value||'').toLowerCase();
   const data=DOMAIN_LIBRARY.map((d,i)=>({d,i})).filter(({d})=>JSON.stringify(d).toLowerCase().includes(q));
   $('#domainChooser').innerHTML = data.map(({d,i})=>`<div class="library-card"><h3>${esc(d.name)}</h3><p class="muted">${esc(d.technique)} • ${esc(d.type)} • nível ${esc(d.level)} • ${esc(d.cost)}</p><p><b>Área:</b> ${esc(d.area)} • <b>Duração:</b> ${esc(d.duration)}</p><p>${esc(d.text)}</p><button data-add-domain-lib="${i}">Adicionar</button></div>`).join('') || '<p class="muted">Nenhuma expansão encontrada.</p>';
@@ -5810,7 +5848,7 @@ function renderWizard(){
   if(wizardStep===1) html=`<p class="muted">Escolha a origem. Se a origem tiver escolhas obrigatórias, elas aparecem abaixo antes de continuar.</p><div class="choice-grid">${ORIGINS.map(o=>`<div class="choice ${wizardData.origin===o.name?'active':''}" data-w-origin="${o.name}"><strong>${o.name}</strong><span>${o.desc}</span></div>`).join('')}</div>${wizardOriginDetailsHtml()}`;
   if(wizardStep===2){
     const cls=CLASSES[wizardData.specialization]||CLASSES.Lutador;
-    html=`<p class="muted">A especialização define PV, PE/Estamina, treinamentos, atributo-chave e habilidades automáticas iniciais.</p><div class="choice-grid">${Object.entries(CLASSES).map(([name,c])=>`<div class="choice ${wizardData.specialization===name?'active':''}" data-w-class="${name}"><strong>${name}</strong><span>PV ${c.hp1} + CON • ${c.stamina?'Estamina '+c.stamina+'/nível':'PE '+c.pe+'/nível'} • ${c.keys.join(' ou ')}</span></div>`).join('')}</div><label style="margin-top:1rem">Atributo-chave<select id="wKey">${(cls.keys||[]).map(k=>`<option ${wizardData.keyAttribute===k?'selected':''}>${k}</option>`).join('')}</select></label><div class="rule-grid" style="margin-top:1rem">${(cls.baseAbilities||[]).map(n=>{ const lib=ABILITY_LIBRARY.find(a=>a.name===n); return `<div class="rule-card"><h3>${esc(n)}</h3><p class="muted">Automática inicial</p><p>${esc(lib?.text||'Habilidade automática da especialização.')}</p></div>`; }).join('')}</div><label class="switch-line"><input id="wApplyBaseAbilities" type="checkbox" ${ensureCreationChoices(wizardData).applyBaseAbilities!==false?'checked':''}> Adicionar habilidades automáticas iniciais ao finalizar</label>`;
+    html=`<p class="muted">A especialização define PV, PE/Estamina, treinamentos, atributo-chave e habilidades automáticas iniciais.${wizardData.origin==='Restringido'?' Como a origem é Restringido, apenas a especialização Restringido fica disponível.':''}</p><div class="choice-grid">${Object.entries(CLASSES).map(([name,c])=>{ const disabled=wizardData.origin==='Restringido' && name!=='Restringido'; return `<div class="choice ${wizardData.specialization===name?'active':''} ${disabled?'disabled':''}" data-w-class="${name}"><strong>${name}</strong><span>PV ${c.hp1} + CON • ${c.stamina?'Estamina '+c.stamina+'/nível':'PE '+c.pe+'/nível'} • ${disabled?'bloqueada para Restringido':c.keys.join(' ou ')}</span></div>`; }).join('')}</div><label style="margin-top:1rem">Atributo-chave<select id="wKey">${(cls.keys||[]).map(k=>`<option ${wizardData.keyAttribute===k?'selected':''}>${k}</option>`).join('')}</select></label><div class="rule-grid" style="margin-top:1rem">${(cls.baseAbilities||[]).map(n=>{ const lib=ABILITY_LIBRARY.find(a=>a.name===n); return `<div class="rule-card"><h3>${esc(n)}</h3><p class="muted">Automática inicial</p><p>${esc(lib?.text||'Habilidade automática da especialização.')}</p></div>`; }).join('')}</div><label class="switch-line"><input id="wApplyBaseAbilities" type="checkbox" ${ensureCreationChoices(wizardData).applyBaseAbilities!==false?'checked':''}> Adicionar habilidades automáticas iniciais ao finalizar</label>`;
   }
   if(wizardStep===3){
     const cc=ensureCreationChoices(wizardData), saves=classSaveOptions(wizardData.specialization), cfg=classSkillOptions(wizardData.specialization);
@@ -5851,7 +5889,7 @@ function bindWizardStep(){
   $$('[data-w-origin-choice]').forEach(el=>el.oninput=()=>{ const oc=wizardData.originChoices ||= originChoicesDefault(); oc[el.dataset.wOriginChoice]=el.value; if(el.dataset.wOriginChoice==='clan'){ const clan=CLANS[oc.clan]||CLANS['Clã Gojo']; const allowed=clanAllowedAttributes(wizardData); if(!allowed.includes(oc.plus2)) oc.plus2=''; if(!allowed.includes(oc.plus1)) oc.plus1=''; if(!(clan.techniqueOptions||[]).includes(oc.clanTechnique)) oc.clanTechnique=''; oc.originTrained=['','']; oc.originMaster=''; } cleanOriginTrainingChoices(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); renderWizard(); });
   $$('[data-w-origin-training-mode]').forEach(el=>el.onchange=()=>{ const oc=wizardData.originChoices ||= originChoicesDefault(); oc.trainingMode=el.value; cleanOriginTrainingChoices(wizardData); renderWizard(); });
   $$('[data-w-origin-trained]').forEach(el=>el.oninput=()=>{ const oc=wizardData.originChoices ||= originChoicesDefault(); const idx=Number(el.dataset.wOriginTrained); oc.originTrained=Array.isArray(oc.originTrained)?oc.originTrained:['','']; oc.originTrained[idx]=el.value; cleanOriginTrainingChoices(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); renderWizard(); });
-  $$('[data-w-class]').forEach(c=>c.onclick=()=>{ wizardData.specialization=c.dataset.wClass; wizardData.keyAttribute=(CLASSES[wizardData.specialization]||CLASSES.Lutador).keys[0]; wizardData.creationChoices.saves=[]; wizardData.creationChoices.trained=[]; renderWizard(); });
+  $$('[data-w-class]').forEach(c=>c.onclick=()=>{ if(wizardData.origin==='Restringido' && c.dataset.wClass!=='Restringido') return; wizardData.specialization=c.dataset.wClass; wizardData.keyAttribute=(CLASSES[wizardData.specialization]||CLASSES.Lutador).keys[0]; wizardData.creationChoices.saves=[]; wizardData.creationChoices.trained=[]; renderWizard(); });
   $('#wKey')?.addEventListener('input',e=>wizardData.keyAttribute=e.target.value);
   $('#wApplyBaseAbilities')?.addEventListener('change',e=>{ wizardData.creationChoices.applyBaseAbilities=e.target.checked; });
   $$('[data-w-save]').forEach(c=>c.onclick=()=>{ wizardData.creationChoices.saves=[c.dataset.wSave]; renderWizard(); });
@@ -6023,7 +6061,7 @@ function init(){
   $$('[data-add]').forEach(btn=>btn.onclick=()=>{ const sheet=current(); if(!sheet) return; const t=btn.dataset.add; const obj=t==='attacks'?{name:'',test:'1d20',damage:'1d8',notes:''}:t==='items'?{name:'',category:'Personalizado',cost:'',qty:1,weight:0,damage:'',properties:'',grade:'',enchantmentCharges:'',uniqueAbility:'',modifications:[],text:''}:t==='techniques'?{name:'',tech:sheet.innateTechnique||'',level:'',action:'',range:'',target:'',duration:'',cost:'',damage:'',resistance:'',prepared:false,signature:false,text:''}:t==='domains'?{name:'',type:'',technique:'',level:'',cost:'',area:'',duration:'',text:''}:t==='invocations'?{name:'',type:'Shikigami',grade:'',cost:'',hp:'',hpCurrent:'',defense:'',movement:'9m',active:false,companion:false,actions:'',traits:'',text:''}:t==='abilities'?{name:'',level:'',class:'',text:''}:t==='talents'?{name:'',level:'',category:'',text:''}:{name:'',text:''}; sheet[t].push(obj); save(); renderRows(sheet); });
   $('#recalculate').onclick=()=>{ const sheet=current(); if(!sheet)return; applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); };
   $('#applyClassSkills').onclick=()=>{ const sheet=current(); if(!sheet)return; applyDefaultSkills(sheet); save(); renderEditor(); };
-  $('#openAbilityChooser').onclick=()=>{ renderAbilityChooser(); openDialog('abilityDialog'); };
+  $('#openAbilityChooser').onclick=()=>{ try{ renderAbilityChooser(); openDialog('abilityDialog'); }catch(err){ console.error(err); alert('Erro ao abrir habilidades disponíveis. Atualize a página; se persistir, envie o erro do console.'); } };
   $('#abilitySearch')?.addEventListener('input', renderAbilityChooser);
   $('#abilityClassFilter')?.addEventListener('input', renderAbilityChooser);
   $('#abilityKindFilter')?.addEventListener('input', renderAbilityChooser);
