@@ -225,3 +225,144 @@ button.primary,.primary{background:linear-gradient(135deg,#5b000c,#8f0b17)}
   .progress-card,.rule-card,.calc-card,.library-card,.ability-card,.item-card,.mini-row{min-width:0;}
   .progress-grid{grid-template-columns:1fr !important;}
 }
+
+
+/* v0.56 - nova tela inicial Exorcizados */
+body.home-active{
+  width:100%;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body.home-active .topbar{
+  display:none;
+}
+body.home-active main{
+  width:100%;
+  margin:0;
+}
+.home-landing{
+  position:relative;
+  min-height:100vh;
+  display:grid !important;
+  place-items:center;
+  overflow:hidden;
+  background:#050000;
+}
+.home-landing::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 50% 48%, rgba(115,0,12,.22), transparent 33%),
+    linear-gradient(180deg, rgba(0,0,0,.25), rgba(18,0,3,.82) 76%, #050000 100%);
+  z-index:1;
+  pointer-events:none;
+}
+.home-landing::after{
+  content:"";
+  position:absolute;
+  inset:-18%;
+  background:
+    radial-gradient(circle at 50% 48%, transparent 0 22%, rgba(0,0,0,.1) 35%, rgba(0,0,0,.78) 77%),
+    linear-gradient(90deg, rgba(0,0,0,.72), transparent 33%, transparent 67%, rgba(0,0,0,.78));
+  z-index:2;
+  pointer-events:none;
+}
+.home-bg{
+  position:absolute;
+  inset:-9%;
+  background-image:url("assets/mahito-bg.jpg");
+  background-size:cover;
+  background-position:center 46%;
+  filter:blur(4px) saturate(1.25) contrast(1.08) brightness(.76);
+  transform:scale(1.08) rotate(90deg);
+  opacity:.78;
+  z-index:0;
+}
+.landing-center{
+  position:relative;
+  z-index:3;
+  display:grid;
+  justify-items:center;
+  gap:1.15rem;
+  text-align:center;
+  padding:2rem;
+}
+.landing-title{
+  margin:0;
+  font-size:clamp(4.2rem, 12vw, 11rem);
+  line-height:.9;
+  letter-spacing:.015em;
+  color:#fff7f7;
+  text-shadow:
+    0 0 4px #000,
+    0 0 18px rgba(0,0,0,.98),
+    0 0 34px rgba(95,0,10,.98),
+    0 0 72px rgba(190,0,20,.72),
+    8px 8px 0 rgba(20,0,2,.72),
+    -8px 6px 0 rgba(20,0,2,.55),
+    0 12px 36px rgba(0,0,0,.9);
+}
+.landing-title::before,
+.landing-title::after{
+  content:"Exorcizados";
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:-1;
+  color:rgba(20,0,2,.86);
+  filter:blur(1px);
+  pointer-events:none;
+}
+.landing-title::before{ transform:translateX(-50%) translate(-12px,10px); opacity:.88; }
+.landing-title::after{ transform:translateX(-50%) translate(12px,16px); opacity:.62; }
+.landing-actions{
+  display:grid;
+  justify-items:center;
+  gap:.85rem;
+}
+.landing-main-action{
+  min-width:160px;
+  padding:1rem 2.1rem;
+  border-radius:16px;
+  font-size:1.1rem;
+  box-shadow:0 14px 38px rgba(150,0,18,.38), inset 0 0 0 1px rgba(255,255,255,.12);
+}
+.landing-secondary-action{
+  min-width:160px;
+  padding:.85rem 1.5rem;
+  border-radius:14px;
+  background:rgba(8,0,2,.66);
+  backdrop-filter:blur(8px);
+  border-color:rgba(180,0,20,.4);
+}
+body:not(.has-sheets) #goSheets,
+body:not(.has-sheets) #homeQuickNav{
+  display:none;
+}
+.home-quick-nav{
+  margin-top:.55rem;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:.7rem;
+  max-width:min(760px,92vw);
+}
+.home-quick-nav button{
+  background:rgba(10,0,2,.68);
+  border-color:rgba(180,0,20,.38);
+  backdrop-filter:blur(10px);
+  border-radius:999px;
+  padding:.8rem 1.15rem;
+  box-shadow:0 10px 28px rgba(0,0,0,.32);
+}
+.home-quick-nav button:hover{
+  background:rgba(95,0,12,.72);
+}
+body:not(.home-active) .home-bg{display:none;}
+@media(max-width:720px){
+  .home-bg{transform:scale(1.18); background-position:center;}
+  .landing-title{font-size:clamp(3.1rem, 17vw, 6rem);}
+  .landing-title::before{transform:translateX(-50%) translate(-7px,7px)}
+  .landing-title::after{transform:translateX(-50%) translate(7px,10px)}
+}

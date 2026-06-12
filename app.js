@@ -4914,6 +4914,7 @@ function enrichLibraryDescriptionsV39() {
 enrichLibraryDescriptionsV39();
 
 const RULES = [
+  {title:'v0.56', text:'Tela inicial refeita: fundo com imagem desfocada, título centralizado, botão Criar e navegação contextual quando já há fichas.'},
   {title:'v0.55', text:'Encantamentos limpos, sem bloco genérico de tipo/aplicação, e cards de resumo mais largos e estáveis visualmente.'},
   {title:'Automação atual', text:'PV, PE/Estamina, Defesa, Atenção, Iniciativa, CD e perícias são calculados a partir de nível, atributos, classe e treinamento.'},
   {title:'v0.7', text:'Habilidades separadas por abas de nível.'},
@@ -5198,7 +5199,16 @@ function addBaseAbilities(sheet){
   cls.baseAbilities.forEach(name=>{ if(!sheet.abilities.some(a=>a.name===name)){ const lib=ABILITY_LIBRARY.find(a=>a.name===name); if(lib && abilityReqLevel(lib)>Number(sheet.level||1)) return; sheet.abilities.push({name, class:sheet.specialization, level:lib?.level || 1, kind:lib?.kind || 'Automática', text:lib?.text || 'Habilidade base da especialização.', options:lib?.options||[], selectedOptions:[]}); } });
 }
 
-function activateTab(id){ $$('.tab').forEach(t=>t.classList.toggle('active', t.id===id)); $$('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===id)); }
+function updateHomeState(){
+  const isHome = $('#home')?.classList.contains('active');
+  document.body.classList.toggle('home-active', !!isHome);
+  document.body.classList.toggle('has-sheets', Array.isArray(sheets) && sheets.length > 0);
+}
+function activateTab(id){
+  $$('.tab').forEach(t=>t.classList.toggle('active', t.id===id));
+  $$('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===id));
+  updateHomeState();
+}
 function activateSubtab(id){ $$('.subtab').forEach(t=>t.classList.toggle('active', t.id===id)); $$('.subnav button').forEach(b=>b.classList.toggle('active', b.dataset.subtab===id)); }
 
 function renderSheetList(){
@@ -6012,7 +6022,7 @@ function toast(message){
 }
 function renderRules(){ if($('#rulesSummary')) $('#rulesSummary').innerHTML = RULES.map(r=>`<div class="rule-card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p></div>`).join(''); }
 function renderChangelog(){ if($('#changelogList')) $('#changelogList').innerHTML = RULES.slice().reverse().map(r=>`<div class="rule-card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p></div>`).join(''); }
-function renderAll(){ renderSheetList(); renderEditor(); renderRules(); renderChangelog(); }
+function renderAll(){ renderSheetList(); renderEditor(); renderRules(); renderChangelog(); updateHomeState(); }
 
 function openWizard(existing=false){ wizardData = existing && current() ? structuredClone(current()) : blankSheet(); ensureCreationChoices(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); wizardStep=0; renderWizard(); $('#wizard').showModal(); }
 function renderWizard(){
@@ -6231,6 +6241,7 @@ function init(){
   sheets.forEach(s=>{ (s.techniques||[]).forEach(t=>{ t.text=stripTechniqueTypePrefix(t.text); }); });
   if(activeId && !sheets.find(s=>s.id===activeId)) activeId=sheets[0]?.id||null;
   $$('.nav button').forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));
+  $$('#homeQuickNav [data-home-tab]').forEach(b=>b.onclick=()=>activateTab(b.dataset.homeTab));
   $$('.subnav button').forEach(b=>b.onclick=()=>activateSubtab(b.dataset.subtab));
   ['startCreate','newSheet','emptyCreate'].forEach(id=>$('#'+id).onclick=()=>openWizard(false));
   $('#goSheets').onclick=()=>activateTab('fichas');

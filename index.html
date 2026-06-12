@@ -23,35 +23,20 @@
   </header>
 
   <main>
-    <section id="home" class="tab active">
-      <article class="hero card exorcizados-hero">
-        <div>
-          <p class="eyebrow">Ficha online de RPG</p>
-          <h2>Exorcizados</h2>
-          <p>Crie, evolua e jogue com fichas de Feiticeiros & Maldições em uma interface escura, rápida e organizada para mesa.</p>
-          <div class="actions-inline">
-            <button id="startCreate" class="primary">+ Criar ficha</button>
-            <button id="goSheets">Ver fichas</button>
-          </div>
+    <section id="home" class="tab active home-landing">
+      <div class="home-bg" aria-hidden="true"></div>
+      <article class="landing-center">
+        <h2 class="landing-title">Exorcizados</h2>
+        <div class="landing-actions">
+          <button id="startCreate" class="primary landing-main-action">Criar</button>
+          <button id="goSheets" class="landing-secondary-action">Ver fichas</button>
         </div>
-        <aside class="hero-panel">
-          <strong>Fluxo principal</strong>
-          <span>Criação guiada</span>
-          <span>Ficha por abas</span>
-          <span>Rolagens e cálculos automáticos</span>
-          <span>Habilidades, talentos, aptidões e técnicas</span>
-          <span>Inventário, encantamentos e invocações</span>
-        </aside>
-      </article>
-
-      <article class="card">
-        <h2>Comece por aqui</h2>
-        <div class="steps-line">
-          <div class="done"><strong>1</strong><span>Crie a ficha</span></div>
-          <div class="done"><strong>2</strong><span>Escolha origem e classe</span></div>
-          <div class="done"><strong>3</strong><span>Distribua atributos</span></div>
-          <div class="done"><strong>4</strong><span>Jogue pela ficha</span></div>
-        </div>
+        <nav id="homeQuickNav" class="home-quick-nav" aria-label="Navegação inicial">
+          <button data-home-tab="fichas">Fichas</button>
+          <button data-home-tab="biblioteca">Biblioteca</button>
+          <button data-home-tab="rolador">Rolador</button>
+          <button data-home-tab="changelog">Notas de atualização</button>
+        </nav>
       </article>
     </section>
 
