@@ -4597,6 +4597,20 @@ const ABILITY_LIBRARY = [
 ];
 
 
+
+function abilityReqLevel(a){
+  if(!a) return 1;
+  const direct = a.level ?? a.requiredLevel ?? a.reqLevel ?? a.nivel ?? a.required_level;
+  if(direct !== undefined && direct !== null && direct !== ''){
+    const n = Number(direct);
+    if(Number.isFinite(n)) return n;
+  }
+  const text = `${a.name||''} ${a.kind||''} ${a.prereq||''} ${a.text||''}`;
+  const m = text.match(/(?:nível|nivel|requisito:\s*nível|requer\s*nível)\s*(\d+)/i);
+  if(m) return Number(m[1]);
+  return 1;
+}
+
 const ABILITY_TEXT_PATCHES = {
   'Lutador|Corpo Treinado': 'Habilidade base automática. Representa o corpo condicionado do Lutador: use como referência para registrar bônus físicos, treino corporal e interações de combate corpo-a-corpo conforme a mesa aplicar o texto oficial.',
   'Lutador|Empolgação': 'Habilidade base automática. Recurso central do Lutador para entrar no ritmo da luta. Registre aqui efeitos, gatilhos e gastos conforme a ficha do personagem.',
