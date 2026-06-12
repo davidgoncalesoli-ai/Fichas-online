@@ -63,3 +63,7 @@
 ## v0.39
 - Descrições de bibliotecas enriquecidas: habilidades, talentos, feitiços, itens, encantamentos, domínios e invocações agora exibem resumos mais claros para uso em mesa.
 - O texto foi organizado em formato de ficha, evitando blocos confusos e destacando custo, ação, requisito, efeito e observações.
+
+
+## v0.41
+Concluída ampliação inicial da biblioteca de técnicas e feitiços. Próximo passo: expandir invocações automáticas, técnicas completas da Enciclopédia e revisão de custos/requisitos.

@@ -101,6 +101,12 @@ const TECHNIQUE_LIBRARY = [
   {name:'Chamas do Desastre', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica ofensiva de fogo e calor. Boa para registrar dano queimante, áreas, explosões e efeitos contínuos.'},
   {name:'Transfiguração Ociosa', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica de manipulação da alma e do corpo. Use com cuidado, registrando permissões da campanha, testes de resistência e consequências.'},
   {name:'Técnica do Julgamento', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica ligada a julgamento, regras especiais e aplicação de penalidades/recompensas conforme veredito.'},
+  {name:'Proporção', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica que divide o alvo em uma razão crítica, permitindo encontrar um ponto fraco e transformar ataques precisos em golpes devastadores.'},
+  {name:'Manipulação de Maldições', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica voltada a absorver, armazenar e comandar maldições derrotadas. Use junto da aba Invocações para registrar maldições controladas.'},
+  {name:'Trem do Puro Amor', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica baseada em rolagens, cenas e recompensas variáveis. Registre resultados, bônus temporários, jackpot e efeitos especiais conforme a mesa.'},
+  {name:'Comediante', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica de alteração da realidade pelo humor. Use com autorização do narrador, registrando limites, gatilhos cômicos e efeitos aceitáveis.'},
+  {name:'Mímica Corporal', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica focada em replicar movimentos, posturas e padrões de combate observados, funcionando como versatilidade física e leitura corporal.'},
+  {name:'Bestas Auspiciosas', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica que manifesta entidades/animais simbólicos para ataque, defesa, mobilidade ou suporte. Use a aba Invocações para registrar cada besta.'},
   {name:'Técnica própria', source:'Personalizada', type:'Livre', text:'Modelo livre para técnica criada pelo jogador. Use o campo de funcionamento básico para registrar regras, limites e equipamentos.'}
 ];
 
@@ -170,10 +176,56 @@ const INVOCATION_LIBRARY = [
 
 function controllerInvocationSlots(sheet){
   const lvl=Number(sheet.level||1);
-  if(sheet.specialization!=='Controlador') return {initial:0, gained:0, maxActive:0, commands:0};
+  if(sheet.specialization!=='Controlador') return {initial:0, gained:0, maxActive:0, commands:0, missing:0};
   const extra=[3,6,9,10,12,15,18].filter(n=>lvl>=n).length;
   const commandBonus=[6,12,18].filter(n=>lvl>=n).length;
-  return {initial:2, gained:2+extra, maxActive:2, commands:1+commandBonus};
+  const gained=2+extra;
+  const current=(sheet.invocations||[]).length;
+  return {initial:2, gained, maxActive:2, commands:1+commandBonus, missing:Math.max(0,gained-current)};
+}
+
+function invocationFromLibraryName(name){
+  const v=INVOCATION_LIBRARY.find(x=>x.name===name) || INVOCATION_LIBRARY.find(x=>x.name==='Invocação Personalizada');
+  return {name:v.name,type:v.type,grade:v.grade,cost:v.cost,hp:v.hp,hpCurrent:'',defense:v.defense,movement:v.movement,active:false,companion:false,actions:v.actions,traits:v.traits,text:v.text};
+}
+function addInvocationIfMissing(sheet, name){
+  sheet.invocations = sheet.invocations || [];
+  if(sheet.invocations.some(v=>String(v.name||'').toLowerCase()===String(name||'').toLowerCase())) return false;
+  sheet.invocations.push(invocationFromLibraryName(name));
+  return true;
+}
+function controllerAutoInvocationNames(sheet){
+  const tech=String(sheet.innateTechnique||'').toLowerCase();
+  if(tech.includes('dez sombras')) return ['Cão Divino','Nue'];
+  if(tech.includes('manipulação de maldi') || tech.includes('manipulacao de maldi')) return ['Maldição Absorvida','Maldição Absorvida'];
+  if(tech.includes('bestas auspiciosas')) return ['Invocar Besta','Shikigami Predador'].map(n=>n==='Invocar Besta'?'Shikigami Predador':n);
+  return ['Shikigami Simples','Shikigami Guardião'];
+}
+function addMissingControllerInvocations(sheet){
+  const slots=controllerInvocationSlots(sheet);
+  if(sheet.specialization!=='Controlador' || slots.missing<=0) return 0;
+  const names=controllerAutoInvocationNames(sheet);
+  let added=0;
+  for(let i=0;i<slots.missing;i++){
+    const base=names[i%names.length] || 'Invocação Personalizada';
+    const inv=invocationFromLibraryName(base);
+    const sameCount=(sheet.invocations||[]).filter(v=>String(v.name||'').startsWith(inv.name)).length;
+    if(sameCount>0) inv.name=`${inv.name} ${sameCount+1}`;
+    sheet.invocations.push(inv);
+    added++;
+  }
+  return added;
+}
+function addInvocationsFromCurrentTechnique(sheet){
+  const tech=String(sheet.innateTechnique||'');
+  let names=[];
+  if(/dez sombras/i.test(tech)) names=['Cão Divino','Nue','Sapo','Coelho Fugitivo'];
+  else if(/manipula.*maldi/i.test(tech)) names=['Maldição Absorvida'];
+  else if(/bestas auspiciosas/i.test(tech)) names=['Shikigami Predador','Shikigami Guardião'];
+  else names=[];
+  let added=0;
+  names.forEach(n=>{ if(addInvocationIfMissing(sheet,n)) added++; });
+  return added;
 }
 
 
@@ -4536,6 +4588,28 @@ const TECH_LIBRARY = [
   {tech:'Técnica do Julgamento', name:'Acusação', level:0, action:'Ação Comum', range:'Médio', target:'Uma criatura', duration:'Cena/definir', cost:'Definir', damage:'', resistance:'Vontade/Astúcia', text:'Modelo para iniciar uma acusação, marcar evidências ou impor condição ligada a julgamento.'},
   {tech:'Técnica do Julgamento', name:'Veredito', level:2, action:'Especial', range:'Médio', target:'Criatura julgada', duration:'Conforme sentença', cost:'Definir', damage:'', resistance:'Conforme julgamento', text:'Aplica resultado de julgamento: penalidade, confisco, restrição ou outro efeito da campanha.'},
 
+
+  {tech:'Proporção', name:'Ponto Fraco 7:3', level:0, action:'Ação Comum', range:'Corpo a corpo/arma', target:'Uma criatura ou objeto', duration:'Imediata', cost:'Definir', damage:'Dano da arma + bônus', resistance:'—', text:'Marca uma divisão crítica no alvo e mira o ponto fraco. Use para ataques precisos; em acerto, registre bônus de dano ou efeito definido pela mesa.'},
+  {tech:'Proporção', name:'Colapso', level:1, action:'Ação Comum', range:'Corpo a corpo/curto', target:'Estrutura, objeto ou criatura', duration:'Imediata', cost:'Definir', damage:'3d8 força', resistance:'Fortitude/Reflexos', text:'Aplica a proporção em um ponto estrutural para romper, quebrar ou derrubar. Útil contra objetos, cobertura e alvos vulneráveis.'},
+  {tech:'Proporção', name:'Hora Extra', level:2, action:'Ação Livre', range:'Pessoal', target:'Você', duration:'Cena/rodadas', cost:'Definir', damage:'', resistance:'—', text:'Modelo de aumento temporário ligado ao esforço extra. Registre bônus, duração, custo e quando pode ser ativado.'},
+
+  {tech:'Manipulação de Maldições', name:'Absorver Maldição', level:0, action:'Especial', range:'Toque/curto', target:'Maldição derrotada', duration:'Permanente', cost:'Definir', damage:'', resistance:'—', text:'Registra uma maldição derrotada como recurso controlável. Depois de absorvida, adicione-a na aba Invocações como Maldição Absorvida.'},
+  {tech:'Manipulação de Maldições', name:'Invocar Maldição', level:0, action:'Ação Comum', range:'Curto', target:'Maldição absorvida', duration:'Cena/sustentado', cost:'Definir', damage:'', resistance:'—', text:'Invoca uma maldição previamente registrada. Use a ficha da invocação para PV, defesa, ações, ataques e características.'},
+  {tech:'Manipulação de Maldições', name:'Extração de Técnica', level:3, action:'Especial', range:'Conforme maldição', target:'Maldição absorvida', duration:'Imediata/definir', cost:'Alto/definir', damage:'', resistance:'Conforme técnica', text:'Modelo avançado para usar uma habilidade/técnica de uma maldição absorvida. Requer aprovação do narrador e registro claro da limitação.'},
+
+  {tech:'Trem do Puro Amor', name:'Iniciar Rodada', level:0, action:'Ação Comum', range:'Pessoal/área', target:'Cena da técnica', duration:'Conforme resultado', cost:'Definir', damage:'', resistance:'—', text:'Inicia o ciclo da técnica e registra rolagens, cenas, indicadores e efeitos ativos.'},
+  {tech:'Trem do Puro Amor', name:'Prévia de Sorte', level:1, action:'Ação Bônus/Reação', range:'Pessoal', target:'Você', duration:'1 rodada', cost:'Definir', damage:'', resistance:'—', text:'Modelo para bônus temporário quando a rolagem/cena indica chance favorável. Anote bônus em ataque, defesa, resistência ou recuperação.'},
+  {tech:'Trem do Puro Amor', name:'Jackpot', level:4, action:'Especial', range:'Pessoal', target:'Você', duration:'Conforme técnica', cost:'—', damage:'', resistance:'—', text:'Registre aqui o estado de recompensa máxima: recuperação, energia, invulnerabilidade relativa, bônus e duração conforme a versão usada na mesa.'},
+
+  {tech:'Comediante', name:'Piada Conveniente', level:0, action:'Ação Livre/Especial', range:'Variável', target:'Cena', duration:'Imediata', cost:'Definir', damage:'', resistance:'Astúcia/Vontade situacional', text:'Modelo para pequenos efeitos absurdos ou cômicos que alteram a cena sem quebrar o jogo. O efeito deve ser aprovado pelo narrador.'},
+  {tech:'Comediante', name:'Realidade Cômica', level:2, action:'Ação Comum', range:'Curto/médio', target:'Uma criatura ou cena', duration:'1 rodada/cena', cost:'Definir', damage:'', resistance:'Vontade/Astúcia', text:'Força uma lógica cômica temporária. Use para debuffs, defesa improvisada, troca de resultado ou controle narrativo limitado.'},
+
+  {tech:'Mímica Corporal', name:'Copiar Movimento', level:0, action:'Reação', range:'Curto/visual', target:'Criatura observada', duration:'1 rodada', cost:'Definir', damage:'', resistance:'—', text:'Observa uma ação física e replica parte da postura, recebendo bônus situacional em teste, ataque ou manobra similar.'},
+  {tech:'Mímica Corporal', name:'Ritmo Imitado', level:1, action:'Ação Bônus', range:'Pessoal', target:'Você', duration:'Cena/rodadas', cost:'Definir', damage:'', resistance:'—', text:'Mantém um padrão de movimento copiado, melhorando iniciativa, esquiva, acerto ou perícias físicas conforme a referência.'},
+
+  {tech:'Bestas Auspiciosas', name:'Invocar Besta', level:0, action:'Ação Comum', range:'Curto', target:'Besta escolhida', duration:'Cena/sustentada', cost:'Definir', damage:'', resistance:'—', text:'Invoca uma besta ligada à técnica. Registre a criatura na aba Invocações, com função de ataque, defesa, montaria ou suporte.'},
+  {tech:'Bestas Auspiciosas', name:'Bênção da Besta', level:1, action:'Ação Bônus', range:'Curto', target:'Você ou aliado', duration:'1 rodada/cena', cost:'Definir', damage:'', resistance:'—', text:'Concede um efeito temático da besta escolhida: deslocamento, defesa, sentidos, ataque extra ou resistência.'},
+
   {tech:'Técnica própria', name:'Feitiço de Dano Personalizado', level:0, action:'Definir', range:'Definir', target:'Definir', duration:'Imediata', cost:'Definir', damage:'1d8', resistance:'Definir', text:'Modelo para habilidade ofensiva criada pelo jogador.'},
   {tech:'Técnica própria', name:'Feitiço Auxiliar Personalizado', level:0, action:'Definir', range:'Definir', target:'Definir', duration:'Definir', cost:'Definir', damage:'', resistance:'Definir', text:'Modelo para suporte, utilidade, movimentação, controle ou defesa.'},
   {tech:'Técnica própria', name:'Feitiço Passivo Personalizado', level:0, action:'Passiva', range:'—', target:'Você', duration:'Permanente', cost:'—', damage:'', resistance:'—', text:'Modelo para efeito passivo da técnica.'}
@@ -4740,7 +4814,8 @@ const RULES = [
   {title:'v0.13', text:'Técnica inata ganhou área própria; feitiços são adicionados em janela com filtro por técnica e nível. Inclui guia de publicação.'},
   {title:'v0.27', text:'Biblioteca de técnicas ampliada; feitiços agora têm dano/cura, resistência, marca registrada, preparado, rolagem de dano e botão para adicionar fundamentos nível 0 da técnica inata.'},
   {title:'v0.37', text:'Técnicas herdadas agora puxam fundamentos de nível 0 automaticamente ao criar Herdado; adicionados modelos iniciais para Ilimitado, Seis Olhos e Projeção.'},
-  {title:'v0.39', text:'Descrições de habilidades, talentos, feitiços, itens, encantamentos, expansões e invocações foram enriquecidas para leitura clara em mesa.'}
+  {title:'v0.39', text:'Descrições de habilidades, talentos, feitiços, itens, encantamentos, expansões e invocações foram enriquecidas para leitura clara em mesa.'},
+  {title:'v0.41', text:'Biblioteca de técnicas e feitiços ampliada com Proporção, Manipulação de Maldições, Trem do Puro Amor, Comediante, Mímica Corporal e Bestas Auspiciosas.'}
 ];
 
 let sheets = readJsonStorage(['femSheetsV13','femSheetsV10','femSheetsV09','femSheetsV08','femSheetsV07','femSheetsV06','femSheetsV05','femSheetsV04'], []);
@@ -5416,7 +5491,7 @@ function renderRows(sheet){
   $('#talentsList').innerHTML = sheet.talents.length ? sheet.talents.map((x,i)=>row('talents',x,i)).join('') : '<p class="muted">Nenhum talento cadastrado.</p>';
   if($('#domainsList')) $('#domainsList').innerHTML = sheet.domains.length ? sheet.domains.map((x,i)=>row('domains',x,i)).join('') : '<p class="muted">Nenhuma expansão de domínio cadastrada.</p>';
   if($('#invocationsList')) $('#invocationsList').innerHTML = sheet.invocations.length ? sheet.invocations.map((x,i)=>row('invocations',x,i)).join('') : '<p class="muted">Nenhuma invocação cadastrada.</p>';
-  if($('#invocationSummary')){ const slots=controllerInvocationSlots(sheet); const active=(sheet.invocations||[]).filter(v=>v.active).length; const comp=(sheet.invocations||[]).filter(v=>v.companion).length; $('#invocationSummary').innerHTML = sheet.specialization==='Controlador' ? `<div class="rule-card"><h3>Invocações do Controlador</h3><p>Recebidas pelo nível: <b>${slots.gained}</b> • Ativas marcadas: <b>${active}</b> • Comandos por ação: <b>${slots.commands}</b></p><p class="muted">Marque “ativa” nas invocações em campo. O limite exato pode variar por habilidade, técnica e decisão do narrador.</p></div>` : `<div class="rule-card"><h3>Invocações</h3><p class="muted">Personagens sem Controlador também podem registrar invocações vindas de técnica, item, acordo ou regra da mesa.</p></div>`; }
+  if($('#invocationSummary')){ const slots=controllerInvocationSlots(sheet); const active=(sheet.invocations||[]).filter(v=>v.active).length; const comp=(sheet.invocations||[]).filter(v=>v.companion).length; const techCan=/dez sombras|manipula.*maldi|bestas auspiciosas/i.test(String(sheet.innateTechnique||'')); $('#invocationSummary').innerHTML = sheet.specialization==='Controlador' ? `<div class="rule-card"><h3>Invocações do Controlador</h3><p>Recebidas pelo nível: <b>${slots.gained}</b> • Cadastradas: <b>${(sheet.invocations||[]).length}</b> • Faltando: <b>${slots.missing}</b> • Ativas marcadas: <b>${active}</b> • Comandos por ação: <b>${slots.commands}</b></p><p class="muted">Use esta área para controlar shikigamis, marionetes, corpos amaldiçoados e maldições controladas. O limite final ainda pode mudar por técnica, habilidade e decisão do narrador.</p><div class="actions-inline tight"><button id="addControllerInvocations" ${slots.missing>0?'':'disabled'}>Adicionar invocações faltantes</button><button id="addTechniqueInvocations" ${techCan?'':'disabled'}>Gerar pela técnica atual</button></div>${slots.missing>0?`<p class="reason">Faltam ${slots.missing} invocação(ões) para o nível atual.</p>`:'<p class="reason good">Quantidade cadastrada suficiente para o nível atual.</p>'}</div>` : `<div class="rule-card"><h3>Invocações</h3><p class="muted">Personagens sem Controlador também podem registrar invocações vindas de técnica, item, acordo ou regra da mesa.</p><div class="actions-inline tight"><button id="addTechniqueInvocations" ${techCan?'':'disabled'}>Gerar pela técnica atual</button></div></div>`; }
   $('#techniquesList').innerHTML = sheet.techniques.length ? sheet.techniques.map((x,i)=>row('techniques',x,i)).join('') : '<p class="muted">Nenhum feitiço/habilidade de técnica adicionada.</p>';
   syncTechniqueSelectors(sheet);
   $('#attacksList').innerHTML = sheet.attacks.length ? sheet.attacks.map((x,i)=>row('attacks',x,i)).join('') : '<p class="muted">Nenhum ataque cadastrado.</p>';
@@ -5427,6 +5502,8 @@ function renderRows(sheet){
   $$('[data-del]').forEach(btn=>btn.onclick=()=>{ sheet[btn.dataset.del].splice(Number(btn.dataset.i),1); save(); renderRows(sheet); });
   $$('[data-tech-toggle]').forEach(el=>el.onchange=()=>{ const t=sheet.techniques[Number(el.dataset.i)]; if(!t) return; t[el.dataset.techToggle]=el.checked; save(); renderRows(sheet); });
   $$('[data-invocation-toggle]').forEach(el=>el.onchange=()=>{ const v=sheet.invocations[Number(el.dataset.i)]; if(!v) return; v[el.dataset.invocationToggle]=el.checked; save(); renderRows(sheet); });
+  const addCtrlBtn=$('#addControllerInvocations'); if(addCtrlBtn) addCtrlBtn.onclick=()=>{ const n=addMissingControllerInvocations(sheet); save(); renderRows(sheet); if(n) toast(`${n} invocação(ões) adicionada(s).`); };
+  const addTechInvBtn=$('#addTechniqueInvocations'); if(addTechInvBtn) addTechInvBtn.onclick=()=>{ const n=addInvocationsFromCurrentTechnique(sheet); save(); renderRows(sheet); toast(n?`${n} invocação(ões) da técnica adicionada(s).`:'Nenhuma invocação nova encontrada para esta técnica.'); };
   $$('[data-roll-tech-damage]').forEach(btn=>btn.onclick=()=>{ const t=sheet.techniques[Number(btn.dataset.rollTechDamage)]; roll(t.damage || '1d8', `${t.name || 'Feitiço'} — dano/cura`); });
   $$('[data-roll-tech-cd]').forEach(btn=>btn.onclick=()=>{ const t=sheet.techniques[Number(btn.dataset.rollTechCd)]; { const text=`${t.name || 'Feitiço'} — CD atual: ${sheet.dc}. Resistência: ${t.resistance || 'não definida'}.`; $('#rollResult').textContent=text; const div=document.createElement('div'); div.textContent=text; $('#rollHistory').prepend(div); activateTab('rolador'); } });
   $$('[data-roll-attack-hit]').forEach(btn=>btn.onclick=()=>{ const atk=sheet.attacks[Number(btn.dataset.rollAttackHit)]; roll(atk.test || '1d20', `${atk.name || 'Ataque'} — acerto`); });
@@ -5614,6 +5691,10 @@ function renderInvocationChooser(){
   $$('[data-add-invocation-lib]').forEach(btn=>btn.onclick=()=>{ const v=INVOCATION_LIBRARY[Number(btn.dataset.addInvocationLib)]; sheet.invocations.push({name:v.name,type:v.type,grade:v.grade,cost:v.cost,hp:v.hp,hpCurrent:'',defense:v.defense,movement:v.movement,active:false,companion:false,actions:v.actions,traits:v.traits,text:v.text}); save(); renderRows(sheet); renderInvocationChooser(); });
 }
 
+function toast(message){
+  const out=$('#rollResult');
+  if(out) out.textContent=message;
+}
 function renderRules(){ $('#rulesSummary').innerHTML = RULES.map(r=>`<div class="rule-card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p></div>`).join(''); }
 function renderAll(){ renderSheetList(); renderEditor(); renderRules(); }
 

@@ -80,3 +80,9 @@ Ainda há itens com descrição estrutural/resumida. A meta continua ser cadastr
 ## v0.39
 - Descrições de bibliotecas enriquecidas: habilidades, talentos, feitiços, itens, encantamentos, domínios e invocações agora exibem resumos mais claros para uso em mesa.
 - O texto foi organizado em formato de ficha, evitando blocos confusos e destacando custo, ação, requisito, efeito e observações.
+
+
+## v0.41
+- Biblioteca de técnicas ampliada com Proporção, Manipulação de Maldições, Trem do Puro Amor, Comediante, Mímica Corporal e Bestas Auspiciosas.
+- Feitiços/modelos adicionados para essas técnicas, com campos de ação, alcance, custo, dano/cura e resistência.
+- Mantido formato estático pronto para GitHub/Vercel.
