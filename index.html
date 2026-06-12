@@ -3,64 +3,54 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>F&M Ficha Online - v0.40</title>
+  <title>Exorcizados - Ficha Online</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
       <p class="eyebrow">Feiticeiros & Maldições</p>
-      <h1>Ficha Online</h1>
-      <span class="version">v0.41 — controlador e invocações automáticas</span>
+      <h1>Exorcizados</h1>
+      <span class="version">Ficha online de campanha</span>
     </div>
     <nav class="nav">
       <button data-tab="home" class="active">Início</button>
       <button data-tab="fichas">Fichas</button>
       <button data-tab="biblioteca">Biblioteca</button>
       <button data-tab="rolador">Rolador</button>
+      <button data-tab="changelog">Notas de atualização</button>
     </nav>
   </header>
 
   <main>
     <section id="home" class="tab active">
-      <article class="hero card">
+      <article class="hero card exorcizados-hero">
         <div>
-          <p class="eyebrow">Projeto pessoal</p>
-          <h2>Agora a ficha começa a ficar compartilhável e organizada.</h2>
-          <p>A v0.40 amplia a biblioteca de técnicas e feitiços, adicionando mais modelos prontos para personagens e fichas herdadas.</p>
+          <p class="eyebrow">Ficha online de RPG</p>
+          <h2>Exorcizados</h2>
+          <p>Crie, evolua e jogue com fichas de Feiticeiros & Maldições em uma interface escura, rápida e organizada para mesa.</p>
           <div class="actions-inline">
             <button id="startCreate" class="primary">+ Criar ficha</button>
             <button id="goSheets">Ver fichas</button>
           </div>
         </div>
         <aside class="hero-panel">
-          <strong>v0.40 entrega</strong>
-          <span>✓ Cálculo de PV/PE</span>
-          <span>✓ Perícias automáticas</span>
-          <span>✓ BT por nível</span>
-          <span>✓ CD de especialização</span>
-          <span>✓ Habilidades filtradas por nível ao adicionar</span>
-          <span>✓ Talentos com pré-requisitos automáticos</span>
-          <span>✓ Rolagens de atributos</span>
-          <span>✓ Aba de aptidões</span>
-          <span>✓ Técnica inata separada</span>
-          <span>✓ Feitiços filtrados por técnica</span>
-          <span>✓ Guia de publicação</span>
-          <span>✓ Atributos por pontos de evolução</span>
-          <span>✓ Modificadores temporários de atributos</span>
-          <span>✓ Habilidades com busca e textos ampliados</span>
-          <span>✓ Invocações</span>
-          <span>✓ Técnicas e feitiços ampliados</span>
+          <strong>Fluxo principal</strong>
+          <span>Criação guiada</span>
+          <span>Ficha por abas</span>
+          <span>Rolagens e cálculos automáticos</span>
+          <span>Habilidades, talentos, aptidões e técnicas</span>
+          <span>Inventário, encantamentos e invocações</span>
         </aside>
       </article>
 
       <article class="card">
-        <h2>Ordem de desenvolvimento</h2>
+        <h2>Comece por aqui</h2>
         <div class="steps-line">
-          <div class="done"><strong>1</strong><span>Ficha por abas</span></div>
-          <div class="done"><strong>2</strong><span>Automação central</span></div>
-          <div class="done"><strong>3</strong><span>Aptidões e rolagens</span></div>
-          <div><strong>4</strong><span>Talentos e domínios</span></div>
+          <div class="done"><strong>1</strong><span>Crie a ficha</span></div>
+          <div class="done"><strong>2</strong><span>Escolha origem e classe</span></div>
+          <div class="done"><strong>3</strong><span>Distribua atributos</span></div>
+          <div class="done"><strong>4</strong><span>Jogue pela ficha</span></div>
         </div>
       </article>
     </section>
@@ -123,6 +113,7 @@
                     <label>Jogador <input data-bind="player"></label>
                     <label>Nível <input data-bind="level" type="number" min="1" max="20"></label>
                     <label>Grau <input data-bind="grade"></label>
+                    <div id="hpRollNotice" class="toast-inline hidden full"></div>
                     <label>Origem <select data-bind="origin" id="originSelect"></select></label>
                     <label>Especialização <select data-bind="specialization" id="classSelect"></select></label>
                     <label>Técnica Inata <input data-bind="innateTechnique" placeholder="Ex.: Boneco de Palha"></label>
@@ -304,6 +295,15 @@
         <div id="rollHistory" class="roll-history"></div>
       </article>
     </section>
+    <section id="changelog" class="tab">
+      <article class="card">
+        <p class="eyebrow">Histórico do projeto</p>
+        <h2>Notas de atualização</h2>
+        <p class="muted">As mudanças ficam aqui para não poluir a tela inicial.</p>
+        <div id="changelogList" class="rule-grid"></div>
+      </article>
+    </section>
+
   </main>
 
   <dialog id="wizard" class="modal">
