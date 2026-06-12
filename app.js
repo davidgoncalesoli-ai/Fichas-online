@@ -23,25 +23,6 @@ const esc = (v='') => String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<'
 function norm(v=''){ return String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
 const makeId = () => crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random());
 
-// Estado principal da aplicação. Mantém compatibilidade com chaves antigas e novas do localStorage.
-let sheets = readJsonStorage(['exorcizados_sheets','fem_sheets','femSheets','fem-ficha-online-sheets'], []);
-if(!Array.isArray(sheets)) sheets = [];
-let activeId = readJsonStorage(['exorcizados_active','fem_active','femActive','fem-ficha-online-active'], null);
-function save(){
-  safeStorage.set('exorcizados_sheets', JSON.stringify(sheets));
-  safeStorage.set('exorcizados_active', JSON.stringify(activeId));
-  // chaves antigas preservadas para migração suave entre versões
-  safeStorage.set('fem_sheets', JSON.stringify(sheets));
-  safeStorage.set('fem_active', JSON.stringify(activeId));
-}
-function current(){
-  if(activeId){
-    const found = sheets.find(s => s && s.id === activeId);
-    if(found) return found;
-  }
-  return sheets[0] || null;
-}
-
 const ATTRS = ['Força','Destreza','Constituição','Inteligência','Sabedoria','Presença'];
 const ATTR_KEY = {FOR:'Força', DES:'Destreza', CON:'Constituição', INT:'Inteligência', SAB:'Sabedoria', PRE:'Presença'};
 const SKILLS = [
@@ -4616,20 +4597,6 @@ const ABILITY_LIBRARY = [
 ];
 
 
-
-function abilityReqLevel(a){
-  if(!a) return 1;
-  const direct = a.level ?? a.requiredLevel ?? a.reqLevel ?? a.nivel ?? a.required_level;
-  if(direct !== undefined && direct !== null && direct !== ''){
-    const n = Number(direct);
-    if(Number.isFinite(n)) return n;
-  }
-  const text = `${a.name||''} ${a.kind||''} ${a.prereq||''} ${a.text||''}`;
-  const m = text.match(/(?:nível|nivel|requisito:\s*nível|requer\s*nível)\s*(\d+)/i);
-  if(m) return Number(m[1]);
-  return 1;
-}
-
 const ABILITY_TEXT_PATCHES = {
   'Lutador|Corpo Treinado': 'Habilidade base automática. Representa o corpo condicionado do Lutador: use como referência para registrar bônus físicos, treino corporal e interações de combate corpo-a-corpo conforme a mesa aplicar o texto oficial.',
   'Lutador|Empolgação': 'Habilidade base automática. Recurso central do Lutador para entrar no ritmo da luta. Registre aqui efeitos, gatilhos e gastos conforme a ficha do personagem.',
@@ -4820,40 +4787,784 @@ function enrichLibraryDescriptionsV39() {
   "Invocação Personalizada": "Modelo livre para invocação criada pela técnica, talento ou decisão do narrador. Preencha função, custo, PV, defesa, ataques e comandos."
 };
   const enchantPatches = {
-  "Afiada": "Concentra energia amaldiçoada no fio ou na ponta da arma, tornando ferimentos críticos mais graves.",
-  "Amplificadora": "Canaliza o impacto de um ataque acertado para fortalecer o próximo feitiço de dano ou técnica marcial de ataque.",
-  "Armazenadora": "Permite guardar energia na arma durante o descanso e recuperar essa reserva depois enquanto a arma estiver empunhada.",
-  "Balanceada": "Ajusta peso, empunhadura e fluxo de energia da arma, facilitando manobras e controle corporal durante o combate.",
-  "Canalizadora": "Transforma a arma em foco de condução da energia amaldiçoada, fortalecendo a CD das habilidades amaldiçoadas.",
-  "Cano Alongado": "Aumenta o alcance efetivo da arma à distância por modificação física e reforço amaldiçoado no disparo.",
-  "Certeira": "Refina a precisão da arma e torna golpes bem colocados mais propensos a se tornarem críticos.",
-  "Compartimento": "Cria um espaço interno ou acoplado para armazenar mistura, óleo ou veneno aplicável à arma em combate.",
-  "Complementar": "Harmoniza a arma com a postura de combate do usuário, fortalecendo CDs de especialização e estilo marcial.",
-  "Cruel": "Torna a arma mais destrutiva, adicionando pontas, serrilhas, peso ofensivo ou energia agressiva para aumentar o dano.",
-  "Defensora": "Prepara a arma para aparar golpes e criar aberturas defensivas durante o combate corpo a corpo.",
-  "Destruidora": "A arma descarrega energia extra nos acertos críticos, aumentando a quantidade de dano causado nesses golpes.",
-  "Discreta": "Oculta melhor a presença física e amaldiçoada da arma, facilitando escondê-la ou sacá-la sem chamar atenção.",
-  "Drenadora": "Absorve energia de criaturas derrotadas e converte parte disso em energia temporária para o usuário.",
-  "Elemental": "Vincula a arma a um tipo de dano elemental escolhido, permitindo alterar o tipo de dano dos ataques.",
-  "Harmonizada": "Sincroniza o fluxo da arma com o usuário; acertos críticos facilitam o uso da próxima habilidade com custo.",
-  "Horrenda": "Distorce a aparência ou aura da arma, tornando efeitos de medo, abalo ou intimidação mais difíceis de resistir.",
-  "Longa": "Aumenta o alcance da arma corpo a corpo, seja por extensão física, corrente, haste ou projeção de energia.",
-  "Otimizada": "Torna a arma mais rápida de preparar e empunhar, favorecendo saque veloz e reação no início do combate.",
-  "Penetrante": "Faz a energia da arma atravessar proteções, ignorando parte da redução de dano do alvo.",
-  "Poderosa": "Aprofunda a brutalidade de uma arma já cruel, aumentando ainda mais o dano fixo dos ataques.",
-  "Potente": "Eleva o dano base da arma, adicionando um dado extra ao dano padrão causado pelos ataques.",
-  "Precisa": "Ajusta o equilíbrio e a mira da arma, concedendo bônus direto nas jogadas de ataque.",
-  "Reluzente": "Faz a arma emitir brilho ou reflexos amaldiçoados, ajudando em fintas e efeitos de ofuscamento.",
-  "Retorno": "Marca a arma de arremesso para retornar à mão do portador após ser lançada, se não estiver presa.",
-  "Sintonizada": "A arma ressoa com um tipo de dano não físico, adicionando dano extra quando o usuário ativa esse elemento.",
-  "Avassalador": "Transforma o escudo em uma ferramenta ofensiva mais brutal quando usado para atacar.",
-  "Bloqueador": "Amplia a área protegida pelo escudo, permitindo cobrir aliados próximos com mais eficiência.",
-  "Espinhoso": "Adiciona pontas, lâminas ou energia agressiva ao escudo, aumentando seu dano quando usado ofensivamente.",
-  "Reforçado": "Fortalece a estrutura do escudo, aumentando sua capacidade de reduzir dano físico.",
-  "Blindado": "Reforça o uniforme com camadas protetoras ou energia defensiva, aumentando a Defesa concedida.",
-  "Furtivo": "Adapta o uniforme para movimentação silenciosa e ocultação, melhorando ações furtivas.",
-  "Material Pesado": "Usa materiais mais densos ou revestimento rígido, melhorando resistência corporal e Fortitude.",
-  "Maldição Personalizada": "Encantamento livre criado pela mesa. Defina efeito, compatibilidade, bônus e limitações com o narrador."
+  "Afiada": "Encantamento/modificação Afiada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Amplificadora": "Encantamento/modificação Amplificadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Armazenadora": "Encantamento/modificação Armazenadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Balanceada": "Encantamento/modificação Balanceada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Canalizadora": "Encantamento/modificação Canalizadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Cano Alongado": "Encantamento/modificação Cano Alongado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Certeira": "Encantamento/modificação Certeira. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Compartimento": "Encantamento/modificação Compartimento. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Complementar": "Encantamento/modificação Complementar. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Cruel": "Aumenta letalidade do golpe. Na ficha, já pode ser tratado como bônus direto de dano se a mesa permitir.",
+  "Defensora": "Encantamento/modificação Defensora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Destruidora": "Encantamento/modificação Destruidora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Discreta": "Encantamento/modificação Discreta. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Drenadora": "Encantamento/modificação Drenadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Elemental": "Adiciona dano ou efeito elemental. Registre o elemento escolhido e se ele troca ou soma dano.",
+  "Harmonizada": "Encantamento/modificação Harmonizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Horrenda": "Encantamento/modificação Horrenda. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Longa": "Encantamento/modificação Longa. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Otimizada": "Encantamento/modificação Otimizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Penetrante": "Encantamento/modificação Penetrante. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Poderosa": "Aumenta força geral do ataque. Na ficha pode ser bônus direto de dano quando aplicável.",
+  "Potente": "Encantamento/modificação Potente. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Precisa": "Aumenta precisão. Na ficha pode entrar como bônus direto de acerto se a regra da mesa permitir.",
+  "Reluzente": "Encantamento/modificação Reluzente. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Retorno": "Permite a arma voltar ao usuário ou ser recuperada com facilidade. Registre ação, alcance e condição para retornar.",
+  "Sintonizada": "Encantamento/modificação Sintonizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Avassalador": "Encantamento/modificação Avassalador. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Bloqueador": "Encantamento/modificação Bloqueador. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Espinhoso": "Encantamento/modificação Espinhoso. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Reforçado": "Encantamento/modificação Reforçado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Blindado": "Encantamento/modificação Blindado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Furtivo": "Encantamento/modificação Furtivo. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Material Pesado": "Encantamento/modificação Material Pesado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
+  "Maldição Personalizada": "Encantamento/modificação Maldição Personalizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso."
+};
+  const domainPatches = {
+  "Expansão de Domínio Incompleta": "Forma inicial ou instável de domínio. Registre área, custo, efeito principal e quais limitações impedem acerto garantido completo.",
+  "Expansão de Domínio Completa": "Manifestação completa do domínio interno. Registre aparência, área, técnica vinculada, efeito de acerto garantido, custo e condições para sustentar.",
+  "Expansão de Domínio Sem Barreiras": "Domínio avançado sem fechamento tradicional. Registre raio, alvo, condição de fuga, custo e como o efeito se mantém sem barreira.",
+  "Puro Amor Mútuo": "Expansão ligada à técnica de Cópia/Rika. Use para registrar cópias disponíveis, armas/técnicas manifestadas e condição de uso durante o domínio.",
+  "Sentença de Morte": "Domínio de julgamento. Registre acusação, prova, veredito e penalidade aplicada, como confisco, condenação ou execução.",
+  "Caixão da Montanha de Ferro": "Domínio de calor e ambiente vulcânico. Registre dano/pressão ambiental, teste de resistência e efeito de acerto garantido.",
+  "Aposta Mortal Indolente": "Domínio baseado em aposta/probabilidade. Registre rodada, jackpot, bônus temporários e estado atual do ciclo.",
+  "Expansão Personalizada": "Modelo livre para criar domínio próprio. Preencha conceito, técnica, área, custo, acerto garantido, resistência e efeitos narrativos."
+};
+  const genericBad = /placeholder|texto completo|revisão|espaço reservado|modelo para|definir conforme mesa|habilidade base automática|ganho automático/i;
+  const addNote = (base, note) => String(base||'').trim() ? String(base).trim() + '\n\n' + note : note;
+
+  TALENT_LIBRARY.forEach(t => {
+    if(talentPatches[t.name]) t.text = talentPatches[t.name];
+    t.text = addNote(t.text, 'Resumo de ficha: confira o pré-requisito antes de adicionar; depois registre usos, cargas ou escolhas internas no próprio talento.');
+  });
+
+  TECHNIQUE_LIBRARY.forEach(t => {
+    if(techniquePatches[t.name]) t.text = techniquePatches[t.name];
+    t.text = addNote(t.text, 'Como usar na ficha: mantenha o funcionamento básico separado dos feitiços. O funcionamento define o que a técnica permite; os feitiços são aplicações específicas com ação, alcance, alvo, custo e efeito.');
+  });
+
+  TECH_LIBRARY.forEach(sp => {
+    const parts = [];
+    if(sp.action) parts.push('Conjuração: ' + sp.action);
+    if(sp.range) parts.push('Alcance: ' + sp.range);
+    if(sp.target) parts.push('Alvo: ' + sp.target);
+    if(sp.duration) parts.push('Duração: ' + sp.duration);
+    if(sp.cost) parts.push('Custo: ' + sp.cost);
+    if(sp.damage) parts.push('Dano/Cura: ' + sp.damage);
+    if(sp.resistance) parts.push('Resistência: ' + sp.resistance);
+    const prefix = parts.length ? parts.join(' • ') + '.\n\n' : '';
+    let body = String(sp.text||'').replace(genericBad, '').trim();
+    if(!body) body = 'Feitiço vinculado à técnica ' + (sp.tech || 'selecionada') + '. Use este registro para controlar ação, custo, alcance, teste de resistência, dano/cura e efeitos adicionais aprovados pelo narrador.';
+    sp.text = prefix + body + '\n\nResumo de mesa: antes de usar, confira se o alvo é válido, se o custo pode ser pago e se há teste de resistência ou rolagem de ataque.';
+  });
+
+  INVOCATION_LIBRARY.forEach(v => {
+    if(invocationPatches[v.name]) v.text = invocationPatches[v.name];
+    const stat = ['Tipo: '+(v.type||'—'), 'Grau: '+(v.grade||'—'), 'PV: '+(v.hp||'—'), 'Defesa: '+(v.defense||'—'), 'Deslocamento: '+(v.movement||'—')].join(' • ');
+    v.text = stat + '.\n\n' + String(v.text||'').trim() + '\n\nComo usar na ficha: marque se está ativa em campo, registre ações/comandos disponíveis e anote características especiais separadas dos ataques.';
+  });
+
+  ITEM_ENCHANTMENT_LIBRARY.forEach(m => {
+    if(enchantPatches[m.name]) m.text = enchantPatches[m.name];
+    const meta = ['Tipo: '+(m.type||'geral'), m.prereq ? 'Pré-requisito: '+m.prereq : '', m.attackBonus ? 'Bônus de acerto: '+(m.attackBonus>0?'+':'')+m.attackBonus : '', m.damageBonus ? 'Bônus de dano: '+(m.damageBonus>0?'+':'')+m.damageBonus : ''].filter(Boolean).join(' • ');
+    m.text = (meta ? meta + '.\n\n' : '') + String(m.text||'').trim() + '\n\nAplicação: adicione ao item, confira se o tipo de equipamento é compatível e ajuste ataques derivados se o efeito alterar acerto, dano, alcance ou propriedade.';
+  });
+
+  DOMAIN_LIBRARY.forEach(d => {
+    if(domainPatches[d.name]) d.text = domainPatches[d.name];
+    const meta = ['Tipo: '+(d.type||'—'), 'Técnica: '+(d.technique||'—'), 'Custo: '+(d.cost||'—'), 'Área: '+(d.area||'—'), 'Duração: '+(d.duration||'—')].join(' • ');
+    d.text = meta + '.\n\n' + String(d.text||'').trim() + '\n\nNa ficha: registre também efeito de acerto garantido, condição de resistência e qualquer limitação imposta pelo narrador.';
+  });
+
+  ITEM_LIBRARY.forEach(it => {
+    const cat = String(it.category||'').toLowerCase();
+    const meta = ['Categoria: '+(it.category||'—'), 'Custo: '+(it.cost||'—'), 'Espaços: '+(it.weight ?? '—'), it.damage ? 'Dano: '+it.damage : '', it.properties ? 'Propriedades: '+it.properties : ''].filter(Boolean).join(' • ');
+    let guide = '';
+    if(cat.includes('arma')) guide = 'Use como equipamento ofensivo. Ao criar ataque a partir dela, confira atributo usado, maestria, propriedade, crítico e modificações aplicadas.';
+    else if(cat.includes('uniforme')) guide = 'Use como proteção vestível. Registre modificações, espaço ocupado, defesa/efeito e possíveis penalidades de carga.';
+    else if(cat.includes('escudo')) guide = 'Use como proteção ativa. Registre bônus defensivo, reação, mão ocupada e encantamentos defensivos.';
+    else if(cat.includes('kit')) guide = 'Use como ferramenta de Ofício ou atividade específica. Registre em quais testes o kit é necessário e se há consumo de material.';
+    else if(cat.includes('item especial')) guide = 'Use como recurso consumível, utilitário ou narrativo. Marque quantidade, carga, duração e condição de uso.';
+    else guide = 'Use como item de inventário. Registre quantidade, espaços e efeito principal.';
+    const base = String(it.text||'').trim();
+    it.text = meta + '.\n\n' + base + '\n\nResumo de uso: ' + guide;
+  });
+
+  ABILITY_LIBRARY.forEach(a => {
+    const key = `${a.class}|${a.name}`;
+    if(abilityPatches[key]) a.text = abilityPatches[key];
+    else if(genericBad.test(a.text||'')) {
+      const level = a.level || a.reqLevel || '—';
+      const kind = a.kind || 'Habilidade';
+      a.text = `${kind} de ${a.class||'especialização'} desbloqueada no nível ${level}. Use este campo para registrar o efeito oficial da habilidade, pré-requisitos, custo, ação e limitações. Se a habilidade tiver escolhas internas, marque as opções dentro da ficha.`;
+    }
+    const req = a.prereq ? 'Pré-requisito: ' + a.prereq + '.\n\n' : '';
+    if(!String(a.text||'').includes('Resumo de ficha:')) a.text = req + String(a.text||'').trim() + '\n\nResumo de ficha: confira nível, especialização e pré-requisitos antes de usar; registre custo, ação, gatilho e usos por descanso/cena quando existirem.';
+  });
+}
+enrichLibraryDescriptionsV39();
+
+const RULES = [
+  {title:'Automação atual', text:'PV, PE/Estamina, Defesa, Atenção, Iniciativa, CD e perícias são calculados a partir de nível, atributos, classe e treinamento.'},
+  {title:'v0.7', text:'Habilidades separadas por abas de nível.'},
+  {title:'v0.8', text:'Aba de habilidades corrigida para nível necessário de desbloqueio, com filtros por nível exigido.'},
+  {title:'v0.9', text:'Biblioteca oficial inicial de habilidades por especialização e requisito de nível cadastrada pelo nome.'},
+  {title:'v0.10', text:'Abas de nível removidas da ficha; talentos gerais e expansões de domínio ganharam biblioteca e cadastro próprio.'},
+  {title:'v0.11', text:'Talentos gerais e de origem receberam biblioteca ampliada, busca, categorias e bloqueios por nível, origem, atributo, perícia e domínio.'},
+  {title:'v0.13', text:'Técnica inata ganhou área própria; feitiços são adicionados em janela com filtro por técnica e nível. Inclui guia de publicação.'},
+  {title:'v0.27', text:'Biblioteca de técnicas ampliada; feitiços agora têm dano/cura, resistência, marca registrada, preparado, rolagem de dano e botão para adicionar fundamentos nível 0 da técnica inata.'},
+  {title:'v0.37', text:'Técnicas herdadas agora puxam fundamentos de nível 0 automaticamente ao criar Herdado; adicionados modelos iniciais para Ilimitado, Seis Olhos e Projeção.'},
+  {title:'v0.39', text:'Descrições de habilidades, talentos, feitiços, itens, encantamentos, expansões e invocações foram enriquecidas para leitura clara em mesa.'},
+  {title:'v0.41', text:'Biblioteca de técnicas e feitiços ampliada com Proporção, Manipulação de Maldições, Trem do Puro Amor, Comediante, Mímica Corporal e Bestas Auspiciosas.'},
+  {title:'v0.53', text:'Rolagem de atributos da criação alterada para 1d20 por atributo; habilidades e talentos agora usam cards resumidos com detalhes expansíveis; automáticas entram somente ao atingir o nível.'},
+  {title:'v0.44', text:'Visual Exorcizados em vermelho e preto, notas de atualização separadas, talentos naturais com todos os talentos, aptidões ampliadas e equipamento inicial organizado por abas.'}
+];
+
+let sheets = readJsonStorage(['femSheetsV13','femSheetsV10','femSheetsV09','femSheetsV08','femSheetsV07','femSheetsV06','femSheetsV05','femSheetsV04'], []);
+let activeId = safeStorage.get('femActiveV13') || safeStorage.get('femActiveV10') || safeStorage.get('femActiveV09') || safeStorage.get('femActiveV08') || safeStorage.get('femActiveV07') || safeStorage.get('femActiveV06') || safeStorage.get('femActiveV05') || safeStorage.get('femActiveV04') || null;
+let wizardData = null;
+let wizardStep = 0;
+let abilitySheetLevelFilter = 'all';
+let abilityLibraryLevelFilter = 'all';
+let abilitySearchFilter = '';
+let abilityClassFilter = 'current';
+let abilityKindFilter = 'all';
+let activeItemModIndex = null;
+let selectedItemModLibraryIndex = null;
+const ABILITY_UNLOCK_TABS = [1,2,4,6,8,10,12,14,16,18,20];
+const wizardSteps = ['Identidade','Origem','Especialização','Treinamentos','Equipamento inicial','Atributos','Resumo'];
+
+function mod(v){ return Math.floor((Number(v||10)-10)/2); }
+function sgn(v){ return v>=0 ? '+'+v : String(v); }
+function halfLevel(lvl){ return Math.floor(Number(lvl||1)/2); }
+function trainingBonus(level){ level=Number(level||1); if(level>=17) return 6; if(level>=13) return 5; if(level>=9) return 4; if(level>=5) return 3; return 2; }
+function gradeByLevel(level){ level=Number(level||1); if(level>=17) return 'Grau Especial'; if(level>=13) return '1º Grau'; if(level>=9) return '2º Grau'; if(level>=5) return '3º Grau'; return '4º Grau'; }
+function rollAttributeValue(){ const value=Math.floor(Math.random()*20)+1; return {rolls:[value], total:value, mode:'1d20'}; }
+function rollAttributeSet(){ return Array.from({length:6},()=>rollAttributeValue()); }
+function fixedAttributeSet(){ return [15,14,13,12,10,8].map(v=>({rolls:[v], total:v, fixed:true})); }
+function attributePoolValues(data){ return (data.attributeRolls||[]).map(r=>Number(r.total)); }
+function usedAttributeValues(data, exceptAttr=''){ const used=[]; for(const a of ATTRS){ if(a!==exceptAttr && data.attributeAssignments?.[a] !== undefined && data.attributeAssignments?.[a] !== '') used.push(Number(data.attributeAssignments[a])); } return used; }
+function countValue(list,value){ return list.filter(v=>Number(v)===Number(value)).length; }
+function attributeAssignmentComplete(data){ return ATTRS.every(a=>data.attributeAssignments?.[a] !== undefined && data.attributeAssignments?.[a] !== ''); }
+function syncAttributesFromAssignments(data){ if(attributeAssignmentComplete(data)){ data.attributeBase=data.attributeBase||{}; ATTRS.forEach(a=>{ const v=Number(data.attributeAssignments[a]); data.attributeBase[a]=v; data.attributes[a]=v; }); } return data; }
+function trainValue(level, rank){ const bt=trainingBonus(level); if(rank==='master') return Math.ceil(bt*1.5); if(rank==='trained') return bt; return 0; }
+function aptitudePointsTotal(sheet){
+  if(sheet.origin==='Restringido' || sheet.specialization==='Restringido') return 0;
+  return Math.floor(Number(sheet.level||1)/2);
+}
+function aptitudePointsSpent(sheet){
+  const levels = sheet.aptitudeLevels || {};
+  return APTITUDE_KEYS.reduce((sum,a)=>sum + Number(levels[a.key]||0),0);
+}
+function aptitudePointsLeft(sheet){ return aptitudePointsTotal(sheet) - aptitudePointsSpent(sheet); }
+function canUseAptitude(sheet, apt){
+  if(sheet.origin==='Restringido' || sheet.specialization==='Restringido') return {ok:false, reason:'Restringido não recebe aptidões amaldiçoadas por padrão.'};
+  const req=apt.req||{};
+  for(const [key,val] of Object.entries(req)){
+    if(Number(sheet.aptitudeLevels?.[key]||0) < Number(val)){
+      const label = APTITUDE_KEYS.find(a=>a.key===key)?.sigla || key;
+      return {ok:false, reason:`Requer ${label} ${val}.`};
+    }
+  }
+  if(sheet.aptitudeChoices?.some(x=>x.name===apt.name)) return {ok:false, reason:'Já adicionada.'};
+  return {ok:true, reason:'Disponível'};
+}
+function attributeBaseValue(sheet, attr){
+  const fromBase = sheet.attributeBase?.[attr];
+  if(fromBase !== undefined && fromBase !== '') return Number(fromBase);
+  const fromAssign = sheet.attributeAssignments?.[attr];
+  if(fromAssign !== undefined && fromAssign !== '') return Number(fromAssign);
+  return Number(sheet.attributes?.[attr] || 10);
+}
+function attributeTempValue(sheet, attr){ return Number(sheet.attributeTempMods?.[attr] || 0); }
+
+function cleanSheetRuleText(text=''){
+  return String(text||'')
+    .replace(/\n?\s*Resumo de ficha:[\s\S]*?(?=(\n\s*Pré-requisito:|\n\s*Efeito:|$))/gi,'')
+    .replace(/\n?\s*Resumo de mesa:[\s\S]*?(?=(\n\s*Pré-requisito:|\n\s*Efeito:|$))/gi,'')
+    .replace(/\n{3,}/g,'\n\n')
+    .trim();
+}
+
+function stripTechniqueTypePrefix(text=''){
+  return String(text||'')
+    .replace(/^\s*\[[^\]\n]+ personalizado\]\s*/i,'')
+    .replace(/^\s*\[[^\]\n]+\]\s*/i,'')
+    .trim();
+}
+
+function splitRequirementAndDescription(entry={}){
+  const raw=cleanSheetRuleText(entry.text||'');
+  let prereq=String(entry.prereq||'').trim();
+  let desc=raw;
+  const m=raw.match(/^\s*Pr[eé]-?requisito\s*:\s*([^\n]+)\n*/i);
+  if(m){ prereq = prereq || m[1].trim(); desc = raw.slice(m[0].length).trim(); }
+  if(!prereq || prereq==='—') prereq = entry.requiredText || '—';
+  return {prereq, desc: desc || 'Descrição não cadastrada ainda.'};
+}
+function temporaryEffectText(text=''){
+  return /(tempor[aá]ri|at[eé] o|fim do turno|pr[oó]ximo turno|rodada|cena|descanso|quando |caso |uma vez|enquanto empunhar|ao acertar|ap[oó]s|durante)/i.test(String(text||''));
+}
+function blankPermanentEffects(){ return {attr:{}, skill:{}, defense:0, hp:0, pe:0, movement:0, dc:0, initiative:0, attention:0, load:0, notes:[]}; }
+function addPerm(map,key,val){ if(!key || !Number(val)) return; map[key]=(Number(map[key]||0)+Number(val)); }
+function parsePermanentEffectsFromText(name='', text=''){
+  const effects=blankPermanentEffects();
+  const raw=cleanSheetRuleText(String(text||''));
+  if(!raw || temporaryEffectText(raw)) return effects;
+  const n=norm(name);
+  const attrAliases = {forca:'Força','força':'Força',destreza:'Destreza',constituicao:'Constituição','constituição':'Constituição',inteligencia:'Inteligência','inteligência':'Inteligência',sabedoria:'Sabedoria',presenca:'Presença','presença':'Presença'};
+  const allStats = [...ATTRS, ...allSkillNames(), 'Defesa','PV','Pontos de Vida','PE','Pontos de Energia','Estamina','Deslocamento','CD','Iniciativa','Atenção','Atencao','Carga'];
+  // Padrões diretos: "+2 em Defesa", "+5 na Fortitude", "+3 PV".
+  raw.replace(/([+-]\s*\d+)\s*(?:em|na|no|de|a|à)?\s*([A-Za-zÀ-ÿ ]{2,32})/g,(m,num,label)=>{
+    const value=Number(String(num).replace(/\s+/g,''));
+    const found=allStats.find(x=>norm(label).includes(norm(x)) || norm(x).includes(norm(label).trim()));
+    if(!found) return m;
+    const key=found;
+    if(ATTRS.includes(key)) addPerm(effects.attr,key,value);
+    else if(allSkillNames().includes(key)) addPerm(effects.skill,key,value);
+    else if(/defesa/i.test(key)) effects.defense += value;
+    else if(/^PV|Pontos de Vida/i.test(key)) effects.hp += value;
+    else if(/^PE|Pontos de Energia|Estamina/i.test(key)) effects.pe += value;
+    else if(/deslocamento/i.test(key)) effects.movement += value;
+    else if(/^CD$/i.test(key)) effects.dc += value;
+    else if(/iniciativa/i.test(key)) effects.initiative += value;
+    else if(/aten/i.test(key)) effects.attention += value;
+    else if(/carga/i.test(key)) effects.load += value;
+    return m;
+  });
+  // Alguns talentos/habilidades comuns cadastrados por nome, para garantir aplicação permanente sem depender do texto.
+  if(n.includes('atencao infalivel') || n.includes('atenção infalível')) effects.attention += 2;
+  if(n.includes('ataque infalivel') || n.includes('ataque infalível')) addPerm(effects.skill,'Luta',2), addPerm(effects.skill,'Pontaria',2);
+  if(n.includes('alma inquebravel') || n.includes('alma inquebrável')) addPerm(effects.skill,'Vontade',2);
+  if(n.includes('corpo treinado')) effects.hp += 2;
+  if(n.includes('fisico abencoado') || n.includes('físico abençoado')) { addPerm(effects.attr,'Força',1); addPerm(effects.attr,'Destreza',1); addPerm(effects.attr,'Constituição',1); }
+  if(n.includes('apice corporal') || n.includes('ápice corporal')) effects.movement += 1.5;
+  return effects;
+}
+function mergeEffects(a,b){
+  Object.entries(b.attr||{}).forEach(([k,v])=>addPerm(a.attr,k,v));
+  Object.entries(b.skill||{}).forEach(([k,v])=>addPerm(a.skill,k,v));
+  ['defense','hp','pe','movement','dc','initiative','attention','load'].forEach(k=>a[k]+=Number(b[k]||0));
+  if(b.notes?.length) a.notes.push(...b.notes);
+  return a;
+}
+function permanentEffects(sheet){
+  const total=blankPermanentEffects();
+  [...(sheet.abilities||[]), ...(sheet.talents||[]), ...(sheet.aptitudeChoices||[])].forEach(x=>mergeEffects(total, parsePermanentEffectsFromText(x.name, x.text||x.description||'')));
+  (sheet.items||[]).forEach(item=>{
+    (item.modifications||[]).forEach(m=>{
+      if(/uniforme/i.test(item.category||'') && /blindado/i.test(m.name||'')) total.defense += 2;
+      if(/uniforme/i.test(item.category||'') && /material pesado/i.test(m.name||'')) addPerm(total.skill,'Fortitude',2);
+      if(/uniforme/i.test(item.category||'') && /furtivo/i.test(m.name||'')) addPerm(total.skill,'Furtividade', Number(item.cost||1)||1);
+    });
+  });
+  return total;
+}
+function permanentAttributeBonus(sheet, attr){ return Number(permanentEffects(sheet).attr?.[attr]||0); }
+function permanentSkillBonus(sheet, skill){ return Number(permanentEffects(sheet).skill?.[skill]||0); }
+function effectBadgesForEntry(entry){
+  const eff=parsePermanentEffectsFromText(entry.name, entry.text||'');
+  const badges=[];
+  Object.entries(eff.attr||{}).forEach(([k,v])=>badges.push(`${k} ${v>=0?'+':''}${v}`));
+  Object.entries(eff.skill||{}).forEach(([k,v])=>badges.push(`${k} ${v>=0?'+':''}${v}`));
+  if(eff.defense) badges.push(`Defesa ${eff.defense>=0?'+':''}${eff.defense}`);
+  if(eff.hp) badges.push(`PV ${eff.hp>=0?'+':''}${eff.hp}`);
+  if(eff.pe) badges.push(`PE/Estamina ${eff.pe>=0?'+':''}${eff.pe}`);
+  if(eff.movement) badges.push(`Deslocamento ${eff.movement>=0?'+':''}${eff.movement}m`);
+  if(eff.dc) badges.push(`CD ${eff.dc>=0?'+':''}${eff.dc}`);
+  if(eff.initiative) badges.push(`Iniciativa ${eff.initiative>=0?'+':''}${eff.initiative}`);
+  if(eff.attention) badges.push(`Atenção ${eff.attention>=0?'+':''}${eff.attention}`);
+  return badges;
+}
+function sanitizeLibrariesV48(){
+  [ABILITY_LIBRARY,TALENT_LIBRARY,APTITUDE_LIBRARY].forEach(lib=>lib.forEach(x=>{ if(x.text) x.text=cleanSheetRuleText(x.text); }));
+}
+sanitizeLibrariesV48();
+
+function effectiveAttribute(sheet, attr){ return Number(sheet.attributes?.[attr] || 10) + originAttributeBonus(sheet, attr) + attributeTempValue(sheet, attr) + permanentAttributeBonus(sheet, attr); }
+function attrMod(sheet, attr){ return mod(effectiveAttribute(sheet, attr)); }
+function attributePointsTotal(sheet){ return Math.max(0, Math.floor(Number(sheet.level||1)/4) * 2); }
+function attributePointsSpent(sheet){ return ATTRS.reduce((sum,a)=>sum + Math.max(0, Number(sheet.attributes?.[a]||10) - attributeBaseValue(sheet,a)), 0); }
+function attributePointsLeft(sheet){ return attributePointsTotal(sheet) - attributePointsSpent(sheet); }
+function itemSpacesUsed(sheet){ return (sheet.items||[]).reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); }
+function loadLimit(sheet){ return Math.max(0, 8 + (attrMod(sheet,'Força') * 2)); }
+function loadState(sheet){ const used=itemSpacesUsed(sheet); const limit=loadLimit(sheet); const max=limit*2; const overloaded=used>limit; const impossible=used>max; return {used,limit,max,overloaded,impossible, defensePenalty:overloaded?-5:0, movementPenalty:overloaded?-4.5:0}; }
+function skillTotal(sheet, skill){ const rank=effectiveSkillRank(sheet, skill.name); const extra=Number(sheet.skillExtras?.[skill.name]||0) + originSkillExtra(sheet, skill.name) + permanentSkillBonus(sheet, skill.name); return attrMod(sheet, skill.attr) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
+function current(){ return sheets.find(s=>s.id===activeId); }
+function save(){ safeStorage.set('femSheetsV13', JSON.stringify(sheets)); if(activeId) safeStorage.set('femActiveV13', activeId); }
+function blankSheet(){
+  const skillRanks={}, skillExtras={}; SKILLS.forEach(([name])=>{ skillRanks[name]='none'; skillExtras[name]=0; });
+  return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeBase:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeTempMods:{'Força':0,'Destreza':0,'Constituição':0,'Inteligência':0,'Sabedoria':0,'Presença':0}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, originChoices:originChoicesDefault(), skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], invocations:[], attacks:[], items:[], hpRolls:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
+}
+function normalize(sheet){
+  const base=blankSheet();
+  sheet = {...base, ...sheet, attributes:{...base.attributes, ...(sheet.attributes||{})}, attributeBase:{...base.attributeBase, ...(sheet.attributeBase||{})}, attributeTempMods:{...base.attributeTempMods, ...(sheet.attributeTempMods||{})}, attributeAssignments:{...base.attributeAssignments, ...(sheet.attributeAssignments||{})}, skillRanks:{...base.skillRanks, ...(sheet.skillRanks||{})}, skillExtras:{...base.skillExtras, ...(sheet.skillExtras||{})}, aptitudeLevels:{...base.aptitudeLevels, ...(sheet.aptitudeLevels||{})}, originChoices:{...originChoicesDefault(), ...(sheet.originChoices||{})}};
+  if(!sheet.attributeBase || ATTRS.some(a=>sheet.attributeBase[a]===undefined)){ sheet.attributeBase=sheet.attributeBase||{}; ATTRS.forEach(a=>{ if(sheet.attributeBase[a]===undefined) sheet.attributeBase[a]=attributeAssignmentComplete(sheet)?Number(sheet.attributeAssignments[a]):Number(sheet.attributes[a]||10); }); }
+  if(!sheet.attributeTempMods) sheet.attributeTempMods={}; ATTRS.forEach(a=>{ if(sheet.attributeTempMods[a]===undefined) sheet.attributeTempMods[a]=0; });
+  if(!sheet.originChoices.originAttrAlloc) sheet.originChoices.originAttrAlloc={}; ATTRS.forEach(a=>{ if(sheet.originChoices.originAttrAlloc[a]===undefined) sheet.originChoices.originAttrAlloc[a]=0; });
+  if(!Array.isArray(sheet.originChoices.originTrained)) sheet.originChoices.originTrained=['',''];
+  while(sheet.originChoices.originTrained.length<2) sheet.originChoices.originTrained.push('');
+  if(sheet.originChoices.trainingMode===undefined) sheet.originChoices.trainingMode='trained2';
+  if(sheet.originChoices.originMaster===undefined) sheet.originChoices.originMaster='';
+  if(sheet.originChoices.clanTechnique===undefined) sheet.originChoices.clanTechnique='';
+  if(sheet.originChoices.originTalent===undefined) sheet.originChoices.originTalent='';
+  if(sheet.originChoices.anatomySkill===undefined) sheet.originChoices.anatomySkill='';
+  clampOriginAlloc(sheet); cleanOriginTrainingChoices(sheet);
+  if(!Array.isArray(sheet.originChoices.cores)) sheet.originChoices.cores=originChoicesDefault().cores;
+  sheet.originChoices.cores = sheet.originChoices.cores.slice(0,3); while(sheet.originChoices.cores.length<3) sheet.originChoices.cores.push({name:`Núcleo ${sheet.originChoices.cores.length+1}`, concept:'', specialization:''});
+  sheet.attributeRolls = Array.isArray(sheet.attributeRolls) ? sheet.attributeRolls : [];
+  ['abilities','talents','techniques','domains','invocations','attacks','items','aptitudeChoices'].forEach(k=>sheet[k]=Array.isArray(sheet[k])?sheet[k]:[]);
+  sheet.domains = sheet.domains.map(d=>({name:d.name||'', type:d.type||'', technique:d.technique||'', level:d.level ?? '', cost:d.cost||'', area:d.area||'', duration:d.duration||'', text:d.text||''}));
+  sheet.invocations = sheet.invocations.map(v=>({name:v.name||'', type:v.type||'', grade:v.grade||'', cost:v.cost||'', hp:v.hp||'', hpCurrent:v.hpCurrent||'', defense:v.defense||'', movement:v.movement||'', active:!!v.active, companion:!!v.companion, actions:v.actions||'', traits:v.traits||'', text:v.text||''}));
+  sheet.techniques = sheet.techniques.map(t=>({name:t.name||'', tech:t.tech || t.technique || '', level:t.level ?? '', action:t.action||'', range:t.range||'', target:t.target||'', duration:t.duration||'', cost:t.cost||'', damage:t.damage||'', resistance:t.resistance||'', prepared:!!t.prepared, signature:!!t.signature, text:t.text||''}));
+  sheet.abilities = sheet.abilities.map(a=>({level:a.level ?? a.nivel ?? '', class:a.class ?? a.classe ?? '', kind:a.kind ?? '', name:a.name||'', text:a.text||'', options:Array.isArray(a.options)?a.options:[], selectedOptions:Array.isArray(a.selectedOptions)?a.selectedOptions:[]}));
+  sheet.items = sheet.items.map(it=>({name:it.name||'', category:it.category||'Item', cost:it.cost??'', qty:it.qty||1, weight:it.weight||0, damage:it.damage||'', properties:it.properties||'', grade:it.grade||'', enchantmentCharges:it.enchantmentCharges??'', uniqueAbility:it.uniqueAbility||'', modifications:Array.isArray(it.modifications)?it.modifications:[], text:it.text||''}));
+  normalizeHpRolls(sheet);
+  return sheet;
+}
+function applyAutoValues(sheet, opts={keepCurrent:true}){
+  sheet=normalize(sheet);
+  const cls=CLASSES[sheet.specialization] || CLASSES.Lutador;
+  if(!cls.keys.includes(sheet.keyAttribute)) sheet.keyAttribute = cls.keys[0];
+  const con=attrMod(sheet,'Constituição');
+  const key=attrMod(sheet, sheet.keyAttribute);
+  syncAutomaticAbilitiesForLevel(sheet);
+  ensureHpRolls(sheet, false);
+  const hp = hpFromRolls(sheet);
+  let pe = cls.pe ? cls.pe * sheet.level : (cls.stamina ? cls.stamina * sheet.level : 0);
+  if(cls.peKeyOnce) pe += key;
+  if(sheet.origin==='Herdado' && sheet.originChoices?.clan==='Clã Gojo') pe += Math.floor(Number(sheet.level||1)/2);
+  let hpAdjusted = hp;
+  if(sheet.origin==='Herdado' && sheet.originChoices?.clan==='Clã Kamo') hpAdjusted += Number(sheet.level||1) + (Number(sheet.level||1)>=10 ? attrMod(sheet,'Constituição') : 0);
+  const perm = permanentEffects(sheet);
+  hpAdjusted += perm.hp;
+  pe += perm.pe;
+  sheet.hpMax = hpAdjusted;
+  sheet.peMax = Math.max(0, pe);
+  if(!opts.keepCurrent || !sheet.hp) sheet.hp = hp;
+  if(!opts.keepCurrent || !sheet.pe) sheet.pe = sheet.peMax;
+  sheet.grade = gradeByLevel(sheet.level);
+  sheet.dc = 10 + halfLevel(sheet.level) + trainingBonus(sheet.level) + key + perm.dc;
+  sheet.defense = 10 + attrMod(sheet,'Destreza') + (sheet.specialization==='Restringido' ? Math.min(sheet.level, Math.max(attrMod(sheet,'Força'), attrMod(sheet,'Constituição'), 0)) : 0) + perm.defense;
+  sheet.attention = 10 + skillTotal(sheet, {name:'Percepção', attr:'Sabedoria'}) + perm.attention;
+  sheet.initiative = skillTotal(sheet, {name:'Reflexos', attr:'Destreza'}) + perm.initiative;
+  sheet.movement = (sheet.origin==='Restringido' || sheet.specialization==='Restringido' ? 12 : 9) + perm.movement;
+  if(sheet.origin==='Sem Técnica' && sheet.specialization==='Especialista em Técnica'){ sheet.automationNotes = 'Origem Sem Técnica não pode ter a especialização Especialista em Técnica. Troque a especialização para corrigir.'; }
+  const load = loadState(sheet);
+  if(load.overloaded){
+    sheet.defense = Math.max(0, sheet.defense + load.defensePenalty);
+    sheet.movement = Math.max(0, sheet.movement + load.movementPenalty);
+  }
+  const auto = [];
+  auto.push(`BT +${trainingBonus(sheet.level)}; metade do nível: ${halfLevel(sheet.level)}; CD: ${sheet.dc}.`);
+  auto.push(`PV: ${cls.hp1}+CON no 1º nível; ao subir de nível, rola 1d${cls.hp1}+CON e soma ao máximo.`);
+  auto.push(cls.stamina ? `Estamina sugerida: ${cls.stamina} por nível.` : `PE sugerido: ${cls.pe} por nível${cls.peKeyOnce ? ' + modificador do atributo-chave uma vez' : ''}.`);
+  auto.push(`Treinamentos da especialização: ${cls.trainings}`);
+  auto.push(`Treinamentos de origem: ${originTrainingSummary(sheet)}`);
+  auto.push(`Aptidões: ${aptitudePointsSpent(sheet)}/${aptitudePointsTotal(sheet)} pontos usados.`);
+  const permNote = [`Defesa ${perm.defense?sgn(perm.defense):''}`, `PV ${perm.hp?sgn(perm.hp):''}`, `PE/Estamina ${perm.pe?sgn(perm.pe):''}`, `Desloc. ${perm.movement?sgn(perm.movement):''}`, `CD ${perm.dc?sgn(perm.dc):''}`].filter(x=>!/ $/.test(x) && !x.endsWith(' '));
+  if(permNote.length) auto.push('Bônus permanentes aplicados: '+permNote.join(' • ')+'.');
+  if(load.overloaded) auto.push(`Carga: sobrecarregado (${load.used}/${load.limit} espaços). Penalidade automática: -5 Defesa e -4,5m deslocamento.`);
+  sheet.automationNotes = auto.join('\n');
+  return sheet;
+}
+function applyDefaultSkills(sheet){
+  sheet=normalize(sheet); const cls=CLASSES[sheet.specialization] || CLASSES.Lutador;
+  [...(cls.defaultSkills||[]),'Fortitude','Reflexos'].forEach(s=>{ if(sheet.skillRanks[s]) sheet.skillRanks[s]='trained'; });
+  if(['Especialista em Técnica','Controlador','Suporte'].includes(sheet.specialization)){ sheet.skillRanks['Astúcia']='trained'; sheet.skillRanks['Vontade']='trained'; }
+  if(sheet.specialization==='Restringido'){ sheet.skillRanks['Fortitude']='trained'; sheet.skillRanks['Reflexos']='trained'; sheet.skillRanks['Feitiçaria']='none'; }
+  return sheet;
+}
+function addBaseAbilities(sheet){
+  const cls=CLASSES[sheet.specialization] || CLASSES.Lutador;
+  cls.baseAbilities.forEach(name=>{ if(!sheet.abilities.some(a=>a.name===name)){ const lib=ABILITY_LIBRARY.find(a=>a.name===name); if(lib && abilityReqLevel(lib)>Number(sheet.level||1)) return; sheet.abilities.push({name, class:sheet.specialization, level:lib?.level || 1, kind:lib?.kind || 'Automática', text:lib?.text || 'Habilidade base da especialização.', options:lib?.options||[], selectedOptions:[]}); } });
+}
+
+function activateTab(id){ $$('.tab').forEach(t=>t.classList.toggle('active', t.id===id)); $$('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===id)); }
+function activateSubtab(id){ $$('.subtab').forEach(t=>t.classList.toggle('active', t.id===id)); $$('.subnav button').forEach(b=>b.classList.toggle('active', b.dataset.subtab===id)); }
+
+function renderSheetList(){
+  const wrap=$('#sheetList');
+  if(!sheets.length){ wrap.innerHTML='<p class="muted">Nenhuma ficha criada.</p>'; return; }
+  wrap.innerHTML=sheets.map(s=>`<button class="sheet-item ${s.id===activeId?'active':''}" data-sheet="${s.id}"><strong>${esc(s.name||'Sem nome')}</strong><span>${esc(s.origin)} • ${esc(s.specialization)} • Nv. ${esc(s.level)}</span></button>`).join('');
+  $$('[data-sheet]').forEach(b=>b.onclick=()=>{ activeId=b.dataset.sheet; save(); renderAll(); activateTab('fichas'); });
+}
+function updateRestrictedUi(sheet){
+  const restricted = sheet.origin==='Restringido' || sheet.specialization==='Restringido';
+  const classSelect=$('#classSelect');
+  if(classSelect){
+    if(restricted){ sheet.specialization='Restringido'; classSelect.value='Restringido'; classSelect.disabled=true; }
+    else classSelect.disabled=false;
+  }
+  const peNow=document.querySelector('[data-bind="pe"]')?.closest('label');
+  const peMax=document.querySelector('[data-bind="peMax"]')?.closest('label');
+  if(peNow && peNow.childNodes[0]) peNow.childNodes[0].textContent = restricted ? 'Estamina Atual ' : 'PE Atual ';
+  if(peMax && peMax.childNodes[0]) peMax.childNodes[0].textContent = restricted ? 'Estamina Máx. ' : 'PE Máx. ';
+  const navMap = {aptidoes:'Aptidões', dominios:'Expansão de Domínio', invocacoes:'Invocações'};
+  Object.keys(navMap).forEach(id=>{ const btn=document.querySelector(`.subnav button[data-subtab="${id}"]`); if(btn) btn.classList.toggle('hidden', restricted); });
+  const techBtn=document.querySelector('.subnav button[data-subtab="tecnicas"]'); if(techBtn) techBtn.textContent = restricted ? 'Estilo Marcial' : 'Técnicas';
+  const techTitle=document.querySelector('#tecnicas h2'); if(techTitle) techTitle.textContent = restricted ? 'Estilo Marcial' : 'Técnica Inata';
+  const techInputLabel=document.querySelector('#tecnicas [data-bind="innateTechnique"]')?.closest('label'); if(techInputLabel && techInputLabel.childNodes[0]) techInputLabel.childNodes[0].textContent = restricted ? 'Estilo marcial atual' : 'Técnica inata atual';
+  const techText=document.querySelector('#tecnicas [data-bind="innateTechniqueText"]')?.closest('label'); if(techText && techText.childNodes[0]) techText.childNodes[0].textContent = restricted ? 'Funcionamento do estilo marcial' : 'Funcionamento básico';
+  if(restricted && ['aptidoes','dominios','invocacoes'].some(id=>document.getElementById(id)?.classList.contains('active'))) activateSubtab('status');
+}
+function renderEditor(){
+  const sheet=current();
+  $('#emptyState').classList.toggle('hidden', !!sheet);
+  $('#sheetEditor').classList.toggle('hidden', !sheet);
+  if(!sheet) return;
+  applyAutoValues(sheet); save();
+  $('#currentName').textContent=sheet.name || 'Sem nome';
+  $('#currentSummary').textContent=`${sheet.origin || 'Sem origem'} • ${sheet.specialization || 'Sem especialização'} • ${sheet.innateTechnique || (sheet.origin==='Restringido'?'Sem estilo marcial definido':'Sem técnica inata definida')}`;
+  $('[data-view="level"]').textContent=sheet.level;
+  $('#btView').textContent='+'+trainingBonus(sheet.level);
+  $('#gradeView').textContent=sheet.grade;
+  $('#dcView').textContent=sheet.dc;
+  fillSelect('#originSelect', ORIGINS.map(o=>o.name), sheet.origin);
+  if(sheet.origin==='Restringido') sheet.specialization='Restringido';
+  fillSelect('#classSelect', Object.keys(CLASSES), sheet.specialization);
+  fillSelect('#keyAttributeSelect', (CLASSES[sheet.specialization]||CLASSES.Lutador).keys, sheet.keyAttribute);
+  updateRestrictedUi(sheet);
+  $$('[data-bind]').forEach(el=>{ const key=el.dataset.bind; if(el.value !== String(sheet[key] ?? '')) el.value = sheet[key] ?? ''; el.oninput=()=>{ const oldLevel=Number(sheet.level||1); sheet[key] = el.type==='number' ? Number(el.value) : el.value; if(key==='origin' && sheet.origin==='Restringido') sheet.specialization='Restringido'; if(key==='specialization' && sheet.origin==='Restringido') sheet.specialization='Restringido'; if(key==='level'){ const newLevel=Number(sheet.level||1); if(newLevel>oldLevel) ensureHpRolls(sheet,true); } if(['level','origin','specialization','keyAttribute'].includes(key)){ applyAutoValues(sheet,{keepCurrent:false}); } save(); renderEditor(); }; });
+  renderAttributes(sheet); renderOriginRefinement(sheet); renderCalcCards(sheet); renderLevelSummary(sheet); renderAptitudes(sheet); renderSkills(sheet); renderRows(sheet); renderTechLibrary();
+}
+function fillSelect(sel, values, selected){ const el=$(sel); if(!el) return; el.innerHTML=values.map(v=>`<option ${v===selected?'selected':''}>${esc(v)}</option>`).join(''); }
+function renderAttributes(sheet){
+  const total=attributePointsTotal(sheet), spent=attributePointsSpent(sheet), left=attributePointsLeft(sheet);
+  const rows = ATTRS.map(a=>{
+    const base=attributeBaseValue(sheet,a);
+    const current=Number(sheet.attributes?.[a]||base);
+    const inc=Math.max(0,current-base);
+    const origin=originAttributeBonus(sheet,a);
+    const temp=attributeTempValue(sheet,a);
+    const eff=effectiveAttribute(sheet,a);
+    const canUp=left>0;
+    const canDown=current>base;
+    return `<div class="attr-box">
+      <strong>${a}</strong>
+      <div class="attr-main"><span class="attr-score">${eff}</span><small>Mod. <b>${sgn(mod(eff))}</b></small></div>
+      <small>Base ${base} + evolução ${inc}${origin?` + origem ${sgn(origin)}`:''}${temp?` + temp. ${sgn(temp)}`:''}</small>
+      <div class="attr-controls"><button data-attr-down="${a}" ${canDown?'':'disabled'}>-</button><button data-attr-up="${a}" ${canUp?'':'disabled'}>+</button></div>
+      <button data-roll-attr="${a}">Rolar d20 ${sgn(mod(eff))}</button>
+    </div>`;
+  }).join('');
+  const mods = ATTRS.map(a=>{
+    const temp=attributeTempValue(sheet,a);
+    return `<label>${a}<input data-temp-attr="${a}" type="number" value="${temp}" step="1"></label>`;
+  }).join('');
+  $('#attributes').innerHTML = `
+    <div class="attribute-points full">
+      <strong>Pontos de atributo:</strong> <span>${Math.max(0,left)} disponíveis</span> <small>(${spent}/${total} usados)</small>
+      <p class="muted">Depois da criação, os atributos só aumentam gastando pontos ganhos por nível. Bônus de origem e modificadores temporários ficam separados e não consomem esses pontos.</p>
+      <p class="muted"><strong>Bônus de origem:</strong> ${esc(originBonusText(sheet))}</p>
+    </div>
+    ${rows}
+    <div class="temp-mods full">
+      <div class="section-title"><h3>Modificadores temporários</h3><small>Use para bônus/penalidades temporárias de técnica, talento, item, condição ou efeito narrativo.</small></div>
+      <div class="form-grid">${mods}</div>
+    </div>`;
+  $$('[data-attr-up]').forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.attrUp; if(attributePointsLeft(sheet)>0){ sheet.attributes[a]=Number(sheet.attributes[a]||attributeBaseValue(sheet,a))+1; applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); } });
+  $$('[data-attr-down]').forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.attrDown; const base=attributeBaseValue(sheet,a); if(Number(sheet.attributes[a]||base)>base){ sheet.attributes[a]=Number(sheet.attributes[a])-1; applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); } });
+  $$('[data-temp-attr]').forEach(i=>i.oninput=()=>{ sheet.attributeTempMods[i.dataset.tempAttr]=Number(i.value||0); applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); });
+  $$('[data-roll-attr]').forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.rollAttr; roll(`1d20${sgn(attrMod(sheet,a))}`, a); });
+}
+function renderCalcCards(sheet){
+  const cls=CLASSES[sheet.specialization]||CLASSES.Lutador;
+  $('#calcCards').innerHTML=`
+    <div class="calc-card hp-card"><span>PV máximo</span><strong>${sheet.hpMax}</strong><small>${cls.hp1}+CON no 1º nível; depois 1d${cls.hp1}+CON por nível</small>${hpRollHistoryHtml(sheet)}</div>
+    <div class="calc-card"><span>${cls.stamina?'Estamina':'PE'} máximo</span><strong>${sheet.peMax}</strong><small>${cls.stamina?cls.stamina+' por nível':cls.pe+' por nível'}</small></div>
+    <div class="calc-card"><span>Defesa</span><strong>${sheet.defense}</strong><small>10 + DES${sheet.specialization==='Restringido'?' + físico limitado por nível':''}</small></div>
+    <div class="calc-card"><span>CD</span><strong>${sheet.dc}</strong><small>10 + 1/2 nível + BT + atributo-chave</small></div>`;
+  $$('#calcCards .calc-card').forEach(()=>{});
+}
+function renderLevelSummary(sheet){
+  const lv=Number(sheet.level||1), bt=trainingBonus(lv), grants=[];
+  grants.push(`Bônus de treinamento: +${bt}`);
+  grants.push(`Metade do nível em testes: +${halfLevel(lv)}`);
+  if([4,8,12,16,20].some(n=>lv>=n)) grants.push(`${attributePointsTotal(sheet)} pontos de atributo obtidos até aqui; ${Math.max(0, attributePointsLeft(sheet))} disponíveis.`);
+  if(lv>=10) grants.push('Pode ter uma perícia mestre por regra geral.');
+  grants.push(sheet.specialization==='Restringido'?'Não recebe aptidões amaldiçoadas por padrão.':'Recebe aptidões amaldiçoadas ao subir de nível.');
+  $('#levelSummary').innerHTML=grants.map((g,i)=>`<div class="rule-card"><h3>${i+1}</h3><p>${esc(g)}</p></div>`).join('');
+}
+function renderAptitudes(sheet){
+  if(!$('#aptitudeLevels')) return;
+  const total=aptitudePointsTotal(sheet), spent=aptitudePointsSpent(sheet), left=aptitudePointsLeft(sheet);
+  $('#aptitudePointsView').textContent = `${Math.max(0,left)} / ${total}`;
+  const blocked = sheet.origin==='Restringido' || sheet.specialization==='Restringido';
+  $('#aptitudeLevels').innerHTML = APTITUDE_KEYS.map(a=>{
+    const val=Number(sheet.aptitudeLevels?.[a.key]||0);
+    const canUp = !blocked && val<5 && left>0;
+    const canDown = val>0;
+    return `<div class="apt-card"><div><strong>${a.name} <span>${a.sigla}</span></strong><p class="muted">${a.desc}</p></div><div class="apt-level"><button data-apt-down="${a.key}" ${canDown?'':'disabled'}>-</button><b>${val}</b><button data-apt-up="${a.key}" ${canUp?'':'disabled'}>+</button></div></div>`;
+  }).join('') + (blocked ? '<p class="muted full">Este personagem é Restringido, então a ficha bloqueia aptidões por padrão. Se o narrador permitir exceção, use Aptidão Personalizada nas escolhas.</p>' : '');
+  $('#aptitudeChoicesList').innerHTML = sheet.aptitudeChoices.length ? sheet.aptitudeChoices.map((x,i)=>row('aptitudeChoices',x,i)).join('') : '<p class="muted">Nenhuma aptidão escolhida ainda.</p>';
+  $$('[data-apt-up]').forEach(btn=>btn.onclick=()=>{ const k=btn.dataset.aptUp; if(aptitudePointsLeft(sheet)>0 && Number(sheet.aptitudeLevels[k]||0)<5){ sheet.aptitudeLevels[k]=Number(sheet.aptitudeLevels[k]||0)+1; applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); }});
+  $$('[data-apt-down]').forEach(btn=>btn.onclick=()=>{ const k=btn.dataset.aptDown; if(Number(sheet.aptitudeLevels[k]||0)>0){ sheet.aptitudeLevels[k]=Number(sheet.aptitudeLevels[k]||0)-1; applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); }});
+}
+
+function renderSkills(sheet){
+  const buildRows = (list) => list.map(([name,attr,req])=>{
+    const manualRank=sheet.skillRanks[name]||'none', effRank=effectiveSkillRank(sheet,name), originRank=originSkillRank(sheet,name);
+    const manualExtra=sheet.skillExtras[name]||0, oExtra=originSkillExtra(sheet,name), total=skillTotal(sheet,{name,attr});
+    const originTag = originRank!=='none' || oExtra ? `<small class="pill">Origem: ${rankLabel(originRank)}${oExtra?` ${sgn(oExtra)}`:''}</small>` : '';
+    return `<div class="skill-row"><strong>${name}${req?' *':''}${originTag}</strong><span>${attr} ${sgn(attrMod(sheet, attr))}</span><select data-skill-rank="${name}"><option value="none" ${manualRank==='none'?'selected':''}>Sem treino</option><option value="trained" ${manualRank==='trained'?'selected':''}>Treinado</option><option value="master" ${manualRank==='master'?'selected':''}>Mestre</option></select><input data-skill-extra="${name}" type="number" value="${manualExtra}" title="Bônus extra manual"><span class="skill-total" title="Rank efetivo: ${rankLabel(effRank)}${oExtra?` • bônus de origem ${sgn(oExtra)}`:''}">${sgn(total)}</span><button data-roll-skill="${name}">d20</button></div>`;
+  }).join('');
+  $('#skills').innerHTML = `<div class="section-title inner"><h3>Perícias comuns</h3><small>Usadas para ações, conhecimento, interação e combate.</small></div>${buildRows(NORMAL_SKILLS)}<div class="section-title inner safeguard-title"><h3>Salva-guardas</h3><small>Fortitude, Reflexos, Vontade, Astúcia e Integridade são testes de resistência/salva-guarda. Não trate como perícias comuns.</small></div>${buildRows(SAFEGUARD_SKILLS)}`;
+  $$('[data-skill-rank]').forEach(el=>el.oninput=()=>{ sheet.skillRanks[el.dataset.skillRank]=el.value; applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); });
+  $$('[data-skill-extra]').forEach(el=>el.oninput=()=>{ sheet.skillExtras[el.dataset.skillExtra]=Number(el.value||0); applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); });
+  $$('[data-roll-skill]').forEach(btn=>btn.onclick=()=>{ const name=btn.dataset.rollSkill; const def=SKILLS.find(s=>s[0]===name); roll(`1d20${sgn(skillTotal(sheet,{name,attr:def[1]}))}`, name); });
+}
+
+function abilityReqLevel(a){ return Number(a.requiredLevel ?? a.unlockLevel ?? a.level ?? 1); }
+function abilityLevelLabel(level){ return level==='' || level===undefined || level===null ? 'Personalizada' : `Requer nível ${level}`; }
+
+function abilityChoiceSlots(sheet){
+  // No Livro, a partir do 2º nível o avanço pode virar habilidade de especialização ou talento.
+  // O 1º nível é tratado separadamente como habilidades base automáticas.
+  return Math.max(0, Number(sheet.level||1) - 1);
+}
+function abilityChoicesUsed(sheet){
+  const chosenAbilities = (sheet.abilities||[]).filter(a => String(a.kind||'').toLowerCase() !== 'automática' && String(a.kind||'').toLowerCase() !== 'automatica').length;
+  const chosenTalents = (sheet.talents||[]).length;
+  return chosenAbilities + chosenTalents;
+}
+function automaticAbilitiesDue(sheet){
+  const lv=Number(sheet.level||1), cls=sheet.specialization;
+  return ABILITY_LIBRARY.filter(a => a.class===cls && String(a.kind||'').toLowerCase().startsWith('autom') && abilityReqLevel(a)<=lv);
+}
+function missingAutomaticAbilities(sheet){
+  return automaticAbilitiesDue(sheet).filter(a => !(sheet.abilities||[]).some(x=>x.name===a.name));
+}
+function addMissingAutomaticAbilities(sheet){
+  missingAutomaticAbilities(sheet).forEach(a=>{
+    const req=abilityReqLevel(a);
+    sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Automática', text:a.text, options:a.options||[], selectedOptions:[]});
+  });
+}
+function removePrematureAutomaticAbilities(sheet){
+  const lv=Number(sheet.level||1);
+  sheet.abilities = (sheet.abilities||[]).filter(chosen=>{
+    const isAuto=String(chosen.kind||'').toLowerCase().startsWith('autom');
+    if(!isAuto) return true;
+    const lib=ABILITY_LIBRARY.find(a=>a.name===chosen.name && (!chosen.class || a.class===chosen.class));
+    if(!lib) return true;
+    return abilityReqLevel(lib)<=lv;
+  });
+}
+function syncAutomaticAbilitiesForLevel(sheet){
+  removePrematureAutomaticAbilities(sheet);
+  addMissingAutomaticAbilities(sheet);
+}
+
+function evaluateSelectedAbilityIssues(sheet){
+  const issues=[];
+  (sheet.abilities||[]).forEach((chosen, idx)=>{
+    const lib = ABILITY_LIBRARY.find(a => a.name===chosen.name && (!chosen.class || a.class===chosen.class)) || chosen;
+    const a = {...lib, ...chosen};
+    const reqLvl=abilityReqLevel(a);
+    const reasons=[];
+    if(a.class && a.class!==sheet.specialization) reasons.push(`classe atual é ${sheet.specialization}, mas a habilidade é de ${a.class}`);
+    if(reqLvl>Number(sheet.level||1)) reasons.push(`requer nível ${reqLvl}`);
+    const r=inferAbilityRequirements(a);
+    if(r.skillTrained && !isSkillTrained(sheet,r.skillTrained)) reasons.push(`requer treino em ${r.skillTrained}`);
+    if(r.skillMaster && !isSkillMaster(sheet,r.skillMaster)) reasons.push(`requer mestre em ${r.skillMaster}`);
+    if(r.anySkillTrained && !r.anySkillTrained.some(s=>isSkillTrained(sheet,s))) reasons.push(`requer treino em ${r.anySkillTrained.join(' ou ')}`);
+    if(r.attr){ Object.entries(r.attr).forEach(([k,v])=>{ if(Number(effectiveAttribute(sheet,k)||sheet.attributes?.[k]||0)<Number(v)) reasons.push(`requer ${k} ${v}`); }); }
+    if(r.ability && !sheetHasAbilityOrTalent(sheet,r.ability)) reasons.push(`requer ${r.ability}`);
+    if(r.abilities){ checkNamedRequirements(sheet,r.abilities).forEach(n=>reasons.push(`requer ${n}`)); }
+    if(r.anyAbility && !r.anyAbility.some(n=>sheetHasAbilityOrTalent(sheet,n))) reasons.push(`requer ${r.anyAbility.join(' ou ')}`);
+    if(r.anyNamed){ checkNamedRequirements(sheet,r.anyNamed).forEach(n=>reasons.push(`requer ${n}`)); }
+    if(r.aptitude){ Object.entries(r.aptitude).forEach(([k,v])=>{ if(Number(sheet.aptitudeLevels?.[k]||0)<Number(v)) reasons.push(`requer ${k.toUpperCase()} ${v}`); }); }
+    if(reasons.length) issues.push({idx, name: chosen.name || 'Habilidade sem nome', reasons});
+  });
+  return issues;
+}
+function renderAbilityIssuePanel(sheet){
+  const el=$('#abilityIssuePanel'); if(!el) return;
+  const issues=evaluateSelectedAbilityIssues(sheet);
+  if(!issues.length){
+    el.innerHTML='<div class="ok-panel">Nenhuma habilidade adicionada está com pré-requisito pendente.</div>';
+    return;
+  }
+  el.innerHTML='<div class="warn-panel"><strong>Revisar habilidades adicionadas:</strong><ul>'+issues.map(i=>`<li><b>${esc(i.name)}</b>: ${esc(i.reasons.join(' • '))}</li>`).join('')+'</ul></div>';
+}
+
+function renderAbilityProgress(sheet){
+  const el=$('#abilityProgress'); if(!el) return;
+  const slots=abilityChoiceSlots(sheet), used=abilityChoicesUsed(sheet), left=Math.max(0, slots-used);
+  const autosDue=automaticAbilitiesDue(sheet).length, autosMissing=missingAutomaticAbilities(sheet).length;
+  const selectedIssues = evaluateSelectedAbilityIssues(sheet);
+  renderAbilityIssuePanel(sheet);
+  const over = used>slots;
+  const msg = over ? `Você usou ${used-slots} escolha(s) a mais do que o esperado para o nível atual.` : `${left} escolha(s) livre(s) para habilidade ou talento.`;
+  el.innerHTML = `
+    <div class="progress-card ${over?'warn':''}"><span>Escolhas de evolução</span><strong>${used}/${slots}</strong><small>${esc(msg)}</small></div>
+    <div class="progress-card ${autosMissing?'warn':''}"><span>Automáticas da classe</span><strong>${autosDue-autosMissing}/${autosDue}</strong><small>${autosMissing?autosMissing+' automática(s) faltando.':'Tudo certo.'}</small></div>
+    <div class="progress-card ${selectedIssues.length?'warn':''}"><span>Pré-requisitos</span><strong>${selectedIssues.length?selectedIssues.length:'OK'}</strong><small>${selectedIssues.length?'habilidade(s) precisam de revisão.':'Habilidades adicionadas coerentes.'}</small></div>
+    <div class="progress-card"><span>Especialização</span><strong>${esc(sheet.specialization)}</strong><small>Nível ${esc(sheet.level)} • ${esc(sheet.grade||'')}</small></div>
+    <div class="progress-card action"><span>Correção rápida</span><button id="addMissingAutos" ${autosMissing?'':'disabled'}>Adicionar automáticas faltantes</button><small>Não consome escolha de evolução.</small></div>`;
+  $('#addMissingAutos')?.addEventListener('click',()=>{ addMissingAutomaticAbilities(sheet); save(); renderRows(sheet); renderAbilityChooser(); });
+}
+function abilityKnownLevels(sheet){
+  const levels = new Set();
+  (sheet.abilities||[]).forEach(a => {
+    if(a.level==='' || a.level===undefined || a.level===null) levels.add('custom');
+    else levels.add(abilityReqLevel(a));
+  });
+  ABILITY_LIBRARY.forEach(a=>levels.add(abilityReqLevel(a)));
+  return [...levels].sort((a,b)=>{
+    if(a==='custom') return 1;
+    if(b==='custom') return -1;
+    return a-b;
+  });
+}
+function renderAbilityLibraryTabs(sheet){
+  const el=$('#abilityLibraryTabs'); if(!el) return;
+  // Mostra somente os níveis em que o personagem realmente ganha/abre novas escolhas
+  // de habilidades. Evita poluir a biblioteca com níveis intermediários que só vieram
+  // de placeholders, automáticas ou requisitos isolados.
+  const availableLevels = new Set(ABILITY_LIBRARY.map(a=>abilityReqLevel(a)));
+  const levels = ABILITY_UNLOCK_TABS.filter(l=>availableLevels.has(l));
+  if(!['available','locked','all'].includes(String(abilityLibraryLevelFilter)) && !levels.includes(Number(abilityLibraryLevelFilter))){
+    abilityLibraryLevelFilter = 'available';
+  }
+  el.innerHTML=[`<button data-ability-lib-tab="available" class="${abilityLibraryLevelFilter==='available'?'active':''}">Disponíveis agora</button>`,
+    `<button data-ability-lib-tab="locked" class="${abilityLibraryLevelFilter==='locked'?'active':''}">Bloqueadas</button>`,
+    `<button data-ability-lib-tab="all" class="${abilityLibraryLevelFilter==='all'?'active':''}">Todas</button>`]
+    .concat(levels.map(l=>`<button data-ability-lib-tab="${l}" class="${String(abilityLibraryLevelFilter)===String(l)?'active':''}">Nível ${l}</button>`)).join('');
+  $$('[data-ability-lib-tab]').forEach(btn=>btn.onclick=()=>{ abilityLibraryLevelFilter=btn.dataset.abilityLibTab; renderAbilityChooser(); });
+}
+function abilityMatchesSheetFilter(a){
+  if(abilitySheetLevelFilter==='all') return true;
+  if(abilitySheetLevelFilter==='custom') return a.level==='' || a.level===undefined || a.level===null;
+  return abilityReqLevel(a)===Number(abilitySheetLevelFilter);
+}
+
+function isAbilityKnown(sheet, name){ return (sheet.abilities||[]).some(a=>a.name===name); }
+function sheetHasAbility(sheet, name){
+  const target=norm(name);
+  return (sheet.abilities||[]).some(x=>norm(x.name)===target);
+}
+function sheetHasTalent(sheet, name){
+  const target=norm(name);
+  return (sheet.talents||[]).some(x=>norm(x.name)===target);
+}
+function sheetHasAbilityOrTalent(sheet, name){ return sheetHasAbility(sheet,name) || sheetHasTalent(sheet,name); }
+function abilityNamesIndex(){
+  return [...new Set(ABILITY_LIBRARY.map(a=>a.name).filter(Boolean))].sort((a,b)=>b.length-a.length);
+}
+function inferAbilityRequirements(a){
+  const req={...(a.req||{})};
+  const txt=String(a.prereq||'').replace(/—/g,'').trim();
+  if(!txt) return req;
+  const skills=SKILLS.map(s=>s[0]);
+  skills.forEach(sk=>{
+    const skEsc=sk.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    if(new RegExp(`treinad[oa] em ${skEsc}`,'i').test(txt) && !req.skillTrained) req.skillTrained=sk;
+    if(new RegExp(`mestre em ${skEsc}`,'i').test(txt) && !req.skillMaster) req.skillMaster=sk;
+  });
+  ATTRS.forEach(attr=>{
+    const m=txt.match(new RegExp(`${attr}\\s*(\\d+)`,'i'));
+    if(m){ req.attr=req.attr||{}; if(!req.attr[attr]) req.attr[attr]=Number(m[1]); }
+  });
+  const needed=[];
+  abilityNamesIndex().forEach(name=>{
+    if(name===a.name) return;
+    if(norm(name).length<4) return;
+    if(norm(txt).includes(norm(name))) needed.push(name);
+  });
+  if(needed.length){ req.anyNamed = [...new Set([...(req.anyNamed||[]), ...needed])]; }
+  return req;
+}
+function checkNamedRequirements(sheet, names){
+  const missing=[];
+  (names||[]).forEach(n=>{ if(!sheetHasAbilityOrTalent(sheet,n)) missing.push(n); });
+  return missing;
+}
+function canUseAbility(sheet,a){
+  const reasons=[];
+  const reqLvl=abilityReqLevel(a);
+  if(a.class && a.class!==sheet.specialization) reasons.push(`requer classe ${a.class}`);
+  if(reqLvl>Number(sheet.level||1)) reasons.push(`requer nível ${reqLvl}`);
+  const r=inferAbilityRequirements(a);
+  if(r.skillTrained && !isSkillTrained(sheet,r.skillTrained)) reasons.push(`requer treino em ${r.skillTrained}`);
+  if(r.skillMaster && !isSkillMaster(sheet,r.skillMaster)) reasons.push(`requer mestre em ${r.skillMaster}`);
+  if(r.anySkillTrained && !r.anySkillTrained.some(s=>isSkillTrained(sheet,s))) reasons.push(`requer treino em ${r.anySkillTrained.join(' ou ')}`);
+  if(r.attr){ Object.entries(r.attr).forEach(([k,v])=>{ if(Number(effectiveAttribute(sheet,k)||sheet.attributes?.[k]||0)<Number(v)) reasons.push(`requer ${k} ${v}`); }); }
+  if(r.ability && !sheetHasAbilityOrTalent(sheet,r.ability)) reasons.push(`requer ${r.ability}`);
+  if(r.abilities){ checkNamedRequirements(sheet,r.abilities).forEach(n=>reasons.push(`requer ${n}`)); }
+  if(r.anyAbility && !r.anyAbility.some(n=>sheetHasAbilityOrTalent(sheet,n))) reasons.push(`requer ${r.anyAbility.join(' ou ')}`);
+  if(r.anyNamed){ checkNamedRequirements(sheet,r.anyNamed).forEach(n=>reasons.push(`requer ${n}`)); }
+  if(r.aptitude){ Object.entries(r.aptitude).forEach(([k,v])=>{ if(Number(sheet.aptitudeLevels?.[k]||0)<Number(v)) reasons.push(`requer ${k.toUpperCase()} ${v}`); }); }
+  if(isAbilityKnown(sheet,a.name)) reasons.push('já adicionada');
+  const isAuto=String(a.kind||'').toLowerCase().startsWith('autom');
+  if(!isAuto && abilityChoicesUsed(sheet) >= abilityChoiceSlots(sheet)) reasons.push('sem escolhas livres');
+  return {ok:reasons.length===0, reason:reasons.length?`Bloqueada: ${reasons.join(' • ')}`:(isAuto?'Automática disponível':'Disponível como escolha de evolução')};
+}
+function abilityRequirementBadges(sheet,a){
+  const res=canUseAbility(sheet,a);
+  const r=inferAbilityRequirements(a);
+  const tags=[];
+  tags.push(abilityReqLevel(a)<=Number(sheet.level||1) ? 'Nível OK' : `Nível ${abilityReqLevel(a)}`);
+  if(a.class) tags.push(a.class===sheet.specialization ? 'Classe OK' : a.class);
+  if(r.skillTrained) tags.push(isSkillTrained(sheet,r.skillTrained) ? `${r.skillTrained} treinado` : `Falta ${r.skillTrained}`);
+  if(r.skillMaster) tags.push(isSkillMaster(sheet,r.skillMaster) ? `${r.skillMaster} mestre` : `Falta mestre ${r.skillMaster}`);
+  if(r.attr) Object.entries(r.attr).forEach(([k,v])=>tags.push(Number(effectiveAttribute(sheet,k)||0)>=Number(v)?`${k} OK`:`${k} ${v}`));
+  if(r.ability) tags.push(sheetHasAbilityOrTalent(sheet,r.ability)?`${r.ability} OK`:`Falta ${r.ability}`);
+  if(r.abilities) r.abilities.forEach(n=>tags.push(sheetHasAbilityOrTalent(sheet,n)?`${n} OK`:`Falta ${n}`));
+  if(r.anyNamed) r.anyNamed.slice(0,3).forEach(n=>tags.push(sheetHasAbilityOrTalent(sheet,n)?`${n} OK`:`Falta ${n}`));
+  tags.push(res.ok?'Pode adicionar':'Bloqueada');
+  return tags;
+}
+
+
+function cleanDiceExpression(value){
+  const raw=String(value||'').trim();
+  if(!raw || raw==='—') return '';
+  const first = raw.split('/')[0].trim();
+  const matches = first.match(/([+-]?\s*\d*d\d+|[+-]?\s*\d+)/gi);
+  return matches ? matches.join(' ').replace(/\+\s*-/g,'-') : first;
+}
+function weaponAttackAttribute(item, sheet){
+  const text = `${item.name||''} ${item.category||''} ${item.properties||''} ${item.text||''}`.toLowerCase();
+  if(/distância|distancia|arremesso|proj[eé]til|arco|besta|arma de fogo|pistola|rifle|rev[oó]lver|metralhadora|shuriken|dardo|azagaia/.test(text)) return 'Destreza';
+  const str=effectiveAttribute(sheet,'Força'), dex=effectiveAttribute(sheet,'Destreza');
+  return mod(dex)>mod(str) ? 'Destreza' : 'Força';
+}
+function itemModificationBonuses(item){
+  const mods=Array.isArray(item.modifications)?item.modifications:[];
+  return mods.reduce((acc,m)=>{ acc.attack += Number(m.attackBonus||0); acc.damage += Number(m.damageBonus||0); return acc; }, {attack:0, damage:0});
+}
+function itemModificationProperties(item){
+  const mods=Array.isArray(item.modifications)?item.modifications:[];
+  return mods.map(m=>m.properties).filter(Boolean).join(' • ');
+}
+function itemEffectiveBonusesHtml(item){
+  const mods=Array.isArray(item.modifications)?item.modifications:[];
+  if(!mods.length) return '';
+  const b=itemModificationBonuses(item);
+  const extra=[];
+  if(b.attack) extra.push(`Acerto ${b.attack>0?'+':''}${b.attack}`);
+  if(b.damage) extra.push(`Dano ${b.damage>0?'+':''}${b.damage}`);
+  mods.forEach(m=>{ if(m.properties) extra.push(`${m.name}: ${m.properties}`); });
+  return `<div class="effect-box"><strong>Melhorias aplicadas automaticamente</strong><div class="tag-list">${extra.map(e=>`<span class="badge good">${esc(e)}</span>`).join('')}</div><p class="muted">Bônus de acerto/dano entram automaticamente ao criar ataques a partir desta arma. Efeitos situacionais ficam registrados para consulta.</p></div>`;
+}
+function buildAttackFromItem(sheet,item){
+  const attr=weaponAttackAttribute(item,sheet);
+  const mods=itemModificationBonuses(item);
+  const attackBonus = attrMod(sheet, attr) + trainingBonus(sheet.level||1) + mods.attack;
+  const damageBonus = attrMod(sheet, attr) + mods.damage;
+  const baseDamage = cleanDiceExpression(item.damage || item.effect || '');
+  const damage = baseDamage ? `${baseDamage}${damageBonus>=0?'+':''}${damageBonus}` : `1d4${damageBonus>=0?'+':''}${damageBonus}`;
+  const modNames=(item.modifications||[]).map(m=>m.name).filter(Boolean);
+  return {
+    name: item.name || 'Ataque com arma',
+    test: `1d20${attackBonus>=0?'+':''}${attackBonus}`,
+    damage,
+    sourceItem: item.name || '',
+    notes: `Criado automaticamente a partir do inventário. Atributo sugerido: ${attr}.${modNames.length?' Modificações consideradas: '+modNames.join(', ')+'.':''} Ajuste acerto/dano se a mesa usar outro atributo, maestria ou bônus específico.`
   };
 }
 function createAttackFromInventoryItem(sheet,index){
@@ -4936,44 +5647,6 @@ function renderItemModificationChooser(){
   $$('[data-select-item-mod]').forEach(btn=>btn.onclick=()=>{ selectedItemModLibraryIndex=Number(btn.dataset.selectItemMod); renderItemModificationChooser(); });
 }
 
-
-function stripTechniqueTypePrefix(text){
-  return String(text||'')
-    .replace(/^\s*\[(?:Dano|Auxiliar\s*\/\s*controle|Auxiliar|Cura|Passivo|Especial|Personalizado)\s+personalizado\]\s*/i,'')
-    .replace(/^\s*\[(?:Dano|Auxiliar\s*\/\s*controle|Auxiliar|Cura|Passivo|Especial|Personalizado)\]\s*/i,'')
-    .trim();
-}
-function cleanSheetRuleText(text){
-  return String(text||'')
-    .replace(/\[Pré-Requisito:[^\]]+\]/gi,'')
-    .replace(/Resumo de ficha:\s*.*$/gim,'')
-    .replace(/Tipo:\s*geral\s*•\s*Pré-requisito:[\s\S]*?(?=\n\s*\n|$)/gi,'')
-    .replace(/Aplicação:\s*[^\n]+/gi,'')
-    .replace(/\n{3,}/g,'\n\n')
-    .trim();
-}
-function splitRequirementAndDescription(entry){
-  const raw=cleanSheetRuleText(entry?.text||'');
-  let prereq=entry?.prereq || '';
-  let desc=raw;
-  const m=raw.match(/^\s*Pré-?requisito\s*:\s*([^\n]+)\n*/i);
-  if(m){ prereq=m[1].trim(); desc=raw.slice(m[0].length).trim(); }
-  if(!desc) desc=raw || 'Sem descrição cadastrada.';
-  return {prereq: prereq || '—', desc};
-}
-function effectBadgesForEntry(entry){
-  const bonuses=entry?.bonuses||entry?.effects||{};
-  const out=[];
-  if(bonuses.defense) out.push(`Defesa ${Number(bonuses.defense)>0?'+':''}${bonuses.defense}`);
-  if(bonuses.hp) out.push(`PV ${Number(bonuses.hp)>0?'+':''}${bonuses.hp}`);
-  if(bonuses.pe) out.push(`PE ${Number(bonuses.pe)>0?'+':''}${bonuses.pe}`);
-  if(bonuses.stamina) out.push(`Estamina ${Number(bonuses.stamina)>0?'+':''}${bonuses.stamina}`);
-  if(bonuses.movement) out.push(`Deslocamento ${Number(bonuses.movement)>0?'+':''}${bonuses.movement}`);
-  if(bonuses.attack) out.push(`Acerto ${Number(bonuses.attack)>0?'+':''}${bonuses.attack}`);
-  if(bonuses.damage) out.push(`Dano ${Number(bonuses.damage)>0?'+':''}${bonuses.damage}`);
-  return out;
-}
-
 function row(kind,x,i){
   if(kind==='items') {
     const modsHtml=itemModificationSummary(x).replaceAll('__ITEM_INDEX__', String(i));
@@ -5002,7 +5675,7 @@ function row(kind,x,i){
     return `<div class="mini-row ability-card"><div class="ability-summary"><div><strong>${esc(x.name||'Talento sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${effects.map(v=>`<span class="badge good">${esc(v)}</span>`).join('')}</div>${preview?`<p class="muted">${esc(preview)}${parts.desc.length>170?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-talent-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="ability-details hidden" id="talentDetails_${i}"><input data-row="talents" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="talents" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label><label>Categoria<input data-row="talents" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label></div><div class="rule-block"><strong>Pré-requisito</strong><p>${esc(parts.prereq||'—')}</p></div><div class="rule-block"><strong>Descrição</strong><p>${esc(parts.desc)}</p></div>${effects.length?`<div class="effect-box"><strong>Bônus permanente aplicado</strong><div class="tag-list">${effects.map(v=>`<span class="badge good">${esc(v)}</span>`).join('')}</div><p class="muted">Esse bônus entra nos cálculos da ficha. Bônus temporários/situacionais ficam só na descrição.</p></div>`:''}<textarea data-row="talents" data-i="${i}" data-field="text" placeholder="Descrição">${esc(cleanSheetRuleText(x.text))}</textarea><button data-del="talents" data-i="${i}">Remover</button></div></div>`;
   }
   if(kind==='invocations') { const detailsId=`invocationDetails_${i}`; const summary=[x.type||'Invocação', x.grade||'', x.hp?`PV ${x.hpCurrent||x.hp}/${x.hp}`:'', x.defense?`Def ${x.defense}`:''].filter(Boolean); const preview=String(x.traits||x.text||'').replace(/\s+/g,' ').trim().slice(0,150); return `<div class="mini-row compact-card"><div class="compact-summary"><div><strong>${esc(x.name||'Invocação sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${x.active?`<span class="badge good">Ativa</span>`:''}${x.companion?`<span class="badge soft">Companheira</span>`:''}</div>${preview?`<p class="muted">${esc(preview)}${String(x.traits||x.text||'').length>150?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-invocation-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="compact-details hidden" id="${detailsId}"><input data-row="invocations" data-i="${i}" data-field="name" placeholder="Nome da invocação" value="${esc(x.name)}"><div class="form-grid"><input data-row="invocations" data-i="${i}" data-field="type" placeholder="Tipo: Shikigami, Marionete..." value="${esc(x.type||'')}"><input data-row="invocations" data-i="${i}" data-field="grade" placeholder="Grau" value="${esc(x.grade||'')}"><input data-row="invocations" data-i="${i}" data-field="cost" placeholder="Custo de invocação/manutenção" value="${esc(x.cost||'')}"><input data-row="invocations" data-i="${i}" data-field="hp" placeholder="PV máximo" value="${esc(x.hp||'')}"><input data-row="invocations" data-i="${i}" data-field="hpCurrent" placeholder="PV atual" value="${esc(x.hpCurrent||'')}"><input data-row="invocations" data-i="${i}" data-field="defense" placeholder="Defesa" value="${esc(x.defense||'')}"><input data-row="invocations" data-i="${i}" data-field="movement" placeholder="Deslocamento" value="${esc(x.movement||'')}"><input data-row="invocations" data-i="${i}" data-field="actions" placeholder="Ações/comandos" value="${esc(x.actions||'')}"></div><div class="actions-inline tight"><label class="checkline"><input data-invocation-toggle="active" data-i="${i}" type="checkbox" ${x.active?'checked':''}> Ativa em campo</label><label class="checkline"><input data-invocation-toggle="companion" data-i="${i}" type="checkbox" ${x.companion?'checked':''}> Companheira amaldiçoada</label></div><textarea data-row="invocations" data-i="${i}" data-field="traits" placeholder="Características, resistências, sentidos, habilidades passivas">${esc(x.traits||'')}</textarea><textarea data-row="invocations" data-i="${i}" data-field="text" placeholder="Ataques, ações, regras especiais e observações">${esc(x.text||'')}</textarea><button data-del="invocations" data-i="${i}">Remover</button></div></div>`; }
-  if(kind==='domains') { const detailsId=`domainDetails_${i}`; const summary=[x.type||'Domínio', x.technique||'', x.cost?`Custo ${x.cost}`:'', x.area||''].filter(Boolean); const preview=String(x.text||'').replace(/\s+/g,' ').trim().slice(0,150); return `<div class="mini-row compact-card"><div class="compact-summary"><div><strong>${esc(x.name||'Expansão sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div>${preview?`<p class="muted">${esc(preview)}${String(x.text||'').length>150?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-domain-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="compact-details hidden" id="${detailsId}"><input data-row="domains" data-i="${i}" data-field="name" placeholder="Nome da expansão" value="${esc(x.name)}"><div class="form-grid"><input data-row="domains" data-i="${i}" data-field="technique" placeholder="Técnica vinculada" value="${esc(x.technique||'')}"><input data-row="domains" data-i="${i}" data-field="type" placeholder="Tipo" value="${esc(x.type||'')}"><input data-row="domains" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="domains" data-i="${i}" data-field="area" placeholder="Área" value="${esc(x.area||'')}"><input data-row="domains" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><label>Nível necessário<input data-row="domains" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label></div><textarea data-row="domains" data-i="${i}" data-field="text" placeholder="Efeitos, acerto garantido, regras e observações">${esc(x.text)}</textarea><button data-del="domains" data-i="${i}">Remover</button></div></div>`; }
+  if(kind==='domains') { const detailsId=`domainDetails_${i}`; const summary=[x.type||'Domínio', x.technique||'', x.cost?`Custo ${x.cost}`:'', x.area||''].filter(Boolean); const preview=String(x.text||'').replace(/\s+/g,' ').trim().slice(0,150); return `<div class="mini-row compact-card"><div class="compact-summary"><div><strong>${esc(x.name||'Expansão sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div>${preview?`<p class="muted">${esc(preview)}${cleanText.length>150?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-domain-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="compact-details hidden" id="${detailsId}"><input data-row="domains" data-i="${i}" data-field="name" placeholder="Nome da expansão" value="${esc(x.name)}"><div class="form-grid"><input data-row="domains" data-i="${i}" data-field="technique" placeholder="Técnica vinculada" value="${esc(x.technique||'')}"><input data-row="domains" data-i="${i}" data-field="type" placeholder="Tipo" value="${esc(x.type||'')}"><input data-row="domains" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="domains" data-i="${i}" data-field="area" placeholder="Área" value="${esc(x.area||'')}"><input data-row="domains" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><label>Nível necessário<input data-row="domains" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label></div><textarea data-row="domains" data-i="${i}" data-field="text" placeholder="Efeitos, acerto garantido, regras e observações">${esc(x.text)}</textarea><button data-del="domains" data-i="${i}">Remover</button></div></div>`; }
   return `<div class="mini-row"><input data-row="${kind}" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><textarea data-row="${kind}" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="${kind}" data-i="${i}">Remover</button></div>`;
 }
 
@@ -5539,7 +6212,6 @@ function addSpellBuilderResult(){
 function init(){
   sheets=sheets.map(normalize);
   sheets.forEach(s=>{ (s.techniques||[]).forEach(t=>{ t.text=stripTechniqueTypePrefix(t.text); }); });
-  save();
   if(activeId && !sheets.find(s=>s.id===activeId)) activeId=sheets[0]?.id||null;
   $$('.nav button').forEach(b=>b.onclick=()=>activateTab(b.dataset.tab));
   $$('.subnav button').forEach(b=>b.onclick=()=>activateSubtab(b.dataset.subtab));
