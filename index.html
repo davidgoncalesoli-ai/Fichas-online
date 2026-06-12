@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>F&M Ficha Online - v0.22</title>
+  <title>F&M Ficha Online - v0.27</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -11,7 +11,7 @@
     <div class="brand">
       <p class="eyebrow">Feiticeiros & Maldições</p>
       <h1>Ficha Online</h1>
-      <span class="version">v0.22 — atributos por evolução e modificadores temporários</span>
+      <span class="version">v0.23 — atributos por evolução e modificadores temporários</span>
     </div>
     <nav class="nav">
       <button data-tab="home" class="active">Início</button>
@@ -27,7 +27,7 @@
         <div>
           <p class="eyebrow">Projeto pessoal</p>
           <h2>Agora a ficha começa a ficar compartilhável e organizada.</h2>
-          <p>A v0.22 adiciona evolução de atributos por pontos de nível e modificadores temporários separados, sem permitir editar atributos livremente após a criação.</p>
+          <p>A v0.23 adiciona evolução de atributos por pontos de nível e modificadores temporários separados, sem permitir editar atributos livremente após a criação.</p>
           <div class="actions-inline">
             <button id="startCreate" class="primary">+ Criar ficha</button>
             <button id="goSheets">Ver fichas</button>
@@ -159,6 +159,7 @@
                   <div class="section-title"><h2>Habilidades na ficha</h2><div class="actions-inline tight"><button id="openAbilityChooser">+ Adicionar habilidade disponível</button><button data-add="abilities">+ Criar personalizada</button></div></div>
                   <p class="muted">Aqui ficam somente as habilidades já adicionadas na ficha. O filtro por nível necessário fica na janela de adicionar habilidade.</p>
                   <div id="abilityProgress" class="progress-grid"></div>
+            <div id="abilityIssuePanel"></div>
                   <div id="abilitiesList" class="stack"></div>
                 </article>
                 <article class="card">
@@ -209,8 +210,8 @@
                   </div>
                 </article>
                 <article class="card">
-                  <div class="section-title"><h2>Feitiços / Habilidades de Técnica</h2><div class="actions-inline tight"><button id="openSpellChooser">+ Adicionar da biblioteca</button><button data-add="techniques">+ Criar feitiço</button></div></div>
-                  <p class="muted">Aqui ficam os feitiços e habilidades da técnica do personagem. A biblioteca agora filtra pela técnica inata escolhida.</p>
+                  <div class="section-title"><h2>Feitiços / Habilidades de Técnica</h2><div class="actions-inline tight"><button id="openSpellChooser">+ Adicionar da biblioteca</button><button id="addInnateDefaults">+ Adicionar nível 0 da técnica</button><button id="openSpellBuilder">+ Criador guiado</button><button data-add="techniques">+ Criar livre</button></div></div>
+                  <p class="muted">Aqui ficam os feitiços e habilidades da técnica do personagem. Agora cada feitiço pode ter dano/cura, resistência, marca registrada, preparado e rolagem própria.</p>
                   <div id="techniquesList" class="stack"></div>
                 </article>
               </div>
@@ -399,6 +400,53 @@
     <div id="techLibrary" class="library"></div>
   </dialog>
 
+
+
+  <dialog id="spellBuilderDialog" class="modal wide-modal">
+    <div class="modal-head">
+      <div>
+        <p class="eyebrow">Criador guiado</p>
+        <h2>Criar feitiço personalizado</h2>
+      </div>
+      <form method="dialog"><button>×</button></form>
+    </div>
+    <div class="grid two">
+      <article class="card soft-card">
+        <div class="form-grid">
+          <label class="full">Tipo de feitiço
+            <select id="spellBuilderType">
+              <option value="dano">Dano</option>
+              <option value="auxiliar">Auxiliar / controle</option>
+              <option value="cura">Cura</option>
+              <option value="passivo">Passivo</option>
+              <option value="especial">Especial</option>
+            </select>
+          </label>
+          <label>Nome<input id="spellBuilderName" placeholder="Ex.: Corte Maldito"></label>
+          <label>Nível<input id="spellBuilderLevel" type="number" min="0" max="20" value="0"></label>
+          <label>Técnica vinculada<input id="spellBuilderTech" placeholder="Técnica atual"></label>
+          <label>Conjuração<input id="spellBuilderAction" placeholder="Ação Comum"></label>
+          <label>Alcance<input id="spellBuilderRange" placeholder="9 metros"></label>
+          <label>Alvo<input id="spellBuilderTarget" placeholder="Uma criatura"></label>
+          <label>Duração<input id="spellBuilderDuration" placeholder="Imediata"></label>
+          <label>Custo<input id="spellBuilderCost" placeholder="Ex.: 2 PE"></label>
+          <label>Dano/Cura<input id="spellBuilderDamage" placeholder="Ex.: 2d8+PRE"></label>
+          <label>Resistência<input id="spellBuilderResistance" placeholder="Ex.: Reflexos reduz metade"></label>
+          <label class="full">Descrição / efeito<textarea id="spellBuilderText" placeholder="Descreva o efeito, condições, limitações e observações da mesa."></textarea></label>
+        </div>
+      </article>
+      <article class="card">
+        <h3>Modelo sugerido</h3>
+        <p class="muted">Escolha o tipo para preencher campos comuns. Depois ajuste livremente antes de adicionar na ficha.</p>
+        <div id="spellBuilderPreview" class="rule-card"></div>
+        <div class="actions-inline">
+          <button id="applySpellBuilderTemplate" type="button">Aplicar modelo</button>
+          <button id="addSpellBuilderResult" type="button">Adicionar feitiço à ficha</button>
+        </div>
+      </article>
+    </div>
+  </dialog>
+
   <dialog id="itemDialog" class="modal wide-modal">
     <div class="modal-head">
       <div>
@@ -453,7 +501,7 @@
         <option value="Geral">Gerais/personalizadas</option>
       </select>
     </div>
-    <div id="itemModChooser" class="library"></div>
+    <div class="enchant-layout"><div id="itemModChooser" class="library compact"></div><div class="enchant-side"><h3>Detalhes</h3><div id="itemModDetails"><p class="muted">Selecione um encantamento/modificação na lista para ver os detalhes.</p></div><button id="addSelectedItemMod" class="primary" disabled>Adicionar encantamento selecionado</button></div></div>
   </dialog>
 
   <dialog id="domainDialog" class="modal wide-modal">

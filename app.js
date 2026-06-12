@@ -78,30 +78,17 @@ const TALENT_LIBRARY = [
 
 
 const TECHNIQUE_LIBRARY = [
-  {
-    name:'Boneco de Palha',
-    source:'Enciclopédia Amaldiçoada',
-    type:'Técnica inata',
-    text:'Técnica baseada em martelo, pregos e boneca de palha. Permite disparar pregos, explodi-los e criar ligações por vestígios para refletir dano.'
-  },
-  {
-    name:'Boogie Woogie',
-    source:'Enciclopédia Amaldiçoada',
-    type:'Técnica inata',
-    text:'Técnica de troca de posição. Permite trocar lugares entre criaturas e objetos válidos ao cumprir o gatilho da técnica.'
-  },
-  {
-    name:'Cópia',
-    source:'Enciclopédia Amaldiçoada',
-    type:'Técnica inata',
-    text:'Técnica voltada para copiar e utilizar técnicas alheias sob condições definidas pelo narrador e pela ficha.'
-  },
-  {
-    name:'Técnica própria',
-    source:'Personalizada',
-    type:'Livre',
-    text:'Modelo livre para técnica criada pelo jogador. Use o campo de funcionamento básico para registrar regras, limites e equipamentos.'
-  }
+  {name:'Boneco de Palha', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica baseada em martelo, pregos e boneca de palha. Permite disparar pregos, explodi-los e criar ligações por vestígios para refletir dano.'},
+  {name:'Boogie Woogie', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica de troca de posição. Permite trocar lugares entre criaturas e objetos válidos ao cumprir o gatilho da técnica.'},
+  {name:'Cópia', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica voltada para copiar e utilizar técnicas alheias sob condições definidas pelo narrador e pela ficha.'},
+  {name:'Fala Amaldiçoada', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica baseada em comandos verbais. Registre aqui comandos conhecidos, custo, risco de retorno no usuário e limitações definidas pela mesa.'},
+  {name:'Dez Sombras', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica de invocação por sombras. Use para registrar shikigamis, intermediários, fusões, perdas e efeitos da sombra.'},
+  {name:'Manipulação de Sangue', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica voltada para controlar sangue como projétil, reforço corporal, ligação e manipulação ofensiva/defensiva.'},
+  {name:'Construção', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica que materializa objetos com energia amaldiçoada. Registre limites de criação, custo e duração dos objetos.'},
+  {name:'Chamas do Desastre', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica ofensiva de fogo e calor. Boa para registrar dano queimante, áreas, explosões e efeitos contínuos.'},
+  {name:'Transfiguração Ociosa', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica de manipulação da alma e do corpo. Use com cuidado, registrando permissões da campanha, testes de resistência e consequências.'},
+  {name:'Técnica do Julgamento', source:'Enciclopédia Amaldiçoada', type:'Técnica inata', text:'Técnica ligada a julgamento, regras especiais e aplicação de penalidades/recompensas conforme veredito.'},
+  {name:'Técnica própria', source:'Personalizada', type:'Livre', text:'Modelo livre para técnica criada pelo jogador. Use o campo de funcionamento básico para registrar regras, limites e equipamentos.'}
 ];
 
 const ITEM_ENCHANTMENT_LIBRARY = [
@@ -1381,21 +1368,21 @@ const ABILITY_LIBRARY = [
     "level": 1,
     "name": "Corpo Treinado",
     "kind": "Automática",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base do Lutador. Representa condicionamento físico, resistência e domínio corporal para o combate direto. Use como base para anotar bônus/efeitos permanentes concedidos pela mesa."
   },
   {
     "class": "Lutador",
     "level": 1,
     "name": "Empolgação",
     "kind": "Automática",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base do Lutador. Controla o estado de empolgação em combate, usado para acompanhar efeitos que crescem conforme o personagem mantém pressão, acerta golpes ou permanece na luta."
   },
   {
     "class": "Lutador",
     "level": 2,
     "name": "Reflexo Evasivo",
     "kind": "Automática",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 2. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático de Lutador no nível indicado. Use para registrar melhorias defensivas ligadas a esquiva, reação e sobrevivência contra ataques."
   },
   {
     "class": "Lutador",
@@ -1511,7 +1498,7 @@ const ABILITY_LIBRARY = [
     "level": 4,
     "name": "Implemento Marcial",
     "kind": "Automática",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 4. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático de Lutador. Marca o avanço do personagem no uso do corpo, armas marciais e implementos de combate."
   },
   {
     "class": "Lutador",
@@ -1624,7 +1611,7 @@ const ABILITY_LIBRARY = [
     "level": 5,
     "name": "Gosto pela Luta",
     "kind": "Automática",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 5. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático de Lutador. Representa o crescimento do personagem conforme permanece em confronto, abrindo espaço para efeitos de recuperação, agressividade ou manutenção de pressão."
   },
   {
     "class": "Lutador",
@@ -1742,7 +1729,7 @@ const ABILITY_LIBRARY = [
     "level": 8,
     "name": "Brutalidade Aprimorada",
     "kind": "Escolha",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 8. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Aprimoramento da Brutalidade. Use junto da habilidade Brutalidade para registrar evolução do bônus, custo ou efeitos adicionais conforme o nível."
   },
   {
     "class": "Lutador",
@@ -1774,7 +1761,7 @@ const ABILITY_LIBRARY = [
     "level": 8,
     "name": "Pancada Desnorteante",
     "kind": "Escolha",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 8. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade de Lutador voltada a golpes que desestabilizam o alvo. Ideal para registrar efeitos de atordoamento, penalidade, deslocamento ou perda de ação conforme a regra da mesa."
   },
   {
     "class": "Lutador",
@@ -1790,7 +1777,7 @@ const ABILITY_LIBRARY = [
     "level": 9,
     "name": "Teste de Resistência Mestre",
     "kind": "Automática",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 9. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Registre aqui qual teste de resistência se tornou mestre quando essa progressão for alcançada."
   },
   {
     "class": "Lutador",
@@ -1847,7 +1834,7 @@ const ABILITY_LIBRARY = [
     "level": 11,
     "name": "Empolgação Máxima",
     "kind": "Automática",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 11. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Aprimoramento alto de Empolgação. Use para controlar o limite superior, bônus máximos ou efeitos finais do estado de empolgação."
   },
   {
     "class": "Lutador",
@@ -1904,28 +1891,28 @@ const ABILITY_LIBRARY = [
     "level": 16,
     "name": "Manobras Finalizadoras Aprimoradas",
     "kind": "Escolha",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 16. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Aprimora manobras finalizadoras do Lutador. Use para registrar efeitos extras ao finalizar, derrubar, agarrar, desarmar ou executar movimentos decisivos."
   },
   {
     "class": "Lutador",
     "level": 20,
     "name": "Lutador Superior",
     "kind": "Automática",
-    "text": "Entrada oficial de Lutador, desbloqueada no nível 20. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho final de Lutador. Representa o ápice da especialização e deve concentrar os benefícios finais concedidos no nível 20."
   },
   {
     "class": "Especialista em Combate",
     "level": 1,
     "name": "Repertório do Especialista",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base do Especialista em Combate. Permite escolher um estilo/repertório de combate, funcionando como eixo principal da forma de lutar do personagem."
   },
   {
     "class": "Especialista em Combate",
     "level": 1,
     "name": "Arte do Combate",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base do Especialista em Combate. Introduz o uso de preparo/recursos táticos para executar artes, manobras e vantagens em combate."
   },
   {
     "class": "Especialista em Combate",
@@ -1988,14 +1975,14 @@ const ABILITY_LIBRARY = [
     "level": 2,
     "name": "Golpes Potentes",
     "kind": "Escolha",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 2. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade de Especialista em Combate focada em aumentar a eficiência ofensiva dos golpes. Use para registrar bônus de dano, dado adicional ou condição de ativação."
   },
   {
     "class": "Especialista em Combate",
     "level": 2,
     "name": "Indomável",
     "kind": "Escolha",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 2. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade defensiva de Especialista em Combate. Use para registrar resistência a controle, medo, queda, recuo ou efeitos que tentem impedir sua atuação."
   },
   {
     "class": "Especialista em Combate",
@@ -2023,7 +2010,7 @@ const ABILITY_LIBRARY = [
     "level": 2,
     "name": "Presença Suprimida",
     "kind": "Escolha",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 2. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade de discrição/controle de presença. Use para registrar benefícios de furtividade, ocultação de energia ou dificuldade de ser percebido."
   },
   {
     "class": "Especialista em Combate",
@@ -2051,7 +2038,7 @@ const ABILITY_LIBRARY = [
     "level": 4,
     "name": "Golpe Especial",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 4. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático do Especialista em Combate. Marca a liberação de um golpe especial, técnica marcial ou ataque aprimorado da especialização."
   },
   {
     "class": "Especialista em Combate",
@@ -2158,7 +2145,7 @@ const ABILITY_LIBRARY = [
     "level": 6,
     "name": "Renovação pelo Sangue",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 6. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Use para registrar recuperação, renovação de recurso ou benefícios quando o personagem causa dano/derruba inimigos."
   },
   {
     "class": "Especialista em Combate",
@@ -2385,7 +2372,7 @@ const ABILITY_LIBRARY = [
     "level": 12,
     "name": "Manejo Único",
     "kind": "Escolha",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 12. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade voltada ao domínio excepcional de uma arma ou estilo específico. Use para registrar bônus e restrições do manejo escolhido."
   },
   {
     "class": "Especialista em Combate",
@@ -2428,21 +2415,21 @@ const ABILITY_LIBRARY = [
     "level": 20,
     "name": "Autossuficiente",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Combate, desbloqueada no nível 20. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho final de Especialista em Combate. Representa independência em combate e domínio completo dos próprios recursos no nível 20."
   },
   {
     "class": "Especialista em Técnica",
     "level": 1,
     "name": "Domínio dos Fundamentos",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Técnica, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base do Especialista em Técnica. O personagem aprende mudanças de fundamento para modificar feitiços, como ampliar alcance, aumentar CD, duplicar alvo ou alterar área conforme escolhas registradas."
   },
   {
     "class": "Especialista em Técnica",
     "level": 1,
     "name": "Conjuração Aprimorada",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Técnica, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base de Especialista em Técnica. Use para registrar melhorias gerais na conjuração, manipulação de feitiços e uso da técnica amaldiçoada."
   },
   {
     "class": "Especialista em Técnica",
@@ -2547,7 +2534,7 @@ const ABILITY_LIBRARY = [
     "level": 4,
     "name": "Adiantar Evolução",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Técnica, desbloqueada no nível 4. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Permite representar avanço acelerado em técnica/feitiços conforme a progressão da especialização."
   },
   {
     "class": "Especialista em Técnica",
@@ -2823,7 +2810,7 @@ const ABILITY_LIBRARY = [
     "level": 10,
     "name": "Foco Amaldiçoado",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Técnica, desbloqueada no nível 10. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Use para registrar o foco escolhido e seus benefícios sobre conjuração, CD, custo, dano ou manutenção de feitiços."
   },
   {
     "class": "Especialista em Técnica",
@@ -2921,14 +2908,14 @@ const ABILITY_LIBRARY = [
     "level": 20,
     "name": "O Honrado",
     "kind": "Automática",
-    "text": "Entrada oficial de Especialista em Técnica, desbloqueada no nível 20. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho final de Especialista em Técnica. Representa o ápice técnico da especialização no nível 20."
   },
   {
     "class": "Controlador",
     "level": 1,
     "name": "Treinamento em Controle",
     "kind": "Automática",
-    "text": "Entrada oficial de Controlador, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base do Controlador. Estrutura o comando de invocações, criaturas, shikigamis ou recursos controlados pelo personagem."
   },
   {
     "class": "Controlador",
@@ -3096,7 +3083,7 @@ const ABILITY_LIBRARY = [
     "level": 4,
     "name": "Invocação às Cegas",
     "kind": "Escolha",
-    "text": "Entrada oficial de Controlador, desbloqueada no nível 4. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade de Controlador ligada a manter ou comandar invocações mesmo sem visão direta. Use para registrar alcance, condição e limite conforme a mesa."
   },
   {
     "class": "Controlador",
@@ -3235,7 +3222,7 @@ const ABILITY_LIBRARY = [
     "level": 1,
     "name": "Suporte em Combate",
     "kind": "Automática",
-    "text": "Entrada oficial de Suporte, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base do Suporte. Define a capacidade de ajudar aliados em combate, oferecendo bônus, cura, proteção, reposicionamento ou melhoria de ações."
   },
   {
     "class": "Suporte",
@@ -3277,14 +3264,14 @@ const ABILITY_LIBRARY = [
     "level": 2,
     "name": "Desvendar Terreno",
     "kind": "Escolha",
-    "text": "Entrada oficial de Suporte, desbloqueada no nível 2. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade de Suporte voltada à leitura do campo de batalha. Use para registrar vantagens táticas, identificação de perigos e benefício a aliados."
   },
   {
     "class": "Suporte",
     "level": 2,
     "name": "Expandir Repertório",
     "kind": "Escolha",
-    "text": "Entrada oficial de Suporte, desbloqueada no nível 2. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade de Suporte que amplia opções disponíveis. Use para registrar novas técnicas de apoio, recursos ou escolhas extras liberadas."
   },
   {
     "class": "Suporte",
@@ -3333,7 +3320,7 @@ const ABILITY_LIBRARY = [
     "level": 3,
     "name": "Presença Inspiradora",
     "kind": "Automática",
-    "text": "Entrada oficial de Suporte, desbloqueada no nível 3. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático de Suporte. Representa influência positiva sobre aliados, moral, foco e desempenho em cenas de combate ou tensão."
   },
   {
     "class": "Suporte",
@@ -3409,7 +3396,7 @@ const ABILITY_LIBRARY = [
     "level": 5,
     "name": "Versatilidade",
     "kind": "Automática",
-    "text": "Entrada oficial de Suporte, desbloqueada no nível 5. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático de Suporte. Marca adaptação ampla da especialização, permitindo cobrir lacunas do grupo ou alternar funções."
   },
   {
     "class": "Suporte",
@@ -3536,7 +3523,7 @@ const ABILITY_LIBRARY = [
     "level": 10,
     "name": "Medicina Infalível",
     "kind": "Automática",
-    "text": "Entrada oficial de Suporte, desbloqueada no nível 10. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Use para registrar melhorias em cura, estabilização, testes de Medicina e tratamento de condições."
   },
   {
     "class": "Suporte",
@@ -3652,28 +3639,28 @@ const ABILITY_LIBRARY = [
     "level": 20,
     "name": "Suporte Absoluto",
     "kind": "Automática",
-    "text": "Entrada oficial de Suporte, desbloqueada no nível 20. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho final de Suporte. Representa o ápice da capacidade de proteger, curar e potencializar aliados no nível 20."
   },
   {
     "class": "Restringido",
     "level": 1,
     "name": "Restrito pelos Céus",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 1. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Habilidade base do Restringido. Registra a restrição congênita/celeste, trocando acesso comum à energia por corpo, sentidos e combate físico excepcionais."
   },
   {
     "class": "Restringido",
     "level": 2,
     "name": "Ataque Furtivo",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 2. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático do Restringido. Use para registrar dano/efeito adicional quando o alvo estiver vulnerável, desprevenido ou em condição favorável."
   },
   {
     "class": "Restringido",
     "level": 2,
     "name": "Versatilidade",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 2. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático do Restringido. Representa adaptação física e prática para lidar com diferentes situações sem depender de energia amaldiçoada."
   },
   {
     "class": "Restringido",
@@ -3757,21 +3744,21 @@ const ABILITY_LIBRARY = [
     "level": 3,
     "name": "Esquiva Sobre-humana",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 3. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Use para registrar benefícios de defesa, reação, esquiva e mobilidade acima do normal."
   },
   {
     "class": "Restringido",
     "level": 4,
     "name": "Implemento Celeste",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 4. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Marca a ligação do Restringido com equipamento, ferramenta ou implemento apropriado ao seu estilo."
   },
   {
     "class": "Restringido",
     "level": 4,
     "name": "Dádiva do Céu",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 4. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Registra o avanço da dádiva física concedida pela restrição, com bônus definidos pela mesa."
   },
   {
     "class": "Restringido",
@@ -3952,14 +3939,14 @@ const ABILITY_LIBRARY = [
     "level": 9,
     "name": "Teste de Resistência Mestre",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 9. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático. Registre aqui qual teste de resistência se tornou mestre quando essa progressão for alcançada."
   },
   {
     "class": "Restringido",
     "level": 10,
     "name": "Restrição Definitiva",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 10. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho automático de alto nível. Representa o estado avançado da restrição e seus benefícios físicos/sensoriais."
   },
   {
     "class": "Restringido",
@@ -4051,7 +4038,7 @@ const ABILITY_LIBRARY = [
     "level": 20,
     "name": "Liberação do Destino",
     "kind": "Automática",
-    "text": "Entrada oficial de Restringido, desbloqueada no nível 20. Texto completo ainda em revisão; use este campo para anotar o trecho oficial da mesa até a biblioteca ser conferida 100%."
+    "text": "Ganho final do Restringido. Representa o ápice da restrição no nível 20."
   }
 ];
 
@@ -4096,15 +4083,51 @@ const ABILITY_UNLOCK_PLACEHOLDERS = [];
 });
 
 const TECH_LIBRARY = [
-  {tech:'Boneco de Palha', name:'Disparo de Pregos', level:0, action:'Ação Comum', range:'9m', target:'Uma criatura', duration:'Imediata', cost:'1 PE + 1 por prego adicional', text:'Dispara pregos contra o alvo. Dano base 1d8 por prego e pode prender pregos no alvo.'},
-  {tech:'Boneco de Palha', name:'Redirecionamento Constante', level:0, action:'Passiva', range:'—', target:'Pregos', duration:'—', cost:'—', text:'Redireciona pregos que não ficaram presos no alvo para melhor aproveitamento futuro.'},
-  {tech:'Boneco de Palha', name:'Grampo de Cabelo', level:1, action:'Ação Comum', range:'12m', target:'Pregos', duration:'Imediata', cost:'Definir conforme mesa', text:'Explode pregos, causando dano de força em área próxima. Pode usar Reflexos ou Fortitude conforme a posição dos pregos.'},
-  {tech:'Boneco de Palha', name:'Ressonância', level:1, action:'Ação Comum', range:'Infinito', target:'Boneca de palha', duration:'Imediata', cost:'Definir conforme mesa', text:'Reflete dano através de um vestígio conectado à boneca de palha.'},
-  {tech:'Boneco de Palha', name:'Explosão Repentina', level:2, action:'Reação', range:'Infinito', target:'Boneca de palha', duration:'Imediata', cost:'Definir conforme mesa', text:'Usa ressonância como reação quando um aliado ataca um inimigo do qual você possui vestígio.'},
-  {tech:'Boneco de Palha', name:'Decepar', level:3, action:'Ação Comum', range:'12m', target:'Uma criatura', duration:'Imediata', cost:'Definir conforme mesa', text:'Dispara um prego concentrado para causar dano elevado e obter vestígio do alvo.'},
-  {tech:'Boogie Woogie', name:'Troca de Posição', level:0, action:'Livre/Especial', range:'Variável', target:'Criaturas/objetos', duration:'Imediata', cost:'Definir conforme mesa', text:'Troca posições ao bater palmas, conforme funcionamento básico da técnica.'},
-  {tech:'Cópia', name:'Copiar Técnica', level:0, action:'Especial', range:'Variável', target:'Uma técnica observada', duration:'Conforme técnica', cost:'Definir conforme mesa', text:'Modelo para registrar uma técnica copiada e suas condições de uso.'},
-  {tech:'Técnica própria', name:'Feitiço Personalizado', level:0, action:'Definir', range:'Definir', target:'Definir', duration:'Definir', cost:'Definir', text:'Modelo em branco para habilidade criada pelo jogador.'}
+  {tech:'Boneco de Palha', name:'Disparo de Pregos', level:0, action:'Ação Comum', range:'9m', target:'Uma criatura', duration:'Imediata', cost:'1 PE + 1 por prego adicional', damage:'1d8 por prego + FOR/DES', resistance:'Fortitude parcial', text:'Dispara pregos contra o alvo. Pode usar Luta ou Pontaria. Em acerto causa dano perfurante e pode deixar pregos presos no alvo.'},
+  {tech:'Boneco de Palha', name:'Redirecionamento Constante', level:0, action:'Passiva', range:'—', target:'Pregos', duration:'—', cost:'—', damage:'', resistance:'—', text:'Redireciona pregos que não ficaram presos no alvo para lugares ou objetos próximos, preparando usos futuros.'},
+  {tech:'Boneco de Palha', name:'Grampo de Cabelo', level:1, action:'Ação Comum', range:'12m', target:'Pregos', duration:'Imediata', cost:'Definir conforme mesa', damage:'2d8 por prego', resistance:'Reflexos ou Fortitude reduz metade', text:'Explode pregos, causando dano de força em área próxima. Se os pregos estiverem presos em uma criatura, pode exigir Fortitude em vez de Reflexos.'},
+  {tech:'Boneco de Palha', name:'Ressonância', level:1, action:'Ação Comum', range:'Infinito', target:'Boneca de palha', duration:'Imediata', cost:'Definir conforme mesa', damage:'4d8 + dano do ataque', resistance:'Reflexos situacional', text:'Usa um vestígio conectado à boneca de palha para refletir dano em criatura ou objeto conectado.'},
+  {tech:'Boneco de Palha', name:'Explosão Repentina', level:2, action:'Reação', range:'Infinito', target:'Boneca de palha', duration:'Imediata', cost:'Definir conforme mesa', damage:'Dano do ataque na boneca', resistance:'Astúcia', text:'Quando um aliado ataca um alvo do qual você possui vestígio, usa a ressonância como reação para criar abertura.'},
+  {tech:'Boneco de Palha', name:'Decepar', level:3, action:'Ação Comum', range:'12m', target:'Uma criatura', duration:'Imediata', cost:'Definir conforme mesa', damage:'16d8', resistance:'Fortitude reduz/evita efeito', text:'Dispara um prego concentrado para causar dano elevado e obter vestígio do alvo.'},
+
+  {tech:'Boogie Woogie', name:'Troca de Posição', level:0, action:'Livre/Especial', range:'Variável', target:'Criaturas/objetos', duration:'Imediata', cost:'Definir conforme mesa', damage:'', resistance:'—', text:'Troca posições ao cumprir o gatilho da técnica. Registre aqui alcance, alvos válidos e gatilhos aceitos pela mesa.'},
+  {tech:'Boogie Woogie', name:'Finta de Troca', level:1, action:'Reação', range:'Variável', target:'Uma criatura', duration:'Imediata', cost:'Definir', damage:'', resistance:'Astúcia/Reflexos', text:'Modelo para usar a troca como defesa, reposicionamento ou abertura para ataque aliado.'},
+  {tech:'Boogie Woogie', name:'Troca Sequencial', level:2, action:'Ação Comum', range:'Variável', target:'Vários alvos válidos', duration:'Imediata', cost:'Definir', damage:'', resistance:'—', text:'Modelo para registrar múltiplas trocas em sequência no mesmo turno.'},
+
+  {tech:'Cópia', name:'Copiar Técnica', level:0, action:'Especial', range:'Variável', target:'Uma técnica observada', duration:'Conforme técnica', cost:'Definir conforme mesa', damage:'', resistance:'—', text:'Modelo para registrar uma técnica copiada, condições de aquisição, usos e limitações.'},
+  {tech:'Cópia', name:'Técnica Copiada', level:1, action:'Conforme técnica', range:'Conforme técnica', target:'Conforme técnica', duration:'Conforme técnica', cost:'Conforme técnica', damage:'', resistance:'Conforme técnica', text:'Modelo para colar uma técnica copiada específica dentro da ficha.'},
+  {tech:'Cópia', name:'Reserva de Cópias', level:2, action:'Passiva', range:'—', target:'Técnicas copiadas', duration:'Permanente', cost:'—', damage:'', resistance:'—', text:'Modelo para organizar técnicas copiadas ativas, armazenadas, expiradas ou limitadas por condição.'},
+
+  {tech:'Fala Amaldiçoada', name:'Comando Simples', level:0, action:'Ação Comum', range:'Curto', target:'Uma criatura que ouça', duration:'Imediata', cost:'Definir', damage:'', resistance:'Vontade/Fortitude conforme comando', text:'Emite uma ordem curta. Registre a palavra usada, o teste de resistência e o efeito aprovado pelo narrador.'},
+  {tech:'Fala Amaldiçoada', name:'Pare', level:1, action:'Ação Comum', range:'Curto', target:'Uma criatura', duration:'1 rodada', cost:'Definir', damage:'', resistance:'Vontade', text:'Modelo para comando de imobilização/interrupção. Ajuste duração, custo e consequência de falha/sucesso.'},
+  {tech:'Fala Amaldiçoada', name:'Exploda', level:2, action:'Ação Comum', range:'Curto', target:'Uma criatura/objeto', duration:'Imediata', cost:'Alto/Definir', damage:'6d8', resistance:'Fortitude reduz metade', text:'Modelo ofensivo de comando destrutivo. Registre retorno no usuário e limites contra alvos superiores.'},
+
+  {tech:'Dez Sombras', name:'Invocar Shikigami', level:0, action:'Ação Comum', range:'Curto', target:'Shikigami conhecido', duration:'Cena/sustentado', cost:'Definir', damage:'', resistance:'—', text:'Modelo para invocar um shikigami conhecido pela técnica. Registre PV, ações, dano e condições.'},
+  {tech:'Dez Sombras', name:'Cão Divino', level:0, action:'Ação Comum', range:'Curto', target:'Invocação', duration:'Cena/sustentado', cost:'Definir', damage:'1d8', resistance:'—', text:'Modelo inicial para shikigami ofensivo/rastreador. Ajuste ficha da invocação conforme a campanha.'},
+  {tech:'Dez Sombras', name:'Nue', level:1, action:'Ação Comum', range:'Médio', target:'Invocação', duration:'Cena/sustentado', cost:'Definir', damage:'2d6 elétrico', resistance:'Reflexos/Fortitude', text:'Modelo para shikigami voador com descarga elétrica ou mobilidade aérea.'},
+  {tech:'Dez Sombras', name:'Fusão de Sombras', level:3, action:'Especial', range:'—', target:'Shikigamis', duration:'Conforme fusão', cost:'Definir', damage:'', resistance:'—', text:'Modelo para combinar características de shikigamis ou registrar perdas/fusões permanentes.'},
+
+  {tech:'Manipulação de Sangue', name:'Disparo de Sangue', level:0, action:'Ação Comum', range:'Médio', target:'Uma criatura', duration:'Imediata', cost:'Definir', damage:'1d8 perfurante', resistance:'—', text:'Projeta sangue como ataque à distância. Registre fonte de sangue, custo e modificador usado.'},
+  {tech:'Manipulação de Sangue', name:'Sangue Perfurante', level:2, action:'Ação Comum', range:'Linha', target:'Criaturas na linha', duration:'Imediata', cost:'Definir', damage:'6d8 perfurante', resistance:'Reflexos reduz metade', text:'Concentra sangue em um disparo de alta pressão que atravessa uma linha.'},
+  {tech:'Manipulação de Sangue', name:'Reforço Sanguíneo', level:1, action:'Ação Bônus/Livre', range:'Pessoal', target:'Você', duration:'Cena/rodadas', cost:'Definir', damage:'', resistance:'—', text:'Modelo para reforçar corpo, velocidade, resistência ou ataques usando sangue.'},
+
+  {tech:'Construção', name:'Criar Objeto Simples', level:0, action:'Ação Comum', range:'Toque/Curto', target:'Objeto criado', duration:'Cena/definir', cost:'Definir', damage:'', resistance:'—', text:'Materializa um objeto simples. Registre material, duração, tamanho e custo.'},
+  {tech:'Construção', name:'Criar Arma', level:1, action:'Ação Comum', range:'Pessoal', target:'Arma criada', duration:'Cena/definir', cost:'Definir', damage:'Conforme arma', resistance:'—', text:'Cria uma arma temporária. Depois você pode adicioná-la ao inventário se ela permanecer.'},
+  {tech:'Construção', name:'Projétil Construído', level:2, action:'Ação Comum', range:'Médio', target:'Uma criatura/área', duration:'Imediata', cost:'Definir', damage:'4d8', resistance:'Reflexos reduz metade', text:'Cria e dispara matéria condensada como ataque.'},
+
+  {tech:'Chamas do Desastre', name:'Labareda', level:0, action:'Ação Comum', range:'Curto', target:'Uma criatura', duration:'Imediata', cost:'Definir', damage:'1d10 queimante', resistance:'Reflexos reduz metade', text:'Ataque básico de chamas. Registre se causa Queimando ou outro efeito da campanha.'},
+  {tech:'Chamas do Desastre', name:'Explosão Vulcânica', level:2, action:'Ação Comum', range:'Médio', target:'Área', duration:'Imediata', cost:'Definir', damage:'6d8 queimante', resistance:'Reflexos reduz metade', text:'Explosão de fogo/rocha em área.'},
+  {tech:'Chamas do Desastre', name:'Calor Intenso', level:3, action:'Ação Comum', range:'Área', target:'Criaturas na área', duration:'Sustentada', cost:'Definir', damage:'3d8 por rodada', resistance:'Fortitude/Reflexos', text:'Cria zona de calor extremo com dano contínuo ou penalidades.'},
+
+  {tech:'Transfiguração Ociosa', name:'Toque Transfigurador', level:1, action:'Ação Comum', range:'Toque', target:'Uma criatura', duration:'Imediata/Conforme efeito', cost:'Definir', damage:'3d8 alma', resistance:'Fortitude/Vontade', text:'Modelo para técnica de toque que altera corpo/alma. Use apenas se a mesa permitir esse tipo de efeito.'},
+  {tech:'Transfiguração Ociosa', name:'Alterar Corpo', level:2, action:'Ação Comum', range:'Toque', target:'Uma criatura', duration:'Cena/definir', cost:'Definir', damage:'', resistance:'Fortitude/Vontade', text:'Modelo para debuff, deformação, cura distorcida ou alteração corporal aprovada pelo narrador.'},
+
+  {tech:'Técnica do Julgamento', name:'Acusação', level:0, action:'Ação Comum', range:'Médio', target:'Uma criatura', duration:'Cena/definir', cost:'Definir', damage:'', resistance:'Vontade/Astúcia', text:'Modelo para iniciar uma acusação, marcar evidências ou impor condição ligada a julgamento.'},
+  {tech:'Técnica do Julgamento', name:'Veredito', level:2, action:'Especial', range:'Médio', target:'Criatura julgada', duration:'Conforme sentença', cost:'Definir', damage:'', resistance:'Conforme julgamento', text:'Aplica resultado de julgamento: penalidade, confisco, restrição ou outro efeito da campanha.'},
+
+  {tech:'Técnica própria', name:'Feitiço de Dano Personalizado', level:0, action:'Definir', range:'Definir', target:'Definir', duration:'Imediata', cost:'Definir', damage:'1d8', resistance:'Definir', text:'Modelo para habilidade ofensiva criada pelo jogador.'},
+  {tech:'Técnica própria', name:'Feitiço Auxiliar Personalizado', level:0, action:'Definir', range:'Definir', target:'Definir', duration:'Definir', cost:'Definir', damage:'', resistance:'Definir', text:'Modelo para suporte, utilidade, movimentação, controle ou defesa.'},
+  {tech:'Técnica própria', name:'Feitiço Passivo Personalizado', level:0, action:'Passiva', range:'—', target:'Você', duration:'Permanente', cost:'—', damage:'', resistance:'—', text:'Modelo para efeito passivo da técnica.'}
 ];
 
 const RULES = [
@@ -4115,7 +4138,8 @@ const RULES = [
   {title:'v0.10', text:'Abas de nível removidas da ficha; talentos gerais e expansões de domínio ganharam biblioteca e cadastro próprio.'},
   {title:'v0.11', text:'Talentos gerais e de origem receberam biblioteca ampliada, busca, categorias e bloqueios por nível, origem, atributo, perícia e domínio.'},
   {title:'v0.13', text:'Técnica inata ganhou área própria; feitiços são adicionados em janela com filtro por técnica e nível. Inclui guia de publicação.'},
-  {title:'Depois', text:'Próxima etapa: completar técnicas/feitiços do livro, textos oficiais das habilidades e iniciar biblioteca real de equipamentos/itens.'}
+  {title:'v0.27', text:'Biblioteca de técnicas ampliada; feitiços agora têm dano/cura, resistência, marca registrada, preparado, rolagem de dano e botão para adicionar fundamentos nível 0 da técnica inata.'},
+  {title:'Depois', text:'Próxima etapa: completar técnicas/feitiços do livro com mais precisão e iniciar criador guiado de feitiços personalizados.'}
 ];
 
 let sheets = readJsonStorage(['femSheetsV13','femSheetsV10','femSheetsV09','femSheetsV08','femSheetsV07','femSheetsV06','femSheetsV05','femSheetsV04'], []);
@@ -4128,6 +4152,8 @@ let abilitySearchFilter = '';
 let abilityClassFilter = 'current';
 let abilityKindFilter = 'all';
 let activeItemModIndex = null;
+let selectedItemModLibraryIndex = null;
+const ABILITY_UNLOCK_TABS = [1,2,4,6,8,10,12,14,16,18,20];
 const wizardSteps = ['Identidade','Origem','Especialização','Atributos','Treinamentos','Resumo'];
 
 function mod(v){ return Math.floor((Number(v||10)-10)/2); }
@@ -4193,7 +4219,7 @@ function normalize(sheet){
   sheet.attributeRolls = Array.isArray(sheet.attributeRolls) ? sheet.attributeRolls : [];
   ['abilities','talents','techniques','domains','attacks','items','aptitudeChoices'].forEach(k=>sheet[k]=Array.isArray(sheet[k])?sheet[k]:[]);
   sheet.domains = sheet.domains.map(d=>({name:d.name||'', type:d.type||'', technique:d.technique||'', level:d.level ?? '', cost:d.cost||'', area:d.area||'', duration:d.duration||'', text:d.text||''}));
-  sheet.techniques = sheet.techniques.map(t=>({name:t.name||'', tech:t.tech || t.technique || '', level:t.level ?? '', action:t.action||'', range:t.range||'', target:t.target||'', duration:t.duration||'', cost:t.cost||'', text:t.text||''}));
+  sheet.techniques = sheet.techniques.map(t=>({name:t.name||'', tech:t.tech || t.technique || '', level:t.level ?? '', action:t.action||'', range:t.range||'', target:t.target||'', duration:t.duration||'', cost:t.cost||'', damage:t.damage||'', resistance:t.resistance||'', prepared:!!t.prepared, signature:!!t.signature, text:t.text||''}));
   sheet.abilities = sheet.abilities.map(a=>({level:a.level ?? a.nivel ?? '', class:a.class ?? a.classe ?? '', kind:a.kind ?? '', name:a.name||'', text:a.text||''}));
   sheet.items = sheet.items.map(it=>({name:it.name||'', category:it.category||'Item', cost:it.cost??'', qty:it.qty||1, weight:it.weight||0, damage:it.damage||'', properties:it.properties||'', grade:it.grade||'', enchantmentCharges:it.enchantmentCharges??'', uniqueAbility:it.uniqueAbility||'', modifications:Array.isArray(it.modifications)?it.modifications:[], text:it.text||''}));
   return sheet;
@@ -4373,15 +4399,52 @@ function addMissingAutomaticAbilities(sheet){
     sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Automática', text:a.text});
   });
 }
+
+function evaluateSelectedAbilityIssues(sheet){
+  const issues=[];
+  (sheet.abilities||[]).forEach((chosen, idx)=>{
+    const lib = ABILITY_LIBRARY.find(a => a.name===chosen.name && (!chosen.class || a.class===chosen.class)) || chosen;
+    const a = {...lib, ...chosen};
+    const reqLvl=abilityReqLevel(a);
+    const reasons=[];
+    if(a.class && a.class!==sheet.specialization) reasons.push(`classe atual é ${sheet.specialization}, mas a habilidade é de ${a.class}`);
+    if(reqLvl>Number(sheet.level||1)) reasons.push(`requer nível ${reqLvl}`);
+    const r=inferAbilityRequirements(a);
+    if(r.skillTrained && !isSkillTrained(sheet,r.skillTrained)) reasons.push(`requer treino em ${r.skillTrained}`);
+    if(r.skillMaster && !isSkillMaster(sheet,r.skillMaster)) reasons.push(`requer mestre em ${r.skillMaster}`);
+    if(r.anySkillTrained && !r.anySkillTrained.some(s=>isSkillTrained(sheet,s))) reasons.push(`requer treino em ${r.anySkillTrained.join(' ou ')}`);
+    if(r.attr){ Object.entries(r.attr).forEach(([k,v])=>{ if(Number(effectiveAttribute(sheet,k)||sheet.attributes?.[k]||0)<Number(v)) reasons.push(`requer ${k} ${v}`); }); }
+    if(r.ability && !sheetHasAbilityOrTalent(sheet,r.ability)) reasons.push(`requer ${r.ability}`);
+    if(r.abilities){ checkNamedRequirements(sheet,r.abilities).forEach(n=>reasons.push(`requer ${n}`)); }
+    if(r.anyAbility && !r.anyAbility.some(n=>sheetHasAbilityOrTalent(sheet,n))) reasons.push(`requer ${r.anyAbility.join(' ou ')}`);
+    if(r.anyNamed){ checkNamedRequirements(sheet,r.anyNamed).forEach(n=>reasons.push(`requer ${n}`)); }
+    if(r.aptitude){ Object.entries(r.aptitude).forEach(([k,v])=>{ if(Number(sheet.aptitudeLevels?.[k]||0)<Number(v)) reasons.push(`requer ${k.toUpperCase()} ${v}`); }); }
+    if(reasons.length) issues.push({idx, name: chosen.name || 'Habilidade sem nome', reasons});
+  });
+  return issues;
+}
+function renderAbilityIssuePanel(sheet){
+  const el=$('#abilityIssuePanel'); if(!el) return;
+  const issues=evaluateSelectedAbilityIssues(sheet);
+  if(!issues.length){
+    el.innerHTML='<div class="ok-panel">Nenhuma habilidade adicionada está com pré-requisito pendente.</div>';
+    return;
+  }
+  el.innerHTML='<div class="warn-panel"><strong>Revisar habilidades adicionadas:</strong><ul>'+issues.map(i=>`<li><b>${esc(i.name)}</b>: ${esc(i.reasons.join(' • '))}</li>`).join('')+'</ul></div>';
+}
+
 function renderAbilityProgress(sheet){
   const el=$('#abilityProgress'); if(!el) return;
   const slots=abilityChoiceSlots(sheet), used=abilityChoicesUsed(sheet), left=Math.max(0, slots-used);
   const autosDue=automaticAbilitiesDue(sheet).length, autosMissing=missingAutomaticAbilities(sheet).length;
+  const selectedIssues = evaluateSelectedAbilityIssues(sheet);
+  renderAbilityIssuePanel(sheet);
   const over = used>slots;
   const msg = over ? `Você usou ${used-slots} escolha(s) a mais do que o esperado para o nível atual.` : `${left} escolha(s) livre(s) para habilidade ou talento.`;
   el.innerHTML = `
     <div class="progress-card ${over?'warn':''}"><span>Escolhas de evolução</span><strong>${used}/${slots}</strong><small>${esc(msg)}</small></div>
     <div class="progress-card ${autosMissing?'warn':''}"><span>Automáticas da classe</span><strong>${autosDue-autosMissing}/${autosDue}</strong><small>${autosMissing?autosMissing+' automática(s) faltando.':'Tudo certo.'}</small></div>
+    <div class="progress-card ${selectedIssues.length?'warn':''}"><span>Pré-requisitos</span><strong>${selectedIssues.length?selectedIssues.length:'OK'}</strong><small>${selectedIssues.length?'habilidade(s) precisam de revisão.':'Habilidades adicionadas coerentes.'}</small></div>
     <div class="progress-card"><span>Especialização</span><strong>${esc(sheet.specialization)}</strong><small>Nível ${esc(sheet.level)} • ${esc(sheet.grade||'')}</small></div>
     <div class="progress-card action"><span>Correção rápida</span><button id="addMissingAutos" ${autosMissing?'':'disabled'}>Adicionar automáticas faltantes</button><small>Não consome escolha de evolução.</small></div>`;
   $('#addMissingAutos')?.addEventListener('click',()=>{ addMissingAutomaticAbilities(sheet); save(); renderRows(sheet); renderAbilityChooser(); });
@@ -4401,7 +4464,14 @@ function abilityKnownLevels(sheet){
 }
 function renderAbilityLibraryTabs(sheet){
   const el=$('#abilityLibraryTabs'); if(!el) return;
-  const levels=abilityKnownLevels(sheet).filter(l=>l!=='custom');
+  // Mostra somente os níveis em que o personagem realmente ganha/abre novas escolhas
+  // de habilidades. Evita poluir a biblioteca com níveis intermediários que só vieram
+  // de placeholders, automáticas ou requisitos isolados.
+  const availableLevels = new Set(ABILITY_LIBRARY.map(a=>abilityReqLevel(a)));
+  const levels = ABILITY_UNLOCK_TABS.filter(l=>availableLevels.has(l));
+  if(!['available','locked','all'].includes(String(abilityLibraryLevelFilter)) && !levels.includes(Number(abilityLibraryLevelFilter))){
+    abilityLibraryLevelFilter = 'available';
+  }
   el.innerHTML=[`<button data-ability-lib-tab="available" class="${abilityLibraryLevelFilter==='available'?'active':''}">Disponíveis agora</button>`,
     `<button data-ability-lib-tab="locked" class="${abilityLibraryLevelFilter==='locked'?'active':''}">Bloqueadas</button>`,
     `<button data-ability-lib-tab="all" class="${abilityLibraryLevelFilter==='all'?'active':''}">Todas</button>`]
@@ -4415,20 +4485,80 @@ function abilityMatchesSheetFilter(a){
 }
 
 function isAbilityKnown(sheet, name){ return (sheet.abilities||[]).some(a=>a.name===name); }
+function sheetHasAbility(sheet, name){
+  const target=norm(name);
+  return (sheet.abilities||[]).some(x=>norm(x.name)===target);
+}
+function sheetHasTalent(sheet, name){
+  const target=norm(name);
+  return (sheet.talents||[]).some(x=>norm(x.name)===target);
+}
+function sheetHasAbilityOrTalent(sheet, name){ return sheetHasAbility(sheet,name) || sheetHasTalent(sheet,name); }
+function abilityNamesIndex(){
+  return [...new Set(ABILITY_LIBRARY.map(a=>a.name).filter(Boolean))].sort((a,b)=>b.length-a.length);
+}
+function inferAbilityRequirements(a){
+  const req={...(a.req||{})};
+  const txt=String(a.prereq||'').replace(/—/g,'').trim();
+  if(!txt) return req;
+  const skills=SKILLS.map(s=>s[0]);
+  skills.forEach(sk=>{
+    const skEsc=sk.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    if(new RegExp(`treinad[oa] em ${skEsc}`,'i').test(txt) && !req.skillTrained) req.skillTrained=sk;
+    if(new RegExp(`mestre em ${skEsc}`,'i').test(txt) && !req.skillMaster) req.skillMaster=sk;
+  });
+  ATTRS.forEach(attr=>{
+    const m=txt.match(new RegExp(`${attr}\\s*(\\d+)`,'i'));
+    if(m){ req.attr=req.attr||{}; if(!req.attr[attr]) req.attr[attr]=Number(m[1]); }
+  });
+  const needed=[];
+  abilityNamesIndex().forEach(name=>{
+    if(name===a.name) return;
+    if(norm(name).length<4) return;
+    if(norm(txt).includes(norm(name))) needed.push(name);
+  });
+  if(needed.length){ req.anyNamed = [...new Set([...(req.anyNamed||[]), ...needed])]; }
+  return req;
+}
+function checkNamedRequirements(sheet, names){
+  const missing=[];
+  (names||[]).forEach(n=>{ if(!sheetHasAbilityOrTalent(sheet,n)) missing.push(n); });
+  return missing;
+}
 function canUseAbility(sheet,a){
   const reasons=[];
   const reqLvl=abilityReqLevel(a);
-  if(a.class && a.class!==sheet.specialization) reasons.push(`classe ${a.class}`);
-  if(reqLvl>Number(sheet.level||1)) reasons.push(`nível ${reqLvl}`);
-  const r=a.req||{};
-  if(r.skillTrained && !isSkillTrained(sheet,r.skillTrained)) reasons.push(`treinado em ${r.skillTrained}`);
-  if(r.skillMaster && !isSkillMaster(sheet,r.skillMaster)) reasons.push(`mestre em ${r.skillMaster}`);
-  if(r.anySkillTrained && !r.anySkillTrained.some(s=>isSkillTrained(sheet,s))) reasons.push(`treinado em ${r.anySkillTrained.join(' ou ')}`);
-  if(r.attr){ Object.entries(r.attr).forEach(([k,v])=>{ if(Number(sheet.attributes?.[k]||0)<Number(v)) reasons.push(`${k} ${v}`); }); }
+  if(a.class && a.class!==sheet.specialization) reasons.push(`requer classe ${a.class}`);
+  if(reqLvl>Number(sheet.level||1)) reasons.push(`requer nível ${reqLvl}`);
+  const r=inferAbilityRequirements(a);
+  if(r.skillTrained && !isSkillTrained(sheet,r.skillTrained)) reasons.push(`requer treino em ${r.skillTrained}`);
+  if(r.skillMaster && !isSkillMaster(sheet,r.skillMaster)) reasons.push(`requer mestre em ${r.skillMaster}`);
+  if(r.anySkillTrained && !r.anySkillTrained.some(s=>isSkillTrained(sheet,s))) reasons.push(`requer treino em ${r.anySkillTrained.join(' ou ')}`);
+  if(r.attr){ Object.entries(r.attr).forEach(([k,v])=>{ if(Number(effectiveAttribute(sheet,k)||sheet.attributes?.[k]||0)<Number(v)) reasons.push(`requer ${k} ${v}`); }); }
+  if(r.ability && !sheetHasAbilityOrTalent(sheet,r.ability)) reasons.push(`requer ${r.ability}`);
+  if(r.abilities){ checkNamedRequirements(sheet,r.abilities).forEach(n=>reasons.push(`requer ${n}`)); }
+  if(r.anyAbility && !r.anyAbility.some(n=>sheetHasAbilityOrTalent(sheet,n))) reasons.push(`requer ${r.anyAbility.join(' ou ')}`);
+  if(r.anyNamed){ checkNamedRequirements(sheet,r.anyNamed).forEach(n=>reasons.push(`requer ${n}`)); }
+  if(r.aptitude){ Object.entries(r.aptitude).forEach(([k,v])=>{ if(Number(sheet.aptitudeLevels?.[k]||0)<Number(v)) reasons.push(`requer ${k.toUpperCase()} ${v}`); }); }
   if(isAbilityKnown(sheet,a.name)) reasons.push('já adicionada');
   const isAuto=String(a.kind||'').toLowerCase().startsWith('autom');
   if(!isAuto && abilityChoicesUsed(sheet) >= abilityChoiceSlots(sheet)) reasons.push('sem escolhas livres');
-  return {ok:reasons.length===0, reason:reasons.length?`Bloqueada: ${reasons.join(', ')}`:(isAuto?'Automática disponível':'Disponível como escolha de evolução')};
+  return {ok:reasons.length===0, reason:reasons.length?`Bloqueada: ${reasons.join(' • ')}`:(isAuto?'Automática disponível':'Disponível como escolha de evolução')};
+}
+function abilityRequirementBadges(sheet,a){
+  const res=canUseAbility(sheet,a);
+  const r=inferAbilityRequirements(a);
+  const tags=[];
+  tags.push(abilityReqLevel(a)<=Number(sheet.level||1) ? 'Nível OK' : `Nível ${abilityReqLevel(a)}`);
+  if(a.class) tags.push(a.class===sheet.specialization ? 'Classe OK' : a.class);
+  if(r.skillTrained) tags.push(isSkillTrained(sheet,r.skillTrained) ? `${r.skillTrained} treinado` : `Falta ${r.skillTrained}`);
+  if(r.skillMaster) tags.push(isSkillMaster(sheet,r.skillMaster) ? `${r.skillMaster} mestre` : `Falta mestre ${r.skillMaster}`);
+  if(r.attr) Object.entries(r.attr).forEach(([k,v])=>tags.push(Number(effectiveAttribute(sheet,k)||0)>=Number(v)?`${k} OK`:`${k} ${v}`));
+  if(r.ability) tags.push(sheetHasAbilityOrTalent(sheet,r.ability)?`${r.ability} OK`:`Falta ${r.ability}`);
+  if(r.abilities) r.abilities.forEach(n=>tags.push(sheetHasAbilityOrTalent(sheet,n)?`${n} OK`:`Falta ${n}`));
+  if(r.anyNamed) r.anyNamed.slice(0,3).forEach(n=>tags.push(sheetHasAbilityOrTalent(sheet,n)?`${n} OK`:`Falta ${n}`));
+  tags.push(res.ok?'Pode adicionar':'Bloqueada');
+  return tags;
 }
 
 
@@ -4502,8 +4632,21 @@ function itemModificationSummary(item){
 }
 function openItemModificationChooser(index){
   activeItemModIndex=Number(index);
+  selectedItemModLibraryIndex = null;
   renderItemModificationChooser();
   openDialog('itemModDialog');
+}
+function applySelectedItemModification(){
+  const sheet=current(); if(!sheet) return;
+  const it=sheet.items?.[activeItemModIndex];
+  const m=ITEM_ENCHANTMENT_LIBRARY[Number(selectedItemModLibraryIndex)];
+  if(!it || !m) return;
+  it.modifications=Array.isArray(it.modifications)?it.modifications:[];
+  if(it.modifications.some(x=>x.name===m.name)) return;
+  it.modifications.push({name:m.name, applies:m.applies||[], grade:m.grade||'', prereq:m.prereq||'', damageBonus:m.damageBonus||0, attackBonus:m.attackBonus||0, properties:m.properties||'', text:m.text||''});
+  if(m.properties && !String(it.properties||'').includes(m.name)) it.properties = [it.properties, `${m.name}: ${m.properties}`].filter(Boolean).join('; ');
+  selectedItemModLibraryIndex = null;
+  save(); renderRows(sheet); renderItemModificationChooser();
 }
 function renderItemModificationChooser(){
   const sheet=current(); if(!sheet) return;
@@ -4519,21 +4662,28 @@ function renderItemModificationChooser(){
     const matchesQ = !q || JSON.stringify(m).toLowerCase().includes(q);
     return matchesType && matchesQ;
   });
-  $('#itemModChooser').innerHTML = data.map(({m,i})=>`<div class="library-card"><h3>${esc(m.name)}</h3><p class="muted">${esc((m.applies||[]).join(', '))} • ${esc(m.grade||'')} • Pré-req.: ${esc(m.prereq||'—')}</p><p><b>Efeito:</b> ${esc(m.properties||'—')}${m.damageBonus?` • <b>Dano:</b> ${m.damageBonus>0?'+':''}${m.damageBonus}`:''}${m.attackBonus?` • <b>Acerto:</b> ${m.attackBonus>0?'+':''}${m.attackBonus}`:''}</p><p>${esc(m.text||'')}</p><button data-add-item-mod="${i}" ${existing.has(m.name)?'disabled':''}>${existing.has(m.name)?'Já aplicada':'Aplicar neste item'}</button></div>`).join('') || '<p class="muted">Nenhuma maldição/modificação encontrada.</p>';
-  $$('[data-add-item-mod]').forEach(btn=>btn.onclick=()=>{
-    const m=ITEM_ENCHANTMENT_LIBRARY[Number(btn.dataset.addItemMod)];
-    const it=sheet.items?.[activeItemModIndex]; if(!it) return;
-    it.modifications=Array.isArray(it.modifications)?it.modifications:[];
-    it.modifications.push({name:m.name, applies:m.applies||[], grade:m.grade||'', prereq:m.prereq||'', damageBonus:m.damageBonus||0, attackBonus:m.attackBonus||0, properties:m.properties||'', text:m.text||''});
-    if(m.properties && !String(it.properties||'').includes(m.name)) it.properties = [it.properties, `${m.name}: ${m.properties}`].filter(Boolean).join('; ');
-    save(); renderRows(sheet); renderItemModificationChooser();
-  });
+  const selected = ITEM_ENCHANTMENT_LIBRARY[Number(selectedItemModLibraryIndex)];
+  const selectedAlready = selected ? existing.has(selected.name) : false;
+  $('#itemModChooser').innerHTML = data.map(({m,i})=>`<button class="enchant-option ${Number(selectedItemModLibraryIndex)===i?'active':''}" data-select-item-mod="${i}" ${existing.has(m.name)?'data-existing="true"':''}>
+    <strong>${esc(m.name)}</strong>
+    <span>${esc((m.applies||[]).join(', '))}${m.grade?` • ${esc(m.grade)}`:''}</span>
+    <small>${existing.has(m.name)?'Já aplicada':'Clique para ver detalhes'}</small>
+  </button>`).join('') || '<p class="muted">Nenhuma maldição/modificação encontrada.</p>';
+  if($('#itemModDetails')) $('#itemModDetails').innerHTML = selected ? `<div class="mod-detail-card"><h3>${esc(selected.name)}</h3><p class="muted">${esc((selected.applies||[]).join(', '))} • ${esc(selected.grade||'')} • Pré-req.: ${esc(selected.prereq||'—')}</p><p><b>Efeito:</b> ${esc(selected.properties||'—')}${selected.damageBonus?` • <b>Dano:</b> ${selected.damageBonus>0?'+':''}${selected.damageBonus}`:''}${selected.attackBonus?` • <b>Acerto:</b> ${selected.attackBonus>0?'+':''}${selected.attackBonus}`:''}</p><p>${esc(selected.text||'')}</p>${selectedAlready?'<p class="reason">Este encantamento já está aplicado neste item.</p>':''}</div>` : '<p class="muted">Selecione um encantamento/modificação na lista para ver os detalhes.</p>';
+  const addBtn=$('#addSelectedItemMod');
+  if(addBtn){ addBtn.disabled = !selected || selectedAlready; addBtn.textContent = selectedAlready ? 'Já aplicado' : 'Adicionar encantamento selecionado'; }
+  $$('[data-select-item-mod]').forEach(btn=>btn.onclick=()=>{ selectedItemModLibraryIndex=Number(btn.dataset.selectItemMod); renderItemModificationChooser(); });
 }
 
 function row(kind,x,i){
-  if(kind==='items') { const modsHtml=itemModificationSummary(x).replaceAll('__ITEM_INDEX__', String(i)); return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.category||'Item')}</span>${x.cost!==undefined && x.cost!==''?`<span class="badge soft">Custo ${esc(x.cost)}</span>`:''}${x.grade?`<span class="badge soft">Grau ${esc(x.grade)}</span>`:''}${x.damage&&x.damage!=='—'?`<span class="badge soft">${esc(x.damage)}</span>`:''}</div><input data-row="items" data-i="${i}" data-field="name" placeholder="Item" value="${esc(x.name)}"><div class="form-grid"><label>Categoria<input data-row="items" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label><label>Custo<input data-row="items" data-i="${i}" data-field="cost" value="${esc(x.cost??'')}"></label><label>Qtd.<input data-row="items" data-i="${i}" data-field="qty" type="number" value="${x.qty||1}"></label><label>Espaços<input data-row="items" data-i="${i}" data-field="weight" type="number" step="0.5" value="${x.weight||0}"></label><label>Grau/Ferramenta amaldiçoada<input data-row="items" data-i="${i}" data-field="grade" placeholder="Ex.: Terceiro, Segundo, Especial" value="${esc(x.grade||'')}"></label><label>Cargas<input data-row="items" data-i="${i}" data-field="enchantmentCharges" placeholder="Ex.: igual ao BT" value="${esc(x.enchantmentCharges??'')}"></label><label>Dano/efeito<input data-row="items" data-i="${i}" data-field="damage" value="${esc(x.damage||'')}"></label><label>Propriedades<input data-row="items" data-i="${i}" data-field="properties" value="${esc(x.properties||'')}"></label></div><div class="mod-box"><strong>Maldições / modificações</strong>${modsHtml}</div><textarea data-row="items" data-i="${i}" data-field="uniqueAbility" placeholder="Habilidade única, caso seja Grau Especial">${esc(x.uniqueAbility||'')}</textarea><textarea data-row="items" data-i="${i}" data-field="text" placeholder="Descrição, efeitos e observações">${esc(x.text||'')}</textarea><div class="row-actions"><button data-open-item-mod="${i}">Adicionar maldição/modificação</button>${cleanDiceExpression(x.damage||'')?`<button data-create-attack-from-item="${i}">Criar ataque</button>`:''}<button data-del="items" data-i="${i}">Remover</button></div></div>`; }
+  if(kind==='items') {
+    const modsHtml=itemModificationSummary(x).replaceAll('__ITEM_INDEX__', String(i));
+    const detailsId=`itemDetails_${i}`;
+    const spaces=Number(x.qty||1)*Number(x.weight||0);
+    const essential=[x.category||'Item', x.damage&&x.damage!=='—'?`Dano ${x.damage}`:'', x.cost!==undefined && x.cost!==''?`Custo ${x.cost}`:'', spaces?`${spaces} espaço(s)`:'' ].filter(Boolean);
+    return `<div class="mini-row item-card"><div class="item-compact"><button class="item-toggle" data-toggle-item-details="${i}" aria-label="Ver detalhes">⌄</button><div><strong>${esc(x.name||'Item sem nome')}</strong><div class="row-head">${essential.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${(x.modifications||[]).length?`<span class="badge">${(x.modifications||[]).length} encant.</span>`:''}</div></div></div><div class="item-details hidden" id="${detailsId}"><div class="form-grid"><label>Nome<input data-row="items" data-i="${i}" data-field="name" placeholder="Item" value="${esc(x.name)}"></label><label>Categoria<input data-row="items" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label><label>Custo<input data-row="items" data-i="${i}" data-field="cost" value="${esc(x.cost??'')}"></label><label>Qtd.<input data-row="items" data-i="${i}" data-field="qty" type="number" value="${x.qty||1}"></label><label>Espaços<input data-row="items" data-i="${i}" data-field="weight" type="number" step="0.5" value="${x.weight||0}"></label><label>Grau/Ferramenta amaldiçoada<input data-row="items" data-i="${i}" data-field="grade" placeholder="Ex.: Terceiro, Segundo, Especial" value="${esc(x.grade||'')}"></label><label>Cargas<input data-row="items" data-i="${i}" data-field="enchantmentCharges" placeholder="Ex.: igual ao BT" value="${esc(x.enchantmentCharges??'')}"></label><label>Dano/efeito<input data-row="items" data-i="${i}" data-field="damage" value="${esc(x.damage||'')}"></label><label class="full">Propriedades<input data-row="items" data-i="${i}" data-field="properties" value="${esc(x.properties||'')}"></label></div><div class="mod-box"><strong>Maldições / modificações</strong>${modsHtml}</div><textarea data-row="items" data-i="${i}" data-field="uniqueAbility" placeholder="Habilidade única, caso seja Grau Especial">${esc(x.uniqueAbility||'')}</textarea><textarea data-row="items" data-i="${i}" data-field="text" placeholder="Descrição, efeitos e observações">${esc(x.text||'')}</textarea><div class="row-actions"><button data-open-item-mod="${i}">Adicionar encantamentos</button>${cleanDiceExpression(x.damage||'')?`<button data-create-attack-from-item="${i}">Criar ataque</button>`:''}<button data-del="items" data-i="${i}">Remover</button></div></div></div>`; }
   if(kind==='attacks') return `<div class="mini-row"><input data-row="attacks" data-i="${i}" data-field="name" placeholder="Nome do ataque" value="${esc(x.name)}"><div class="form-grid"><label>Rolagem de acerto<input data-row="attacks" data-i="${i}" data-field="test" placeholder="Ex.: 1d20+5" value="${esc(x.test||'1d20')}"></label><label>Rolagem de dano<input data-row="attacks" data-i="${i}" data-field="damage" placeholder="Ex.: 1d8+3 ou 1d6 Ct + 1d6 Pf" value="${esc(x.damage||'1d8')}"></label></div><textarea data-row="attacks" data-i="${i}" data-field="notes" placeholder="Notas">${esc(x.notes)}</textarea><div class="row-actions"><button data-roll-attack-hit="${i}">Rolar acerto</button><button data-roll-attack-damage="${i}">Rolar dano</button><button data-del="attacks" data-i="${i}">Remover</button></div></div>`;
-  if(kind==='techniques') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.tech || 'Feitiço')}</span>${x.level!==''?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="techniques" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><input data-row="techniques" data-i="${i}" data-field="tech" placeholder="Técnica vinculada" value="${esc(x.tech||'')}"><input data-row="techniques" data-i="${i}" data-field="level" placeholder="Nível" value="${esc(x.level)}"><input data-row="techniques" data-i="${i}" data-field="action" placeholder="Conjuração" value="${esc(x.action||'')}"><input data-row="techniques" data-i="${i}" data-field="range" placeholder="Alcance" value="${esc(x.range||'')}"><input data-row="techniques" data-i="${i}" data-field="target" placeholder="Alvo" value="${esc(x.target||'')}"><input data-row="techniques" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><input data-row="techniques" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"></div><textarea data-row="techniques" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="techniques" data-i="${i}">Remover</button></div>`;
+  if(kind==='techniques') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.tech || 'Feitiço')}</span>${x.level!==''?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}${x.prepared?`<span class="badge good">Preparado</span>`:''}${x.signature?`<span class="badge soft">Marca registrada</span>`:''}</div><input data-row="techniques" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><input data-row="techniques" data-i="${i}" data-field="tech" placeholder="Técnica vinculada" value="${esc(x.tech||'')}"><input data-row="techniques" data-i="${i}" data-field="level" placeholder="Nível" value="${esc(x.level)}"><input data-row="techniques" data-i="${i}" data-field="action" placeholder="Conjuração" value="${esc(x.action||'')}"><input data-row="techniques" data-i="${i}" data-field="range" placeholder="Alcance" value="${esc(x.range||'')}"><input data-row="techniques" data-i="${i}" data-field="target" placeholder="Alvo" value="${esc(x.target||'')}"><input data-row="techniques" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><input data-row="techniques" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="techniques" data-i="${i}" data-field="damage" placeholder="Dano/cura. Ex.: 4d8+3" value="${esc(x.damage||'')}"><input data-row="techniques" data-i="${i}" data-field="resistance" placeholder="Teste de resistência" value="${esc(x.resistance||'')}"></div><div class="actions-inline tight"><label class="checkline"><input data-tech-toggle="prepared" data-i="${i}" type="checkbox" ${x.prepared?'checked':''}> Preparado</label><label class="checkline"><input data-tech-toggle="signature" data-i="${i}" type="checkbox" ${x.signature?'checked':''}> Marca registrada</label>${x.damage?`<button data-roll-tech-damage="${i}">Rolar dano/cura</button>`:''}<button data-roll-tech-cd="${i}">Mostrar CD</button></div><textarea data-row="techniques" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="techniques" data-i="${i}">Remover</button></div>`;
   if(kind==='abilities') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(abilityLevelLabel(x.level))}</span>${x.class?`<span class="badge soft">${esc(x.class)}</span>`:''}${x.kind?`<span class="badge soft">${esc(x.kind)}</span>`:''}</div><input data-row="abilities" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="abilities" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level)}" placeholder="Livre"></label><label>Classe<input data-row="abilities" data-i="${i}" data-field="class" value="${esc(x.class)}" placeholder="Opcional"></label></div><textarea data-row="abilities" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="abilities" data-i="${i}">Remover</button></div>`;
   if(kind==='talents') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.category||'Talento')}</span>${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="talents" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="talents" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label><label>Categoria<input data-row="talents" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label></div><textarea data-row="talents" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="talents" data-i="${i}">Remover</button></div>`;
   if(kind==='domains') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.type||'Domínio')}</span>${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="domains" data-i="${i}" data-field="name" placeholder="Nome da expansão" value="${esc(x.name)}"><div class="form-grid"><input data-row="domains" data-i="${i}" data-field="technique" placeholder="Técnica vinculada" value="${esc(x.technique||'')}"><input data-row="domains" data-i="${i}" data-field="type" placeholder="Tipo" value="${esc(x.type||'')}"><input data-row="domains" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="domains" data-i="${i}" data-field="area" placeholder="Área" value="${esc(x.area||'')}"><input data-row="domains" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><label>Nível necessário<input data-row="domains" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label></div><textarea data-row="domains" data-i="${i}" data-field="text" placeholder="Efeitos, acerto garantido, regras e observações">${esc(x.text)}</textarea><button data-del="domains" data-i="${i}">Remover</button></div>`;
@@ -4553,9 +4703,13 @@ function renderRows(sheet){
   { const used = sheet.items.reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); const limit = 8 + (attrMod(sheet,'Força')*2); const max = limit*2; $('#loadView').textContent = `${used} / ${limit} espaços${used>max?' (impossível carregar)':used>limit?' (sobrecarregado)':''}`; }
   $$('[data-row]').forEach(el=>el.oninput=()=>{ const arr=sheet[el.dataset.row]; arr[Number(el.dataset.i)][el.dataset.field] = (el.dataset.field==='level' && el.value==='') ? '' : (el.type==='number'?Number(el.value):el.value); save(); if(['items','abilities','talents','domains'].includes(el.dataset.row)) renderRows(sheet); });
   $$('[data-del]').forEach(btn=>btn.onclick=()=>{ sheet[btn.dataset.del].splice(Number(btn.dataset.i),1); save(); renderRows(sheet); });
+  $$('[data-tech-toggle]').forEach(el=>el.onchange=()=>{ const t=sheet.techniques[Number(el.dataset.i)]; if(!t) return; t[el.dataset.techToggle]=el.checked; save(); renderRows(sheet); });
+  $$('[data-roll-tech-damage]').forEach(btn=>btn.onclick=()=>{ const t=sheet.techniques[Number(btn.dataset.rollTechDamage)]; roll(t.damage || '1d8', `${t.name || 'Feitiço'} — dano/cura`); });
+  $$('[data-roll-tech-cd]').forEach(btn=>btn.onclick=()=>{ const t=sheet.techniques[Number(btn.dataset.rollTechCd)]; { const text=`${t.name || 'Feitiço'} — CD atual: ${sheet.dc}. Resistência: ${t.resistance || 'não definida'}.`; $('#rollResult').textContent=text; const div=document.createElement('div'); div.textContent=text; $('#rollHistory').prepend(div); activateTab('rolador'); } });
   $$('[data-roll-attack-hit]').forEach(btn=>btn.onclick=()=>{ const atk=sheet.attacks[Number(btn.dataset.rollAttackHit)]; roll(atk.test || '1d20', `${atk.name || 'Ataque'} — acerto`); });
   $$('[data-roll-attack-damage]').forEach(btn=>btn.onclick=()=>{ const atk=sheet.attacks[Number(btn.dataset.rollAttackDamage)]; roll(atk.damage || '1d8', `${atk.name || 'Ataque'} — dano`); });
   $$('[data-create-attack-from-item]').forEach(btn=>btn.onclick=()=>createAttackFromInventoryItem(sheet, btn.dataset.createAttackFromItem));
+  $$('[data-toggle-item-details]').forEach(btn=>btn.onclick=()=>{ const box=$('#itemDetails_'+btn.dataset.toggleItemDetails); if(box) box.classList.toggle('hidden'); });
   $$('[data-open-item-mod]').forEach(btn=>btn.onclick=()=>openItemModificationChooser(btn.dataset.openItemMod));
   $$('[data-remove-item-mod]').forEach(btn=>btn.onclick=()=>{ const it=sheet.items[Number(btn.dataset.itemIndex)]; if(!it) return; it.modifications.splice(Number(btn.dataset.removeItemMod),1); save(); renderRows(sheet); });
 }
@@ -4575,6 +4729,14 @@ function syncTechniqueSelectors(sheet){
     if(!spellFilter.value) spellFilter.value=preferred;
   }
 }
+function addTechniqueZeroDefaults(){
+  const sheet=current(); if(!sheet || !sheet.innateTechnique) return;
+  const existing=new Set((sheet.techniques||[]).map(t=>`${t.tech}::${t.name}`));
+  const defaults=TECH_LIBRARY.filter(t=>t.tech===sheet.innateTechnique && Number(t.level)===0 && !existing.has(`${t.tech}::${t.name}`));
+  defaults.forEach(t=>sheet.techniques.push({name:t.name, tech:t.tech, level:t.level, action:t.action, range:t.range, target:t.target, duration:t.duration, cost:t.cost||'', damage:t.damage||'', resistance:t.resistance||'', text:t.text, prepared:true, signature:false}));
+  save(); renderRows(sheet); renderTechLibrary();
+}
+
 function renderTechLibrary(){
   const sheet=current(); if(!sheet) return;
   syncTechniqueSelectors(sheet);
@@ -4587,8 +4749,8 @@ function renderTechLibrary(){
     const levelOk = levelFilter==='all' || (levelFilter==='4' ? Number(t.level)>=4 : Number(t.level)===Number(levelFilter));
     return techniqueOk && levelOk && blob.includes(q);
   });
-  $('#techLibrary').innerHTML = data.map((t,i)=>`<div class="library-card"><h3>${esc(t.name)}</h3><p class="muted">${esc(t.tech)} • nível ${esc(t.level)} • ${esc(t.action)} • ${esc(t.range)} • ${esc(t.cost||'custo indefinido')}</p><p><b>Alvo:</b> ${esc(t.target||'—')} • <b>Duração:</b> ${esc(t.duration||'—')}</p><p>${esc(t.text)}</p><button data-add-tech-lib="${i}">Adicionar feitiço</button></div>`).join('') || '<p class="muted">Nenhum feitiço encontrado neste filtro.</p>';
-  $$('[data-add-tech-lib]').forEach(btn=>btn.onclick=()=>{ const t=data[Number(btn.dataset.addTechLib)]; sheet.techniques.push({name:t.name, tech:t.tech, level:t.level, action:t.action, range:t.range, target:t.target, duration:t.duration, cost:t.cost||'', text:t.text}); save(); renderRows(sheet); renderTechLibrary(); });
+  $('#techLibrary').innerHTML = data.map((t,i)=>`<div class="library-card"><h3>${esc(t.name)}</h3><p class="muted">${esc(t.tech)} • nível ${esc(t.level)} • ${esc(t.action)} • ${esc(t.range)} • ${esc(t.cost||'custo indefinido')}</p><p><b>Alvo:</b> ${esc(t.target||'—')} • <b>Duração:</b> ${esc(t.duration||'—')}</p><p><b>Dano/cura:</b> ${esc(t.damage||'—')} • <b>Resistência:</b> ${esc(t.resistance||'—')}</p><p>${esc(t.text)}</p><button data-add-tech-lib="${i}">Adicionar feitiço</button></div>`).join('') || '<p class="muted">Nenhum feitiço encontrado neste filtro.</p>';
+  $$('[data-add-tech-lib]').forEach(btn=>btn.onclick=()=>{ const t=data[Number(btn.dataset.addTechLib)]; sheet.techniques.push({name:t.name, tech:t.tech, level:t.level, action:t.action, range:t.range, target:t.target, duration:t.duration, cost:t.cost||'', damage:t.damage||'', resistance:t.resistance||'', text:t.text, prepared:false, signature:false}); save(); renderRows(sheet); renderTechLibrary(); });
 }
 function renderAbilityChooser(){
   const sheet=current(); if(!sheet) return;
@@ -4616,7 +4778,8 @@ function renderAbilityChooser(){
     const req=abilityReqLevel(a);
     const res=canUseAbility(sheet,a);
     const prereq = a.prereq ? ` • pré-req.: ${esc(a.prereq)}` : '';
-    return `<div class="library-card ${res.ok?'':'unavailable'}"><h3>${esc(a.name)}</h3><p class="muted">${esc(a.class)} • ${esc(a.kind || 'Escolha')} • requisito: nível ${req}${prereq}</p><p>${esc(a.text)}</p><p class="reason">${esc(res.reason)}</p><button data-add-ability-lib="${i}" ${res.ok?'':'disabled'}>Adicionar</button></div>`;
+    const badges = abilityRequirementBadges(sheet,a).map(t=>`<span class="mini-badge ${String(t).startsWith('Falta')||String(t).includes('Bloqueada')?'bad':'ok'}">${esc(t)}</span>`).join('');
+    return `<div class="library-card ${res.ok?'':'unavailable'}"><h3>${esc(a.name)}</h3><p class="muted">${esc(a.class)} • ${esc(a.kind || 'Escolha')} • requisito: nível ${req}${prereq}</p><div class="req-badges">${badges}</div><p>${esc(a.text)}</p><p class="reason">${esc(res.reason)}</p><button data-add-ability-lib="${i}" ${res.ok?'':'disabled'}>Adicionar</button></div>`;
   }).join('') || '<p class="muted">Nenhuma habilidade neste filtro.</p>';
   $$('[data-add-ability-lib]').forEach(btn=>btn.onclick=()=>{ const a=ABILITY_LIBRARY[Number(btn.dataset.addAbilityLib)]; const req=abilityReqLevel(a); sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Escolha', text:`${a.prereq?'Pré-requisito: '+a.prereq+'\n\n':''}${a.text}`}); save(); renderRows(sheet); renderAbilityChooser(); });
 }
@@ -4786,6 +4949,95 @@ function roll(expr,label='Rolagem'){
   } catch(e){ $('#rollResult').textContent=e.message; activateTab('rolador'); }
 }
 
+
+const SPELL_BUILDER_TEMPLATES = {
+  dano: {
+    action:'Ação Comum', range:'9 metros', target:'Uma criatura', duration:'Imediata', cost:'1 PE', damage:'2d8+PRE', resistance:'Reflexos reduz metade',
+    text:'Você manifesta energia amaldiçoada em forma ofensiva. Faça a rolagem ou force o alvo a realizar o teste de resistência indicado. Em falha, o alvo sofre o dano completo; em sucesso, sofre metade, se aplicável.'
+  },
+  auxiliar: {
+    action:'Ação Comum', range:'9 metros', target:'Uma criatura ou área', duration:'1 rodada', cost:'1 PE', damage:'', resistance:'Vontade ou Reflexos evita',
+    text:'Você altera a posição, condição ou capacidade do alvo. Defina o efeito principal, a condição aplicada, como o alvo resiste e quando o efeito termina.'
+  },
+  cura: {
+    action:'Ação Comum', range:'Toque', target:'Uma criatura', duration:'Imediata', cost:'2 PE', damage:'2d8+SAB', resistance:'—',
+    text:'Você canaliza energia reversa ou efeito curativo. O alvo recupera os pontos indicados. Defina se remove condições, limitações por cena e se funciona em alvos específicos.'
+  },
+  passivo: {
+    action:'Passiva', range:'Pessoal', target:'Você', duration:'Permanente', cost:'—', damage:'', resistance:'—',
+    text:'Esta habilidade altera uma regra do personagem de forma contínua. Descreva o bônus, gatilho, limite por rodada/cena e qualquer incompatibilidade.'
+  },
+  especial: {
+    action:'Especial', range:'Variável', target:'Variável', duration:'Variável', cost:'Variável', damage:'', resistance:'Definido pelo efeito',
+    text:'Use este modelo para feitiços com regras próprias, múltiplas etapas, preparação, ritual, invocação, domínio, voto ou interação incomum com a técnica.'
+  }
+};
+function spellBuilderTypeLabel(type){
+  return ({dano:'Dano', auxiliar:'Auxiliar / controle', cura:'Cura', passivo:'Passivo', especial:'Especial'})[type] || 'Personalizado';
+}
+function currentSpellBuilderType(){ return $('#spellBuilderType')?.value || 'dano'; }
+function renderSpellBuilderPreview(){
+  const type=currentSpellBuilderType();
+  const t=SPELL_BUILDER_TEMPLATES[type] || SPELL_BUILDER_TEMPLATES.dano;
+  const el=$('#spellBuilderPreview');
+  if(!el) return;
+  el.innerHTML = `<h3>${esc(spellBuilderTypeLabel(type))}</h3><ul><li><b>Conjuração:</b> ${esc(t.action)}</li><li><b>Alcance:</b> ${esc(t.range)}</li><li><b>Alvo:</b> ${esc(t.target)}</li><li><b>Duração:</b> ${esc(t.duration)}</li><li><b>Custo:</b> ${esc(t.cost)}</li><li><b>Dano/Cura:</b> ${esc(t.damage||'—')}</li><li><b>Resistência:</b> ${esc(t.resistance||'—')}</li></ul><p>${esc(t.text)}</p>`;
+}
+function openSpellBuilder(){
+  const sheet=current(); if(!sheet) return;
+  if($('#spellBuilderTech')) $('#spellBuilderTech').value = sheet.innateTechnique || '';
+  renderSpellBuilderPreview();
+  openDialog('spellBuilderDialog');
+}
+function applySpellBuilderTemplate(){
+  const type=currentSpellBuilderType();
+  const t=SPELL_BUILDER_TEMPLATES[type] || SPELL_BUILDER_TEMPLATES.dano;
+  const fields={Action:'action',Range:'range',Target:'target',Duration:'duration',Cost:'cost',Damage:'damage',Resistance:'resistance',Text:'text'};
+  Object.entries(fields).forEach(([idKey,key])=>{
+    const el=$(`#spellBuilder${idKey}`);
+    if(el && (!el.value || key==='text')) el.value=t[key]||'';
+  });
+  if(!$('#spellBuilderName')?.value){
+    const nameEl=$('#spellBuilderName');
+    if(nameEl) nameEl.value = type==='dano'?'Feitiço de Dano':type==='cura'?'Feitiço Curativo':type==='passivo'?'Habilidade Passiva':type==='auxiliar'?'Feitiço Auxiliar':'Feitiço Especial';
+  }
+}
+function normalizeBuilderDamageFormula(expr,sheet){
+  let out=String(expr||'');
+  const map={FOR:'Força',DES:'Destreza',CON:'Constituição',INT:'Inteligência',SAB:'Sabedoria',PRE:'Presença'};
+  Object.entries(map).forEach(([abbr,attr])=>{
+    const value=attrMod(sheet,attr);
+    out=out.replace(new RegExp(`\\b${abbr}\\b`,'gi'), `${value>=0?'+':''}${value}`);
+  });
+  return out.replace(/\+\+/g,'+').replace(/\+-/g,'-');
+}
+function addSpellBuilderResult(){
+  const sheet=current(); if(!sheet) return;
+  const name=$('#spellBuilderName')?.value?.trim();
+  if(!name){ alert('Dê um nome para o feitiço antes de adicionar.'); return; }
+  const type=currentSpellBuilderType();
+  const tech=$('#spellBuilderTech')?.value?.trim() || sheet.innateTechnique || 'Técnica própria';
+  const spell={
+    name,
+    tech,
+    level: Number($('#spellBuilderLevel')?.value || 0),
+    action: $('#spellBuilderAction')?.value || '',
+    range: $('#spellBuilderRange')?.value || '',
+    target: $('#spellBuilderTarget')?.value || '',
+    duration: $('#spellBuilderDuration')?.value || '',
+    cost: $('#spellBuilderCost')?.value || '',
+    damage: normalizeBuilderDamageFormula($('#spellBuilderDamage')?.value || '', sheet),
+    resistance: $('#spellBuilderResistance')?.value || '',
+    prepared: false,
+    signature: false,
+    customType: spellBuilderTypeLabel(type),
+    text: `[${spellBuilderTypeLabel(type)} personalizado]\n${$('#spellBuilderText')?.value || ''}`
+  };
+  sheet.techniques.push(spell);
+  save(); renderRows(sheet); renderTechLibrary();
+  const dlg=$('#spellBuilderDialog'); if(dlg?.open) dlg.close();
+}
+
 function init(){
   sheets=sheets.map(normalize);
   if(activeId && !sheets.find(s=>s.id===activeId)) activeId=sheets[0]?.id||null;
@@ -4796,7 +5048,7 @@ function init(){
   $('#reopenWizard').onclick=()=>openWizard(true);
   $('#wizardBack').onclick=()=>{ collectWizard(); if(wizardStep>0) wizardStep--; renderWizard(); };
   $('#wizardNext').onclick=()=>{ collectWizard(); if(wizardStep===3 && !attributeAssignmentComplete(wizardData)){ alert('Distribua os 6 valores rolados/fixos entre os atributos antes de continuar.'); return; } if(wizardStep<wizardSteps.length-1){ wizardStep++; renderWizard(); } else finishWizard(); };
-  $$('[data-add]').forEach(btn=>btn.onclick=()=>{ const sheet=current(); if(!sheet) return; const t=btn.dataset.add; const obj=t==='attacks'?{name:'',test:'1d20',damage:'1d8',notes:''}:t==='items'?{name:'',category:'Personalizado',cost:'',qty:1,weight:0,damage:'',properties:'',grade:'',enchantmentCharges:'',uniqueAbility:'',modifications:[],text:''}:t==='techniques'?{name:'',tech:sheet.innateTechnique||'',level:'',action:'',range:'',target:'',duration:'',cost:'',text:''}:t==='domains'?{name:'',type:'',technique:'',level:'',cost:'',area:'',duration:'',text:''}:t==='abilities'?{name:'',level:'',class:'',text:''}:t==='talents'?{name:'',level:'',category:'',text:''}:{name:'',text:''}; sheet[t].push(obj); save(); renderRows(sheet); });
+  $$('[data-add]').forEach(btn=>btn.onclick=()=>{ const sheet=current(); if(!sheet) return; const t=btn.dataset.add; const obj=t==='attacks'?{name:'',test:'1d20',damage:'1d8',notes:''}:t==='items'?{name:'',category:'Personalizado',cost:'',qty:1,weight:0,damage:'',properties:'',grade:'',enchantmentCharges:'',uniqueAbility:'',modifications:[],text:''}:t==='techniques'?{name:'',tech:sheet.innateTechnique||'',level:'',action:'',range:'',target:'',duration:'',cost:'',damage:'',resistance:'',prepared:false,signature:false,text:''}:t==='domains'?{name:'',type:'',technique:'',level:'',cost:'',area:'',duration:'',text:''}:t==='abilities'?{name:'',level:'',class:'',text:''}:t==='talents'?{name:'',level:'',category:'',text:''}:{name:'',text:''}; sheet[t].push(obj); save(); renderRows(sheet); });
   $('#recalculate').onclick=()=>{ const sheet=current(); if(!sheet)return; applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); };
   $('#applyClassSkills').onclick=()=>{ const sheet=current(); if(!sheet)return; applyDefaultSkills(sheet); save(); renderEditor(); };
   $('#openAbilityChooser').onclick=()=>{ renderAbilityChooser(); openDialog('abilityDialog'); };
@@ -4817,6 +5069,11 @@ function init(){
   if($('#spellTechniqueFilter')) $('#spellTechniqueFilter').onchange=renderTechLibrary;
   if($('#spellLevelFilter')) $('#spellLevelFilter').onchange=renderTechLibrary;
   if($('#openSpellChooser')) $('#openSpellChooser').onclick=()=>{ renderTechLibrary(); openDialog('spellDialog'); };
+  if($('#openSpellBuilder')) $('#openSpellBuilder').onclick=openSpellBuilder;
+  if($('#spellBuilderType')) $('#spellBuilderType').onchange=renderSpellBuilderPreview;
+  if($('#applySpellBuilderTemplate')) $('#applySpellBuilderTemplate').onclick=applySpellBuilderTemplate;
+  if($('#addSpellBuilderResult')) $('#addSpellBuilderResult').onclick=addSpellBuilderResult;
+  if($('#addInnateDefaults')) $('#addInnateDefaults').onclick=addTechniqueZeroDefaults;
   if($('#applyInnateTechnique')) $('#applyInnateTechnique').onclick=()=>{ const sheet=current(); if(!sheet) return; const chosen=$('#innateTechniqueSelect')?.value; if(!chosen) return; const tech=TECHNIQUE_LIBRARY.find(t=>t.name===chosen); sheet.innateTechnique=chosen; if(tech && !sheet.innateTechniqueText) sheet.innateTechniqueText=tech.text; save(); renderAll(); };
   if($('#innateTechniqueSelect')) $('#innateTechniqueSelect').onchange=()=>{ const sheet=current(); if(!sheet) return; const chosen=$('#innateTechniqueSelect').value; const tech=TECHNIQUE_LIBRARY.find(t=>t.name===chosen); if(tech){ sheet.innateTechnique=chosen; if(!sheet.innateTechniqueText) sheet.innateTechniqueText=tech.text; save(); renderAll(); } };
   $('#talentFilter')?.addEventListener('input', renderTalentChooser);
@@ -4827,7 +5084,8 @@ function init(){
   $('#itemCategoryFilter')?.addEventListener('input', renderItemChooser);
   $('#itemCostFilter')?.addEventListener('input', renderItemChooser);
   $('#itemModSearch')?.addEventListener('input', renderItemModificationChooser);
-  $('#itemModTypeFilter')?.addEventListener('input', renderItemModificationChooser);
+  $('#itemModTypeFilter')?.addEventListener('input',()=>{ selectedItemModLibraryIndex=null; renderItemModificationChooser(); });
+  $('#addSelectedItemMod')?.addEventListener('click', applySelectedItemModification);
   save(); renderAll();
 }
 function boot(){

@@ -37,3 +37,26 @@
 @media(max-width:900px){.progress-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.progress-grid{grid-template-columns:1fr}}
 .mod-box{border:1px solid var(--border);background:rgba(255,255,255,.03);border-radius:12px;padding:.75rem;margin:.6rem 0}.tag-list{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.5rem}.chip-x{border:0;background:transparent;color:inherit;padding:0 .15rem;margin-left:.3rem;cursor:pointer;font-weight:800}.chip-x:hover{transform:scale(1.1)}
+
+.item-card{padding:.75rem}.item-compact{display:grid;grid-template-columns:auto 1fr;gap:.75rem;align-items:center}.item-compact strong{font-size:1.02rem}.item-toggle{width:40px;height:40px;padding:0;display:grid;place-items:center;font-size:1.2rem}.item-details{border-top:1px solid var(--line);margin-top:.75rem;padding-top:.75rem}.enchant-layout{display:grid;grid-template-columns:minmax(280px,1fr) minmax(300px,.9fr);gap:1rem;padding:0 1.25rem 1.25rem}.enchant-side{position:sticky;top:0;align-self:start;background:#140a10;border:1px solid var(--line);border-radius:16px;padding:1rem}.enchant-option{width:100%;text-align:left;display:grid;gap:.25rem;border-radius:14px}.enchant-option strong{font-size:1rem}.enchant-option span,.enchant-option small{color:var(--muted)}.enchant-option.active{border-color:var(--accent2);background:#42182e}.mod-detail-card{display:grid;gap:.45rem}.mod-detail-card h3{margin:.1rem 0}.reason{color:var(--warn)}@media(max-width:800px){.enchant-layout{grid-template-columns:1fr}.enchant-side{position:static}}
+
+/* v0.25 - revisão de habilidades e painel de pré-requisitos */
+.req-badges{display:flex;flex-wrap:wrap;gap:.35rem;margin:.55rem 0 .35rem}
+.mini-badge{font-size:.72rem;border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:.16rem .5rem;background:rgba(255,255,255,.05)}
+.mini-badge.ok{border-color:rgba(91,218,166,.35);color:#a9ffd7;background:rgba(91,218,166,.08)}
+.mini-badge.bad{border-color:rgba(255,114,146,.35);color:#ffb8c8;background:rgba(255,114,146,.08)}
+.library-card.unavailable .mini-badge.ok{opacity:.7}
+
+/* v0.25 */
+.ok-panel,.warn-panel{margin:10px 0 16px;padding:12px 14px;border-radius:14px;border:1px solid var(--border);background:rgba(255,255,255,.035)}
+.ok-panel{color:#bfe8cf;border-color:rgba(117,214,152,.35)}
+.warn-panel{color:#ffd6d6;border-color:rgba(255,120,120,.35);background:rgba(255,80,80,.06)}
+.warn-panel ul{margin:8px 0 0 18px;padding:0}
+.warn-panel li{margin:4px 0}
+
+/* v0.27 - técnicas e feitiços */
+.badge.good{border-color:rgba(89,255,172,.45);color:#89ffac;background:rgba(89,255,172,.08)}
+.checkline{display:inline-flex;align-items:center;gap:.45rem;padding:.35rem .6rem;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.04);font-size:.9rem;color:var(--muted)}
+.checkline input{width:auto;accent-color:var(--accent)}
+.soft-card { background: rgba(255,255,255,.035); }
+#spellBuilderPreview ul { margin: 8px 0 0 18px; }

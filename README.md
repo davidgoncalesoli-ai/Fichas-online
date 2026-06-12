@@ -1,4 +1,4 @@
-# F&M Ficha Online v0.22
+# F&M Ficha Online v0.28
 
 # F&M Ficha Online v0.16
 
@@ -25,12 +25,33 @@ Ainda há itens com descrição estrutural/resumida. A meta continua ser cadastr
 - Próxima frente: completar textos e pré-requisitos das habilidades oficiais.
 
 
-## v0.22
+## v0.28
+
+- Biblioteca de técnicas inatas ampliada.
+- Biblioteca de feitiços/habilidades de técnica ampliada por técnica.
+- Feitiços agora têm campos de dano/cura e teste de resistência.
+- Botões para rolar dano/cura e mostrar CD atual da ficha.
+- Marcação de feitiço Preparado e Marca Registrada.
+- Botão para adicionar automaticamente fundamentos de nível 0 da técnica inata.
+
 - Armas/equipamentos agora aceitam maldições, encantamentos e modificações.
 - Adicionada biblioteca inicial de encantamentos para armas, escudos e uniformes.
 - Ataques criados a partir de armas consideram bônus simples de acerto/dano das modificações cadastradas.
 
 
-## v0.22
+## v0.28
 - Atributos pós-criação agora aumentam apenas por pontos de evolução.
 - Modificadores temporários ficam separados dos atributos permanentes.
+
+
+## v0.28
+
+- Refinamento dos pré-requisitos de habilidades.
+- Biblioteca de habilidades agora identifica requisitos por nível, classe, perícia treinada/mestre, atributo mínimo e habilidades prévias citadas no pré-requisito.
+- Cards de habilidade exibem marcadores visuais de requisitos atendidos e faltantes.
+
+
+## v0.28
+- Revisão de descrições provisórias das habilidades automáticas e principais.
+- Novo painel de pré-requisitos pendentes nas habilidades adicionadas.
+- A ficha agora avisa quando uma habilidade cadastrada ficou incompatível com nível, classe, perícia, atributo, aptidão ou habilidade exigida.
