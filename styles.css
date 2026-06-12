@@ -112,3 +112,60 @@ button.primary,.primary{background:linear-gradient(135deg,#5b000c,#8f0b17)}
 .rule-block p,.effect-box p{margin:.25rem 0;white-space:pre-wrap;}
 .badge.good{background:rgba(22,101,52,.55);border-color:rgba(34,197,94,.35);color:#dcfce7;}
 .mod-detail-card .muted{line-height:1.45;}
+
+/* v0.54 — polimento de cards e PV */
+.rule-grid{
+  grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr)) !important;
+  align-items:stretch;
+}
+.progress-card,.rule-card,.calc-card,.library-card,.mini-row,.compact-card,.ability-card{
+  min-width:0;
+  overflow-wrap:normal;
+  word-break:normal;
+  hyphens:none;
+}
+.progress-card{
+  min-height:116px;
+  padding:16px;
+}
+.progress-card span,.rule-card h3,.calc-card span{
+  word-break:normal;
+}
+.progress-card small,.rule-card p,.muted{
+  line-height:1.45;
+}
+.stat-grid.compact{
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr)) !important;
+}
+.invocation-panel,.invocation-panel .rule-card{
+  max-width:100%;
+}
+.hp-card{
+  grid-column:span 2;
+}
+.hp-roll-summary{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.45rem;
+  align-items:center;
+  margin-top:.6rem;
+}
+.hp-roll-summary button{
+  padding:.42rem .7rem;
+  border-radius:999px;
+  font-size:.82rem;
+}
+.hp-roll-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.35rem;
+  margin-top:.55rem;
+  max-height:150px;
+  overflow:auto;
+  padding-right:.25rem;
+}
+.hp-roll-list .badge{font-size:.78rem;}
+@media(max-width:760px){
+  .hp-card{grid-column:span 1;}
+  .progress-card{min-height:auto;}
+}

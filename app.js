@@ -1671,7 +1671,7 @@ function normalizeHpRolls(sheet){
     className:r.className || r.class || sheet.specialization || '',
     total:Number(r.total || (Number(r.roll||0)+Number(r.con ?? r.conAtRoll ?? 0))),
     createdAt:r.createdAt || new Date().toISOString()
-  })).filter(r=>r.level>=2 && r.roll>0 && r.die>0);
+  })).filter(r=>r.level>=2 && r.level<=20 && r.roll>0 && r.die>0);
   return sheet.hpRolls;
 }
 function rollHpForLevel(sheet, level){
@@ -1688,20 +1688,26 @@ function rollHpForLevel(sheet, level){
 }
 function ensureHpRolls(sheet, notify=false){
   normalizeHpRolls(sheet);
-  const lvl=Math.max(1, Number(sheet.level||1));
+  const lvl=clampCharacterLevel(sheet.level);
+  sheet.level = lvl;
+  sheet.hpRolls = normalizeHpRolls(sheet).filter(r=>r.level<=lvl);
   const made=[];
   for(let n=2;n<=lvl;n++){
     if(!sheet.hpRolls.some(r=>Number(r.level)===n)) made.push(rollHpForLevel(sheet,n));
   }
   if(notify && made.length){
-    const details=made.map(r=>`Nível ${r.level}: d${r.die} [${r.roll}] ${r.con>=0?'+':'-'} ${Math.abs(r.con)} CON = ${r.total} PV`).join(' • ');
-    showHpRollNotice(`Avanço de nível: ${details}`);
+    const gained = made.reduce((sum,r)=>sum+Number(r.total||0),0);
+    const last = made[made.length-1];
+    const text = made.length===1
+      ? `PV de avanço: +${last.total} PV` 
+      : `PV de avanço: +${gained} PV no total (${made.length} níveis rolados).`;
+    showHpRollNotice(text);
   }
   return made;
 }
 function hpFromRolls(sheet){
   normalizeHpRolls(sheet);
-  const lvl=Math.max(1,Number(sheet.level||1));
+  const lvl=clampCharacterLevel(sheet.level);
   const cls=CLASSES[sheet.specialization] || CLASSES.Lutador;
   const first=Math.max(1, Number(cls.hp1||10) + attrMod(sheet,'Constituição'));
   const gained=sheet.hpRolls.filter(r=>r.level>=2 && r.level<=lvl).reduce((sum,r)=>sum+Math.max(1,Number(r.total||0)),0);
@@ -1714,10 +1720,12 @@ function showHpRollNotice(text){
 }
 function hpRollHistoryHtml(sheet){
   normalizeHpRolls(sheet);
-  const lvl=Math.max(1,Number(sheet.level||1));
+  const lvl=clampCharacterLevel(sheet.level);
   const rows=sheet.hpRolls.filter(r=>r.level>=2 && r.level<=lvl).sort((a,b)=>a.level-b.level);
   if(!rows.length) return '<p class="muted">No nível 1 não há rolagem de avanço. Ao subir para o nível 2 ou superior, a ficha rola o PV automaticamente.</p>';
-  return `<div class="hp-roll-list">${rows.map(r=>`<span class="badge soft">Nv. ${r.level}: d${r.die} [${r.roll}] ${r.con>=0?'+':'-'} ${Math.abs(r.con)} CON = <b>${r.total}</b></span>`).join('')}</div>`;
+  const total = rows.reduce((sum,r)=>sum+Number(r.total||0),0);
+  const last = rows[rows.length-1];
+  return `<div class="hp-roll-summary"><span class="badge good">Rolagens de avanço: +${total} PV</span><span class="badge soft">Última: Nv. ${last.level} = +${last.total} PV</span><button data-show-hp-rolls>Ver rolagens</button></div><div class="hp-roll-list hidden" id="hpRollDetails">${rows.map(r=>`<span class="badge soft">Nv. ${r.level}: +${r.total} PV</span>`).join('')}</div>`;
 }
 
 
@@ -5098,9 +5106,17 @@ function blankSheet(){
   const skillRanks={}, skillExtras={}; SKILLS.forEach(([name])=>{ skillRanks[name]='none'; skillExtras[name]=0; });
   return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeBase:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeTempMods:{'Força':0,'Destreza':0,'Constituição':0,'Inteligência':0,'Sabedoria':0,'Presença':0}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, originChoices:originChoicesDefault(), skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], invocations:[], attacks:[], items:[], hpRolls:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
 }
+
+function clampCharacterLevel(value){
+  const n = Number(value || 1);
+  if(!Number.isFinite(n)) return 1;
+  return Math.max(1, Math.min(20, Math.floor(n)));
+}
+
 function normalize(sheet){
   const base=blankSheet();
   sheet = {...base, ...sheet, attributes:{...base.attributes, ...(sheet.attributes||{})}, attributeBase:{...base.attributeBase, ...(sheet.attributeBase||{})}, attributeTempMods:{...base.attributeTempMods, ...(sheet.attributeTempMods||{})}, attributeAssignments:{...base.attributeAssignments, ...(sheet.attributeAssignments||{})}, skillRanks:{...base.skillRanks, ...(sheet.skillRanks||{})}, skillExtras:{...base.skillExtras, ...(sheet.skillExtras||{})}, aptitudeLevels:{...base.aptitudeLevels, ...(sheet.aptitudeLevels||{})}, originChoices:{...originChoicesDefault(), ...(sheet.originChoices||{})}};
+  sheet.level = clampCharacterLevel(sheet.level);
   if(!sheet.attributeBase || ATTRS.some(a=>sheet.attributeBase[a]===undefined)){ sheet.attributeBase=sheet.attributeBase||{}; ATTRS.forEach(a=>{ if(sheet.attributeBase[a]===undefined) sheet.attributeBase[a]=attributeAssignmentComplete(sheet)?Number(sheet.attributeAssignments[a]):Number(sheet.attributes[a]||10); }); }
   if(!sheet.attributeTempMods) sheet.attributeTempMods={}; ATTRS.forEach(a=>{ if(sheet.attributeTempMods[a]===undefined) sheet.attributeTempMods[a]=0; });
   if(!sheet.originChoices.originAttrAlloc) sheet.originChoices.originAttrAlloc={}; ATTRS.forEach(a=>{ if(sheet.originChoices.originAttrAlloc[a]===undefined) sheet.originChoices.originAttrAlloc[a]=0; });
@@ -5227,8 +5243,9 @@ function renderEditor(){
   fillSelect('#classSelect', Object.keys(CLASSES), sheet.specialization);
   fillSelect('#keyAttributeSelect', (CLASSES[sheet.specialization]||CLASSES.Lutador).keys, sheet.keyAttribute);
   updateRestrictedUi(sheet);
-  $$('[data-bind]').forEach(el=>{ const key=el.dataset.bind; if(el.value !== String(sheet[key] ?? '')) el.value = sheet[key] ?? ''; el.oninput=()=>{ const oldLevel=Number(sheet.level||1); sheet[key] = el.type==='number' ? Number(el.value) : el.value; if(key==='origin' && sheet.origin==='Restringido') sheet.specialization='Restringido'; if(key==='specialization' && sheet.origin==='Restringido') sheet.specialization='Restringido'; if(key==='level'){ const newLevel=Number(sheet.level||1); if(newLevel>oldLevel) ensureHpRolls(sheet,true); } if(['level','origin','specialization','keyAttribute'].includes(key)){ applyAutoValues(sheet,{keepCurrent:false}); } save(); renderEditor(); }; });
+  $$('[data-bind]').forEach(el=>{ const key=el.dataset.bind; if(el.value !== String(sheet[key] ?? '')) el.value = sheet[key] ?? ''; el.oninput=()=>{ const oldLevel=clampCharacterLevel(sheet.level||1); sheet[key] = el.type==='number' ? Number(el.value) : el.value; if(key==='level'){ sheet.level = clampCharacterLevel(sheet.level); el.value = sheet.level; } if(key==='origin' && sheet.origin==='Restringido') sheet.specialization='Restringido'; if(key==='specialization' && sheet.origin==='Restringido') sheet.specialization='Restringido'; if(key==='level'){ const newLevel=clampCharacterLevel(sheet.level||1); if(newLevel>oldLevel) ensureHpRolls(sheet,true); } if(['level','origin','specialization','keyAttribute'].includes(key)){ applyAutoValues(sheet,{keepCurrent:false}); } save(); renderEditor(); }; });
   renderAttributes(sheet); renderOriginRefinement(sheet); renderCalcCards(sheet); renderLevelSummary(sheet); renderAptitudes(sheet); renderSkills(sheet); renderRows(sheet); renderTechLibrary();
+  $('[data-show-hp-rolls]')?.addEventListener('click',()=>$('#hpRollDetails')?.classList.toggle('hidden'));
 }
 function fillSelect(sel, values, selected){ const el=$(sel); if(!el) return; el.innerHTML=values.map(v=>`<option ${v===selected?'selected':''}>${esc(v)}</option>`).join(''); }
 function renderAttributes(sheet){
