@@ -32,13 +32,13 @@
 - Melhor bloqueio visual das habilidades indisponíveis.
 
 
-## v0.28 concluída
+## v0.29 concluída
 
 - Pré-requisitos de habilidades mais claros e menos dependentes de texto solto.
 - Bloqueio melhorado para habilidades que exigem outras habilidades, perícias ou atributos.
 
 
-## v0.28
+## v0.29
 - Revisão de descrições provisórias das habilidades automáticas e principais.
 - Novo painel de pré-requisitos pendentes nas habilidades adicionadas.
 - A ficha agora avisa quando uma habilidade cadastrada ficou incompatível com nível, classe, perícia, atributo, aptidão ou habilidade exigida.

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>F&M Ficha Online - v0.27</title>
+  <title>F&M Ficha Online - v0.29</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -165,6 +165,7 @@
                 <article class="card">
                   <div class="section-title"><h2>Talentos</h2><div class="actions-inline tight"><button id="openTalentChooser">+ Adicionar talento</button><button data-add="talents">+ Criar personalizado</button></div></div>
                   <p class="muted">Talentos são opções gerais: qualquer especialização pode usar, respeitando nível e pré-requisitos.</p>
+                  <div id="originTalentGrantPanel"></div>
                   <div id="talentsList" class="stack"></div>
                 </article>
               </div>
@@ -242,7 +243,7 @@
                 <article class="card">
                   <div class="section-title"><h2>Inventário</h2><div class="actions-inline tight"><button id="openItemChooser">+ Adicionar equipamento</button><button data-add="items">+ Criar item</button></div></div>
                   <div id="itemsList" class="stack"></div>
-                  <p class="muted">Carga: <strong id="loadView">0</strong></p>
+                  <div class="load-panel"><p class="muted">Carga: <strong id="loadView">0</strong></p><div id="loadDetails"></div></div>
                 </article>
               </div>
             </section>

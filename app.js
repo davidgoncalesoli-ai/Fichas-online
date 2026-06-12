@@ -1359,7 +1359,7 @@ const CLASSES = {
   'Especialista em Técnica': {hp1:10, hpFixed:5, pe:6, peKeyOnce:true, keys:['Inteligência','Sabedoria'], trainings:'Armas simples e armas a distância. TR Astúcia ou Vontade. Duas entre Ofício, Feitiçaria, Ocultismo e mais 2 perícias.', defaultSkills:['Feitiçaria','Ocultismo'], baseAbilities:['Domínio dos Fundamentos']},
   'Controlador': {hp1:10, hpFixed:5, pe:5, peKeyOnce:true, keys:['Presença','Sabedoria'], trainings:'Armas simples e armas a distância. TR Astúcia ou Vontade. Ofício, Percepção, Persuasão e mais 2 perícias.', defaultSkills:['Ofício','Percepção','Persuasão'], baseAbilities:['Treinamento em Controle']},
   'Suporte': {hp1:10, hpFixed:5, pe:5, peKeyOnce:true, keys:['Presença','Sabedoria'], trainings:'Armas simples e escudos. TR Astúcia ou Vontade. Duas Ofício, Medicina, Prestidigitação e mais 3 perícias.', defaultSkills:['Ofício','Medicina','Prestidigitação'], baseAbilities:['Suporte em Combate']},
-  'Restringido': {hp1:16, hpFixed:7, pe:0, stamina:4, peKeyOnce:false, keys:['Força','Destreza','Constituição','Inteligência','Sabedoria','Presença'], trainings:'Todas as armas e escudos. TR Fortitude e Reflexos. Ofício e mais 4 perícias, exceto Feitiçaria.', defaultSkills:['Ofício','Atletismo','Luta'], baseAbilities:['Restrito pelos Céus']}
+  'Restringido': {hp1:16, hpFixed:7, pe:0, stamina:4, peKeyOnce:false, keys:['Força','Destreza','Constituição','Inteligência','Sabedoria','Presença'], trainings:'Todas as armas e escudos. TR Fortitude e Reflexos. Ofício e mais 4 perícias, exceto Feitiçaria.', defaultSkills:['Ofício','Atletismo','Luta'], baseAbilities:['Restrito pelos Céus','Arsenal Vivo','Uso Rápido','Resiliência Imediata']}
 };
 
 const ABILITY_LIBRARY = [
@@ -1777,7 +1777,8 @@ const ABILITY_LIBRARY = [
     "level": 9,
     "name": "Teste de Resistência Mestre",
     "kind": "Automática",
-    "text": "Ganho automático. Registre aqui qual teste de resistência se tornou mestre quando essa progressão for alcançada."
+    "text": "Ganho automático. Registre aqui qual teste de resistência se tornou mestre quando essa progressão for alcançada.",
+    "options": ["Fortitude", "Reflexos", "Astúcia", "Vontade"]
   },
   {
     "class": "Lutador",
@@ -3650,6 +3651,30 @@ const ABILITY_LIBRARY = [
   },
   {
     "class": "Restringido",
+    "level": 1,
+    "name": "Arsenal Vivo",
+    "kind": "Automática",
+    "text": "Você recebe a característica Arsenal gratuitamente. Opcionalmente, conforme permissão do narrador, pode receber equipamentos de ofício igual ao seu BT.",
+    "options": ["Registrar Arsenal gratuito", "Adicionar equipamentos de ofício igual ao BT", "Definir arsenal narrativo com o narrador"]
+  },
+  {
+    "class": "Restringido",
+    "level": 1,
+    "name": "Uso Rápido",
+    "kind": "Automática",
+    "text": "Você consegue usar certos itens com velocidade superior. Um item de custo pode ser utilizado como Ação Livre; outros itens de custo podem ser usados como Ação Bônus ou Rápida, conforme a mesa aplicar.",
+    "options": ["Item de custo como Ação Livre", "Outros itens de custo como Ação Bônus", "Outros itens de custo como Ação Rápida"]
+  },
+  {
+    "class": "Restringido",
+    "level": 1,
+    "name": "Resiliência Imediata",
+    "kind": "Automática",
+    "text": "Uma quantidade de vezes igual ao seu BT, você pode evitar um desmembramento que fosse receber. Use as opções abaixo para marcar usos e observações.",
+    "options": ["Uso 1 disponível", "Uso 2 disponível", "Uso 3 disponível", "Uso 4 disponível", "Uso 5 disponível", "Uso 6 disponível"]
+  },
+  {
+    "class": "Restringido",
     "level": 2,
     "name": "Ataque Furtivo",
     "kind": "Automática",
@@ -3660,7 +3685,8 @@ const ABILITY_LIBRARY = [
     "level": 2,
     "name": "Versatilidade",
     "kind": "Automática",
-    "text": "Ganho automático do Restringido. Representa adaptação física e prática para lidar com diferentes situações sem depender de energia amaldiçoada."
+    "text": "Ganho automático do Restringido. Representa adaptação física e prática para lidar com diferentes situações sem depender de energia amaldiçoada.",
+    "options": ["Escolher perícia adicional", "Escolher treinamento físico", "Escolher ferramenta/arma de preferência", "Registrar opção definida pelo narrador"]
   },
   {
     "class": "Restringido",
@@ -3751,14 +3777,16 @@ const ABILITY_LIBRARY = [
     "level": 4,
     "name": "Implemento Celeste",
     "kind": "Automática",
-    "text": "Ganho automático. Marca a ligação do Restringido com equipamento, ferramenta ou implemento apropriado ao seu estilo."
+    "text": "Ganho automático. Marca a ligação do Restringido com equipamento, ferramenta ou implemento apropriado ao seu estilo.",
+    "options": ["Arma escolhida", "Escudo escolhido", "Uniforme escolhido", "Ferramenta amaldiçoada escolhida", "Implemento personalizado"]
   },
   {
     "class": "Restringido",
     "level": 4,
     "name": "Dádiva do Céu",
     "kind": "Automática",
-    "text": "Ganho automático. Registra o avanço da dádiva física concedida pela restrição, com bônus definidos pela mesa."
+    "text": "Ganho automático. Registra o avanço da dádiva física concedida pela restrição, com bônus definidos pela mesa.",
+    "options": ["Força física", "Velocidade", "Resistência", "Sentidos", "Furtividade/presença apagada", "Outra dádiva definida pelo narrador"]
   },
   {
     "class": "Restringido",
@@ -3939,14 +3967,16 @@ const ABILITY_LIBRARY = [
     "level": 9,
     "name": "Teste de Resistência Mestre",
     "kind": "Automática",
-    "text": "Ganho automático. Registre aqui qual teste de resistência se tornou mestre quando essa progressão for alcançada."
+    "text": "Ganho automático. Registre aqui qual teste de resistência se tornou mestre quando essa progressão for alcançada.",
+    "options": ["Fortitude", "Reflexos", "Astúcia", "Vontade"]
   },
   {
     "class": "Restringido",
     "level": 10,
     "name": "Restrição Definitiva",
     "kind": "Automática",
-    "text": "Ganho automático de alto nível. Representa o estado avançado da restrição e seus benefícios físicos/sensoriais."
+    "text": "Ganho automático de alto nível. Representa o estado avançado da restrição e seus benefícios físicos/sensoriais.",
+    "options": ["Desvantagem para perceber o Restringido", "Perceber traçado da alma", "Ver maldições sem ferramenta", "Imune ao acerto garantido de Expansão", "Escolher permanecer ou sair da Expansão"]
   },
   {
     "class": "Restringido",
@@ -3999,7 +4029,8 @@ const ABILITY_LIBRARY = [
     "level": 12,
     "name": "Pináculo Físico",
     "kind": "Escolha",
-    "text": "Você recebe +4 pontos de estamina máximos e pode escolher aumentar o valor de dois atributos entre Força, Destreza e Constituição em 2. No nível 16, o valor de ambos os atributos escolhidos aumentam novamente em 2."
+    "text": "Você recebe +4 pontos de estamina máximos e pode escolher aumentar o valor de dois atributos entre Força, Destreza e Constituição em 2. No nível 16, o valor de ambos os atributos escolhidos aumentam novamente em 2.",
+    "options": ["Força", "Destreza", "Constituição"]
   },
   {
     "class": "Restringido",
@@ -4204,6 +4235,9 @@ function attrMod(sheet, attr){ return mod(effectiveAttribute(sheet, attr)); }
 function attributePointsTotal(sheet){ return Math.max(0, Math.floor(Number(sheet.level||1)/4) * 2); }
 function attributePointsSpent(sheet){ return ATTRS.reduce((sum,a)=>sum + Math.max(0, Number(sheet.attributes?.[a]||10) - attributeBaseValue(sheet,a)), 0); }
 function attributePointsLeft(sheet){ return attributePointsTotal(sheet) - attributePointsSpent(sheet); }
+function itemSpacesUsed(sheet){ return (sheet.items||[]).reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); }
+function loadLimit(sheet){ return Math.max(0, 8 + (attrMod(sheet,'Força') * 2)); }
+function loadState(sheet){ const used=itemSpacesUsed(sheet); const limit=loadLimit(sheet); const max=limit*2; const overloaded=used>limit; const impossible=used>max; return {used,limit,max,overloaded,impossible, defensePenalty:overloaded?-5:0, movementPenalty:overloaded?-4.5:0}; }
 function skillTotal(sheet, skill){ const rank=sheet.skillRanks?.[skill.name] || 'none'; const extra=Number(sheet.skillExtras?.[skill.name]||0); return attrMod(sheet, skill.attr) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
 function current(){ return sheets.find(s=>s.id===activeId); }
 function save(){ safeStorage.set('femSheetsV13', JSON.stringify(sheets)); if(activeId) safeStorage.set('femActiveV13', activeId); }
@@ -4220,7 +4254,7 @@ function normalize(sheet){
   ['abilities','talents','techniques','domains','attacks','items','aptitudeChoices'].forEach(k=>sheet[k]=Array.isArray(sheet[k])?sheet[k]:[]);
   sheet.domains = sheet.domains.map(d=>({name:d.name||'', type:d.type||'', technique:d.technique||'', level:d.level ?? '', cost:d.cost||'', area:d.area||'', duration:d.duration||'', text:d.text||''}));
   sheet.techniques = sheet.techniques.map(t=>({name:t.name||'', tech:t.tech || t.technique || '', level:t.level ?? '', action:t.action||'', range:t.range||'', target:t.target||'', duration:t.duration||'', cost:t.cost||'', damage:t.damage||'', resistance:t.resistance||'', prepared:!!t.prepared, signature:!!t.signature, text:t.text||''}));
-  sheet.abilities = sheet.abilities.map(a=>({level:a.level ?? a.nivel ?? '', class:a.class ?? a.classe ?? '', kind:a.kind ?? '', name:a.name||'', text:a.text||''}));
+  sheet.abilities = sheet.abilities.map(a=>({level:a.level ?? a.nivel ?? '', class:a.class ?? a.classe ?? '', kind:a.kind ?? '', name:a.name||'', text:a.text||'', options:Array.isArray(a.options)?a.options:[], selectedOptions:Array.isArray(a.selectedOptions)?a.selectedOptions:[]}));
   sheet.items = sheet.items.map(it=>({name:it.name||'', category:it.category||'Item', cost:it.cost??'', qty:it.qty||1, weight:it.weight||0, damage:it.damage||'', properties:it.properties||'', grade:it.grade||'', enchantmentCharges:it.enchantmentCharges??'', uniqueAbility:it.uniqueAbility||'', modifications:Array.isArray(it.modifications)?it.modifications:[], text:it.text||''}));
   return sheet;
 }
@@ -4243,12 +4277,18 @@ function applyAutoValues(sheet, opts={keepCurrent:true}){
   sheet.attention = 10 + skillTotal(sheet, {name:'Percepção', attr:'Sabedoria'});
   sheet.initiative = skillTotal(sheet, {name:'Reflexos', attr:'Destreza'});
   sheet.movement = sheet.origin==='Restringido' || sheet.specialization==='Restringido' ? 12 : 9;
+  const load = loadState(sheet);
+  if(load.overloaded){
+    sheet.defense = Math.max(0, sheet.defense + load.defensePenalty);
+    sheet.movement = Math.max(0, sheet.movement + load.movementPenalty);
+  }
   const auto = [];
   auto.push(`BT +${trainingBonus(sheet.level)}; metade do nível: ${halfLevel(sheet.level)}; CD: ${sheet.dc}.`);
   auto.push(`PV sugerido: ${cls.hp1}+CON no 1º nível; depois ${cls.hpFixed}+CON por nível.`);
   auto.push(cls.stamina ? `Estamina sugerida: ${cls.stamina} por nível.` : `PE sugerido: ${cls.pe} por nível${cls.peKeyOnce ? ' + modificador do atributo-chave uma vez' : ''}.`);
   auto.push(`Treinamentos da especialização: ${cls.trainings}`);
   auto.push(`Aptidões: ${aptitudePointsSpent(sheet)}/${aptitudePointsTotal(sheet)} pontos usados.`);
+  if(load.overloaded) auto.push(`Carga: sobrecarregado (${load.used}/${load.limit} espaços). Penalidade automática: -5 Defesa e -4,5m deslocamento.`);
   sheet.automationNotes = auto.join('\n');
   return sheet;
 }
@@ -4261,7 +4301,7 @@ function applyDefaultSkills(sheet){
 }
 function addBaseAbilities(sheet){
   const cls=CLASSES[sheet.specialization] || CLASSES.Lutador;
-  cls.baseAbilities.forEach(name=>{ if(!sheet.abilities.some(a=>a.name===name)){ const lib=ABILITY_LIBRARY.find(a=>a.name===name); sheet.abilities.push({name, class:sheet.specialization, level:lib?.level || 1, kind:lib?.kind || 'Automática', text:lib?.text || 'Habilidade base da especialização.'}); } });
+  cls.baseAbilities.forEach(name=>{ if(!sheet.abilities.some(a=>a.name===name)){ const lib=ABILITY_LIBRARY.find(a=>a.name===name); sheet.abilities.push({name, class:sheet.specialization, level:lib?.level || 1, kind:lib?.kind || 'Automática', text:lib?.text || 'Habilidade base da especialização.', options:lib?.options||[], selectedOptions:[]}); } });
 }
 
 function activateTab(id){ $$('.tab').forEach(t=>t.classList.toggle('active', t.id===id)); $$('.nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===id)); }
@@ -4396,7 +4436,7 @@ function missingAutomaticAbilities(sheet){
 function addMissingAutomaticAbilities(sheet){
   missingAutomaticAbilities(sheet).forEach(a=>{
     const req=abilityReqLevel(a);
-    sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Automática', text:a.text});
+    sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Automática', text:a.text, options:a.options||[], selectedOptions:[]});
   });
 }
 
@@ -4684,12 +4724,33 @@ function row(kind,x,i){
     return `<div class="mini-row item-card"><div class="item-compact"><button class="item-toggle" data-toggle-item-details="${i}" aria-label="Ver detalhes">⌄</button><div><strong>${esc(x.name||'Item sem nome')}</strong><div class="row-head">${essential.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${(x.modifications||[]).length?`<span class="badge">${(x.modifications||[]).length} encant.</span>`:''}</div></div></div><div class="item-details hidden" id="${detailsId}"><div class="form-grid"><label>Nome<input data-row="items" data-i="${i}" data-field="name" placeholder="Item" value="${esc(x.name)}"></label><label>Categoria<input data-row="items" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label><label>Custo<input data-row="items" data-i="${i}" data-field="cost" value="${esc(x.cost??'')}"></label><label>Qtd.<input data-row="items" data-i="${i}" data-field="qty" type="number" value="${x.qty||1}"></label><label>Espaços<input data-row="items" data-i="${i}" data-field="weight" type="number" step="0.5" value="${x.weight||0}"></label><label>Grau/Ferramenta amaldiçoada<input data-row="items" data-i="${i}" data-field="grade" placeholder="Ex.: Terceiro, Segundo, Especial" value="${esc(x.grade||'')}"></label><label>Cargas<input data-row="items" data-i="${i}" data-field="enchantmentCharges" placeholder="Ex.: igual ao BT" value="${esc(x.enchantmentCharges??'')}"></label><label>Dano/efeito<input data-row="items" data-i="${i}" data-field="damage" value="${esc(x.damage||'')}"></label><label class="full">Propriedades<input data-row="items" data-i="${i}" data-field="properties" value="${esc(x.properties||'')}"></label></div><div class="mod-box"><strong>Maldições / modificações</strong>${modsHtml}</div><textarea data-row="items" data-i="${i}" data-field="uniqueAbility" placeholder="Habilidade única, caso seja Grau Especial">${esc(x.uniqueAbility||'')}</textarea><textarea data-row="items" data-i="${i}" data-field="text" placeholder="Descrição, efeitos e observações">${esc(x.text||'')}</textarea><div class="row-actions"><button data-open-item-mod="${i}">Adicionar encantamentos</button>${cleanDiceExpression(x.damage||'')?`<button data-create-attack-from-item="${i}">Criar ataque</button>`:''}<button data-del="items" data-i="${i}">Remover</button></div></div></div>`; }
   if(kind==='attacks') return `<div class="mini-row"><input data-row="attacks" data-i="${i}" data-field="name" placeholder="Nome do ataque" value="${esc(x.name)}"><div class="form-grid"><label>Rolagem de acerto<input data-row="attacks" data-i="${i}" data-field="test" placeholder="Ex.: 1d20+5" value="${esc(x.test||'1d20')}"></label><label>Rolagem de dano<input data-row="attacks" data-i="${i}" data-field="damage" placeholder="Ex.: 1d8+3 ou 1d6 Ct + 1d6 Pf" value="${esc(x.damage||'1d8')}"></label></div><textarea data-row="attacks" data-i="${i}" data-field="notes" placeholder="Notas">${esc(x.notes)}</textarea><div class="row-actions"><button data-roll-attack-hit="${i}">Rolar acerto</button><button data-roll-attack-damage="${i}">Rolar dano</button><button data-del="attacks" data-i="${i}">Remover</button></div></div>`;
   if(kind==='techniques') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.tech || 'Feitiço')}</span>${x.level!==''?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}${x.prepared?`<span class="badge good">Preparado</span>`:''}${x.signature?`<span class="badge soft">Marca registrada</span>`:''}</div><input data-row="techniques" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><input data-row="techniques" data-i="${i}" data-field="tech" placeholder="Técnica vinculada" value="${esc(x.tech||'')}"><input data-row="techniques" data-i="${i}" data-field="level" placeholder="Nível" value="${esc(x.level)}"><input data-row="techniques" data-i="${i}" data-field="action" placeholder="Conjuração" value="${esc(x.action||'')}"><input data-row="techniques" data-i="${i}" data-field="range" placeholder="Alcance" value="${esc(x.range||'')}"><input data-row="techniques" data-i="${i}" data-field="target" placeholder="Alvo" value="${esc(x.target||'')}"><input data-row="techniques" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><input data-row="techniques" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="techniques" data-i="${i}" data-field="damage" placeholder="Dano/cura. Ex.: 4d8+3" value="${esc(x.damage||'')}"><input data-row="techniques" data-i="${i}" data-field="resistance" placeholder="Teste de resistência" value="${esc(x.resistance||'')}"></div><div class="actions-inline tight"><label class="checkline"><input data-tech-toggle="prepared" data-i="${i}" type="checkbox" ${x.prepared?'checked':''}> Preparado</label><label class="checkline"><input data-tech-toggle="signature" data-i="${i}" type="checkbox" ${x.signature?'checked':''}> Marca registrada</label>${x.damage?`<button data-roll-tech-damage="${i}">Rolar dano/cura</button>`:''}<button data-roll-tech-cd="${i}">Mostrar CD</button></div><textarea data-row="techniques" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="techniques" data-i="${i}">Remover</button></div>`;
-  if(kind==='abilities') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(abilityLevelLabel(x.level))}</span>${x.class?`<span class="badge soft">${esc(x.class)}</span>`:''}${x.kind?`<span class="badge soft">${esc(x.kind)}</span>`:''}</div><input data-row="abilities" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="abilities" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level)}" placeholder="Livre"></label><label>Classe<input data-row="abilities" data-i="${i}" data-field="class" value="${esc(x.class)}" placeholder="Opcional"></label></div><textarea data-row="abilities" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="abilities" data-i="${i}">Remover</button></div>`;
+  if(kind==='abilities') { const opts=Array.isArray(x.options)?x.options:[]; const selected=Array.isArray(x.selectedOptions)?x.selectedOptions:[]; const optsHtml=opts.length?`<div class="option-box"><strong>Escolhas desta habilidade</strong><p class="muted">Marque as opções/efeitos escolhidos para esta habilidade.</p>${opts.map((op,oi)=>`<button class="choice-pill ${selected.includes(op)?'active':''}" data-ability-option="${i}" data-option-index="${oi}">${esc(op)}</button>`).join('')}</div>`:''; return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(abilityLevelLabel(x.level))}</span>${x.class?`<span class="badge soft">${esc(x.class)}</span>`:''}${x.kind?`<span class="badge soft">${esc(x.kind)}</span>`:''}</div><input data-row="abilities" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="abilities" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level)}" placeholder="Livre"></label><label>Classe<input data-row="abilities" data-i="${i}" data-field="class" value="${esc(x.class)}" placeholder="Opcional"></label></div>${optsHtml}<textarea data-row="abilities" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="abilities" data-i="${i}">Remover</button></div>`; }
   if(kind==='talents') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.category||'Talento')}</span>${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="talents" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="talents" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label><label>Categoria<input data-row="talents" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label></div><textarea data-row="talents" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="talents" data-i="${i}">Remover</button></div>`;
   if(kind==='domains') return `<div class="mini-row"><div class="row-head"><span class="badge">${esc(x.type||'Domínio')}</span>${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div><input data-row="domains" data-i="${i}" data-field="name" placeholder="Nome da expansão" value="${esc(x.name)}"><div class="form-grid"><input data-row="domains" data-i="${i}" data-field="technique" placeholder="Técnica vinculada" value="${esc(x.technique||'')}"><input data-row="domains" data-i="${i}" data-field="type" placeholder="Tipo" value="${esc(x.type||'')}"><input data-row="domains" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="domains" data-i="${i}" data-field="area" placeholder="Área" value="${esc(x.area||'')}"><input data-row="domains" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><label>Nível necessário<input data-row="domains" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label></div><textarea data-row="domains" data-i="${i}" data-field="text" placeholder="Efeitos, acerto garantido, regras e observações">${esc(x.text)}</textarea><button data-del="domains" data-i="${i}">Remover</button></div>`;
   return `<div class="mini-row"><input data-row="${kind}" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><textarea data-row="${kind}" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="${kind}" data-i="${i}">Remover</button></div>`;
 }
+
+function talentHasNoRequirement(t){
+  const prereq=String(t.prereq||'—').trim();
+  return talentReqLevel(t)<=1 && (!t.req || Object.keys(t.req).length===0) && (prereq==='—' || prereq==='' || prereq.toLowerCase()==='sem requisito');
+}
+function originTalentGrant(sheet){
+  if(sheet.origin==='Herdado') return {title:'Talento adicional da origem Herdado', text:'Escolha um talento sem pré-requisitos para registrar o benefício inicial da origem.'};
+  return null;
+}
+function renderOriginTalentGrant(sheet){
+  const box=$('#originTalentGrantPanel'); if(!box) return;
+  const grant=originTalentGrant(sheet);
+  if(!grant){ box.innerHTML=''; return; }
+  const talents=TALENT_LIBRARY.filter(talentHasNoRequirement).filter(t=>!(sheet.talents||[]).some(x=>x.name===t.name));
+  box.innerHTML = `<div class="rule-card accent"><h3>${esc(grant.title)}</h3><p>${esc(grant.text)}</p><div class="choice-grid">${talents.map((t,i)=>`<button data-origin-talent="${esc(t.name)}"><strong>${esc(t.name)}</strong><small>${esc(t.category||'Geral')}</small></button>`).join('') || '<p class="muted">Todos os talentos sem requisito já foram adicionados.</p>'}</div></div>`;
+  $$('[data-origin-talent]', box).forEach(btn=>btn.onclick=()=>{ const t=TALENT_LIBRARY.find(x=>x.name===btn.dataset.originTalent); if(!t) return; sheet.talents.push({name:t.name, level:talentReqLevel(t), category:t.category||'Geral', text:`Talento adicional da origem ${sheet.origin}.
+Pré-requisito: ${t.prereq||'—'}
+
+${t.text}`}); save(); renderRows(sheet); });
+}
 function renderRows(sheet){
+  applyAutoValues(sheet);
   renderAbilityProgress(sheet);
   const filteredAbilities = (sheet.abilities||[]).map((x,i)=>({x,i}));
   $('#abilitiesList').innerHTML = filteredAbilities.length ? filteredAbilities.map(({x,i})=>row('abilities',x,i)).join('') : '<p class="muted">Nenhuma habilidade adicionada.</p>';
@@ -4700,7 +4761,8 @@ function renderRows(sheet){
   syncTechniqueSelectors(sheet);
   $('#attacksList').innerHTML = sheet.attacks.length ? sheet.attacks.map((x,i)=>row('attacks',x,i)).join('') : '<p class="muted">Nenhum ataque cadastrado.</p>';
   $('#itemsList').innerHTML = sheet.items.length ? sheet.items.map((x,i)=>row('items',x,i)).join('') : '<p class="muted">Nenhum item cadastrado.</p>';
-  { const used = sheet.items.reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); const limit = 8 + (attrMod(sheet,'Força')*2); const max = limit*2; $('#loadView').textContent = `${used} / ${limit} espaços${used>max?' (impossível carregar)':used>limit?' (sobrecarregado)':''}`; }
+  { const load=loadState(sheet); const status=load.impossible?'Impossível carregar':load.overloaded?'Sobrecarregado':'Dentro do limite'; $('#loadView').textContent = `${load.used} / ${load.limit} espaços`; const details=$('#loadDetails'); if(details){ details.innerHTML = `<div class="load-meter"><span style="width:${Math.min(100, load.limit ? (load.used/load.limit)*100 : 100)}%"></span></div><div class="row-head"><span class="badge ${load.overloaded?'bad':'good'}">${esc(status)}</span><span class="badge soft">Máximo absoluto: ${esc(load.max)} espaços</span>${load.overloaded?'<span class="badge bad">-5 Defesa</span><span class="badge bad">-4,5m Deslocamento</span>':''}</div>`; } }
+  renderOriginTalentGrant(sheet);
   $$('[data-row]').forEach(el=>el.oninput=()=>{ const arr=sheet[el.dataset.row]; arr[Number(el.dataset.i)][el.dataset.field] = (el.dataset.field==='level' && el.value==='') ? '' : (el.type==='number'?Number(el.value):el.value); save(); if(['items','abilities','talents','domains'].includes(el.dataset.row)) renderRows(sheet); });
   $$('[data-del]').forEach(btn=>btn.onclick=()=>{ sheet[btn.dataset.del].splice(Number(btn.dataset.i),1); save(); renderRows(sheet); });
   $$('[data-tech-toggle]').forEach(el=>el.onchange=()=>{ const t=sheet.techniques[Number(el.dataset.i)]; if(!t) return; t[el.dataset.techToggle]=el.checked; save(); renderRows(sheet); });
@@ -4712,6 +4774,7 @@ function renderRows(sheet){
   $$('[data-toggle-item-details]').forEach(btn=>btn.onclick=()=>{ const box=$('#itemDetails_'+btn.dataset.toggleItemDetails); if(box) box.classList.toggle('hidden'); });
   $$('[data-open-item-mod]').forEach(btn=>btn.onclick=()=>openItemModificationChooser(btn.dataset.openItemMod));
   $$('[data-remove-item-mod]').forEach(btn=>btn.onclick=()=>{ const it=sheet.items[Number(btn.dataset.itemIndex)]; if(!it) return; it.modifications.splice(Number(btn.dataset.removeItemMod),1); save(); renderRows(sheet); });
+  $$('[data-ability-option]').forEach(btn=>btn.onclick=()=>{ const ab=sheet.abilities[Number(btn.dataset.abilityOption)]; if(!ab) return; ab.selectedOptions=Array.isArray(ab.selectedOptions)?ab.selectedOptions:[]; const option=(ab.options||[])[Number(btn.dataset.optionIndex)]; if(!option) return; const idx=ab.selectedOptions.indexOf(option); if(idx>=0) ab.selectedOptions.splice(idx,1); else ab.selectedOptions.push(option); save(); renderRows(sheet); });
 }
 
 function syncTechniqueSelectors(sheet){
@@ -4781,7 +4844,7 @@ function renderAbilityChooser(){
     const badges = abilityRequirementBadges(sheet,a).map(t=>`<span class="mini-badge ${String(t).startsWith('Falta')||String(t).includes('Bloqueada')?'bad':'ok'}">${esc(t)}</span>`).join('');
     return `<div class="library-card ${res.ok?'':'unavailable'}"><h3>${esc(a.name)}</h3><p class="muted">${esc(a.class)} • ${esc(a.kind || 'Escolha')} • requisito: nível ${req}${prereq}</p><div class="req-badges">${badges}</div><p>${esc(a.text)}</p><p class="reason">${esc(res.reason)}</p><button data-add-ability-lib="${i}" ${res.ok?'':'disabled'}>Adicionar</button></div>`;
   }).join('') || '<p class="muted">Nenhuma habilidade neste filtro.</p>';
-  $$('[data-add-ability-lib]').forEach(btn=>btn.onclick=()=>{ const a=ABILITY_LIBRARY[Number(btn.dataset.addAbilityLib)]; const req=abilityReqLevel(a); sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Escolha', text:`${a.prereq?'Pré-requisito: '+a.prereq+'\n\n':''}${a.text}`}); save(); renderRows(sheet); renderAbilityChooser(); });
+  $$('[data-add-ability-lib]').forEach(btn=>btn.onclick=()=>{ const a=ABILITY_LIBRARY[Number(btn.dataset.addAbilityLib)]; const req=abilityReqLevel(a); sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Escolha', text:`${a.prereq?'Pré-requisito: '+a.prereq+'\n\n':''}${a.text}`, options:a.options||[], selectedOptions:[]}); save(); renderRows(sheet); renderAbilityChooser(); });
 }
 
 function renderAptitudeChooser(){
