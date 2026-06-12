@@ -4918,7 +4918,7 @@ const RULES = [
   {title:'v0.37', text:'Técnicas herdadas agora puxam fundamentos de nível 0 automaticamente ao criar Herdado; adicionados modelos iniciais para Ilimitado, Seis Olhos e Projeção.'},
   {title:'v0.39', text:'Descrições de habilidades, talentos, feitiços, itens, encantamentos, expansões e invocações foram enriquecidas para leitura clara em mesa.'},
   {title:'v0.41', text:'Biblioteca de técnicas e feitiços ampliada com Proporção, Manipulação de Maldições, Trem do Puro Amor, Comediante, Mímica Corporal e Bestas Auspiciosas.'},
-  {title:'v0.46', text:'Rolagem de atributos da criação alterada para 1d20 por atributo; habilidades e talentos agora usam cards resumidos com detalhes expansíveis; automáticas entram somente ao atingir o nível.'},
+  {title:'v0.48', text:'Rolagem de atributos da criação alterada para 1d20 por atributo; habilidades e talentos agora usam cards resumidos com detalhes expansíveis; automáticas entram somente ao atingir o nível.'},
   {title:'v0.44', text:'Visual Exorcizados em vermelho e preto, notas de atualização separadas, talentos naturais com todos os talentos, aptidões ampliadas e equipamento inicial organizado por abas.'}
 ];
 
@@ -4979,7 +4979,103 @@ function attributeBaseValue(sheet, attr){
   return Number(sheet.attributes?.[attr] || 10);
 }
 function attributeTempValue(sheet, attr){ return Number(sheet.attributeTempMods?.[attr] || 0); }
-function effectiveAttribute(sheet, attr){ return Number(sheet.attributes?.[attr] || 10) + originAttributeBonus(sheet, attr) + attributeTempValue(sheet, attr); }
+
+function cleanSheetRuleText(text=''){
+  return String(text||'')
+    .replace(/\n?\s*Resumo de ficha:[\s\S]*?(?=(\n\s*Pré-requisito:|\n\s*Efeito:|$))/gi,'')
+    .replace(/\n?\s*Resumo de mesa:[\s\S]*?(?=(\n\s*Pré-requisito:|\n\s*Efeito:|$))/gi,'')
+    .replace(/\n{3,}/g,'\n\n')
+    .trim();
+}
+function splitRequirementAndDescription(entry={}){
+  const raw=cleanSheetRuleText(entry.text||'');
+  let prereq=String(entry.prereq||'').trim();
+  let desc=raw;
+  const m=raw.match(/^\s*Pr[eé]-?requisito\s*:\s*([^\n]+)\n*/i);
+  if(m){ prereq = prereq || m[1].trim(); desc = raw.slice(m[0].length).trim(); }
+  if(!prereq || prereq==='—') prereq = entry.requiredText || '—';
+  return {prereq, desc: desc || 'Descrição não cadastrada ainda.'};
+}
+function temporaryEffectText(text=''){
+  return /(tempor[aá]ri|at[eé] o|fim do turno|pr[oó]ximo turno|rodada|cena|descanso|quando |caso |uma vez|enquanto empunhar|ao acertar|ap[oó]s|durante)/i.test(String(text||''));
+}
+function blankPermanentEffects(){ return {attr:{}, skill:{}, defense:0, hp:0, pe:0, movement:0, dc:0, initiative:0, attention:0, load:0, notes:[]}; }
+function addPerm(map,key,val){ if(!key || !Number(val)) return; map[key]=(Number(map[key]||0)+Number(val)); }
+function parsePermanentEffectsFromText(name='', text=''){
+  const effects=blankPermanentEffects();
+  const raw=cleanSheetRuleText(String(text||''));
+  if(!raw || temporaryEffectText(raw)) return effects;
+  const n=norm(name);
+  const attrAliases = {forca:'Força','força':'Força',destreza:'Destreza',constituicao:'Constituição','constituição':'Constituição',inteligencia:'Inteligência','inteligência':'Inteligência',sabedoria:'Sabedoria',presenca:'Presença','presença':'Presença'};
+  const allStats = [...ATTRS, ...allSkillNames(), 'Defesa','PV','Pontos de Vida','PE','Pontos de Energia','Estamina','Deslocamento','CD','Iniciativa','Atenção','Atencao','Carga'];
+  // Padrões diretos: "+2 em Defesa", "+5 na Fortitude", "+3 PV".
+  raw.replace(/([+-]\s*\d+)\s*(?:em|na|no|de|a|à)?\s*([A-Za-zÀ-ÿ ]{2,32})/g,(m,num,label)=>{
+    const value=Number(String(num).replace(/\s+/g,''));
+    const found=allStats.find(x=>norm(label).includes(norm(x)) || norm(x).includes(norm(label).trim()));
+    if(!found) return m;
+    const key=found;
+    if(ATTRS.includes(key)) addPerm(effects.attr,key,value);
+    else if(allSkillNames().includes(key)) addPerm(effects.skill,key,value);
+    else if(/defesa/i.test(key)) effects.defense += value;
+    else if(/^PV|Pontos de Vida/i.test(key)) effects.hp += value;
+    else if(/^PE|Pontos de Energia|Estamina/i.test(key)) effects.pe += value;
+    else if(/deslocamento/i.test(key)) effects.movement += value;
+    else if(/^CD$/i.test(key)) effects.dc += value;
+    else if(/iniciativa/i.test(key)) effects.initiative += value;
+    else if(/aten/i.test(key)) effects.attention += value;
+    else if(/carga/i.test(key)) effects.load += value;
+    return m;
+  });
+  // Alguns talentos/habilidades comuns cadastrados por nome, para garantir aplicação permanente sem depender do texto.
+  if(n.includes('atencao infalivel') || n.includes('atenção infalível')) effects.attention += 2;
+  if(n.includes('ataque infalivel') || n.includes('ataque infalível')) addPerm(effects.skill,'Luta',2), addPerm(effects.skill,'Pontaria',2);
+  if(n.includes('alma inquebravel') || n.includes('alma inquebrável')) addPerm(effects.skill,'Vontade',2);
+  if(n.includes('corpo treinado')) effects.hp += 2;
+  if(n.includes('fisico abencoado') || n.includes('físico abençoado')) { addPerm(effects.attr,'Força',1); addPerm(effects.attr,'Destreza',1); addPerm(effects.attr,'Constituição',1); }
+  if(n.includes('apice corporal') || n.includes('ápice corporal')) effects.movement += 1.5;
+  return effects;
+}
+function mergeEffects(a,b){
+  Object.entries(b.attr||{}).forEach(([k,v])=>addPerm(a.attr,k,v));
+  Object.entries(b.skill||{}).forEach(([k,v])=>addPerm(a.skill,k,v));
+  ['defense','hp','pe','movement','dc','initiative','attention','load'].forEach(k=>a[k]+=Number(b[k]||0));
+  if(b.notes?.length) a.notes.push(...b.notes);
+  return a;
+}
+function permanentEffects(sheet){
+  const total=blankPermanentEffects();
+  [...(sheet.abilities||[]), ...(sheet.talents||[]), ...(sheet.aptitudeChoices||[])].forEach(x=>mergeEffects(total, parsePermanentEffectsFromText(x.name, x.text||x.description||'')));
+  (sheet.items||[]).forEach(item=>{
+    (item.modifications||[]).forEach(m=>{
+      if(/uniforme/i.test(item.category||'') && /blindado/i.test(m.name||'')) total.defense += 2;
+      if(/uniforme/i.test(item.category||'') && /material pesado/i.test(m.name||'')) addPerm(total.skill,'Fortitude',2);
+      if(/uniforme/i.test(item.category||'') && /furtivo/i.test(m.name||'')) addPerm(total.skill,'Furtividade', Number(item.cost||1)||1);
+    });
+  });
+  return total;
+}
+function permanentAttributeBonus(sheet, attr){ return Number(permanentEffects(sheet).attr?.[attr]||0); }
+function permanentSkillBonus(sheet, skill){ return Number(permanentEffects(sheet).skill?.[skill]||0); }
+function effectBadgesForEntry(entry){
+  const eff=parsePermanentEffectsFromText(entry.name, entry.text||'');
+  const badges=[];
+  Object.entries(eff.attr||{}).forEach(([k,v])=>badges.push(`${k} ${v>=0?'+':''}${v}`));
+  Object.entries(eff.skill||{}).forEach(([k,v])=>badges.push(`${k} ${v>=0?'+':''}${v}`));
+  if(eff.defense) badges.push(`Defesa ${eff.defense>=0?'+':''}${eff.defense}`);
+  if(eff.hp) badges.push(`PV ${eff.hp>=0?'+':''}${eff.hp}`);
+  if(eff.pe) badges.push(`PE/Estamina ${eff.pe>=0?'+':''}${eff.pe}`);
+  if(eff.movement) badges.push(`Deslocamento ${eff.movement>=0?'+':''}${eff.movement}m`);
+  if(eff.dc) badges.push(`CD ${eff.dc>=0?'+':''}${eff.dc}`);
+  if(eff.initiative) badges.push(`Iniciativa ${eff.initiative>=0?'+':''}${eff.initiative}`);
+  if(eff.attention) badges.push(`Atenção ${eff.attention>=0?'+':''}${eff.attention}`);
+  return badges;
+}
+function sanitizeLibrariesV48(){
+  [ABILITY_LIBRARY,TALENT_LIBRARY,APTITUDE_LIBRARY].forEach(lib=>lib.forEach(x=>{ if(x.text) x.text=cleanSheetRuleText(x.text); }));
+}
+sanitizeLibrariesV48();
+
+function effectiveAttribute(sheet, attr){ return Number(sheet.attributes?.[attr] || 10) + originAttributeBonus(sheet, attr) + attributeTempValue(sheet, attr) + permanentAttributeBonus(sheet, attr); }
 function attrMod(sheet, attr){ return mod(effectiveAttribute(sheet, attr)); }
 function attributePointsTotal(sheet){ return Math.max(0, Math.floor(Number(sheet.level||1)/4) * 2); }
 function attributePointsSpent(sheet){ return ATTRS.reduce((sum,a)=>sum + Math.max(0, Number(sheet.attributes?.[a]||10) - attributeBaseValue(sheet,a)), 0); }
@@ -4987,7 +5083,7 @@ function attributePointsLeft(sheet){ return attributePointsTotal(sheet) - attrib
 function itemSpacesUsed(sheet){ return (sheet.items||[]).reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); }
 function loadLimit(sheet){ return Math.max(0, 8 + (attrMod(sheet,'Força') * 2)); }
 function loadState(sheet){ const used=itemSpacesUsed(sheet); const limit=loadLimit(sheet); const max=limit*2; const overloaded=used>limit; const impossible=used>max; return {used,limit,max,overloaded,impossible, defensePenalty:overloaded?-5:0, movementPenalty:overloaded?-4.5:0}; }
-function skillTotal(sheet, skill){ const rank=effectiveSkillRank(sheet, skill.name); const extra=Number(sheet.skillExtras?.[skill.name]||0) + originSkillExtra(sheet, skill.name); return attrMod(sheet, skill.attr) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
+function skillTotal(sheet, skill){ const rank=effectiveSkillRank(sheet, skill.name); const extra=Number(sheet.skillExtras?.[skill.name]||0) + originSkillExtra(sheet, skill.name) + permanentSkillBonus(sheet, skill.name); return attrMod(sheet, skill.attr) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
 function current(){ return sheets.find(s=>s.id===activeId); }
 function save(){ safeStorage.set('femSheetsV13', JSON.stringify(sheets)); if(activeId) safeStorage.set('femActiveV13', activeId); }
 function blankSheet(){
@@ -5034,16 +5130,19 @@ function applyAutoValues(sheet, opts={keepCurrent:true}){
   if(sheet.origin==='Herdado' && sheet.originChoices?.clan==='Clã Gojo') pe += Math.floor(Number(sheet.level||1)/2);
   let hpAdjusted = hp;
   if(sheet.origin==='Herdado' && sheet.originChoices?.clan==='Clã Kamo') hpAdjusted += Number(sheet.level||1) + (Number(sheet.level||1)>=10 ? attrMod(sheet,'Constituição') : 0);
+  const perm = permanentEffects(sheet);
+  hpAdjusted += perm.hp;
+  pe += perm.pe;
   sheet.hpMax = hpAdjusted;
   sheet.peMax = Math.max(0, pe);
   if(!opts.keepCurrent || !sheet.hp) sheet.hp = hp;
   if(!opts.keepCurrent || !sheet.pe) sheet.pe = sheet.peMax;
   sheet.grade = gradeByLevel(sheet.level);
-  sheet.dc = 10 + halfLevel(sheet.level) + trainingBonus(sheet.level) + key;
-  sheet.defense = 10 + attrMod(sheet,'Destreza') + (sheet.specialization==='Restringido' ? Math.min(sheet.level, Math.max(attrMod(sheet,'Força'), attrMod(sheet,'Constituição'), 0)) : 0);
-  sheet.attention = 10 + skillTotal(sheet, {name:'Percepção', attr:'Sabedoria'});
-  sheet.initiative = skillTotal(sheet, {name:'Reflexos', attr:'Destreza'});
-  sheet.movement = sheet.origin==='Restringido' || sheet.specialization==='Restringido' ? 12 : 9;
+  sheet.dc = 10 + halfLevel(sheet.level) + trainingBonus(sheet.level) + key + perm.dc;
+  sheet.defense = 10 + attrMod(sheet,'Destreza') + (sheet.specialization==='Restringido' ? Math.min(sheet.level, Math.max(attrMod(sheet,'Força'), attrMod(sheet,'Constituição'), 0)) : 0) + perm.defense;
+  sheet.attention = 10 + skillTotal(sheet, {name:'Percepção', attr:'Sabedoria'}) + perm.attention;
+  sheet.initiative = skillTotal(sheet, {name:'Reflexos', attr:'Destreza'}) + perm.initiative;
+  sheet.movement = (sheet.origin==='Restringido' || sheet.specialization==='Restringido' ? 12 : 9) + perm.movement;
   if(sheet.origin==='Sem Técnica' && sheet.specialization==='Especialista em Técnica'){ sheet.automationNotes = 'Origem Sem Técnica não pode ter a especialização Especialista em Técnica. Troque a especialização para corrigir.'; }
   const load = loadState(sheet);
   if(load.overloaded){
@@ -5057,6 +5156,8 @@ function applyAutoValues(sheet, opts={keepCurrent:true}){
   auto.push(`Treinamentos da especialização: ${cls.trainings}`);
   auto.push(`Treinamentos de origem: ${originTrainingSummary(sheet)}`);
   auto.push(`Aptidões: ${aptitudePointsSpent(sheet)}/${aptitudePointsTotal(sheet)} pontos usados.`);
+  const permNote = [`Defesa ${perm.defense?sgn(perm.defense):''}`, `PV ${perm.hp?sgn(perm.hp):''}`, `PE/Estamina ${perm.pe?sgn(perm.pe):''}`, `Desloc. ${perm.movement?sgn(perm.movement):''}`, `CD ${perm.dc?sgn(perm.dc):''}`].filter(x=>!/ $/.test(x) && !x.endsWith(' '));
+  if(permNote.length) auto.push('Bônus permanentes aplicados: '+permNote.join(' • ')+'.');
   if(load.overloaded) auto.push(`Carga: sobrecarregado (${load.used}/${load.limit} espaços). Penalidade automática: -5 Defesa e -4,5m deslocamento.`);
   sheet.automationNotes = auto.join('\n');
   return sheet;
@@ -5428,6 +5529,20 @@ function itemModificationBonuses(item){
   const mods=Array.isArray(item.modifications)?item.modifications:[];
   return mods.reduce((acc,m)=>{ acc.attack += Number(m.attackBonus||0); acc.damage += Number(m.damageBonus||0); return acc; }, {attack:0, damage:0});
 }
+function itemModificationProperties(item){
+  const mods=Array.isArray(item.modifications)?item.modifications:[];
+  return mods.map(m=>m.properties).filter(Boolean).join(' • ');
+}
+function itemEffectiveBonusesHtml(item){
+  const mods=Array.isArray(item.modifications)?item.modifications:[];
+  if(!mods.length) return '';
+  const b=itemModificationBonuses(item);
+  const extra=[];
+  if(b.attack) extra.push(`Acerto ${b.attack>0?'+':''}${b.attack}`);
+  if(b.damage) extra.push(`Dano ${b.damage>0?'+':''}${b.damage}`);
+  mods.forEach(m=>{ if(m.properties) extra.push(`${m.name}: ${m.properties}`); });
+  return `<div class="effect-box"><strong>Melhorias aplicadas automaticamente</strong><div class="tag-list">${extra.map(e=>`<span class="badge good">${esc(e)}</span>`).join('')}</div><p class="muted">Bônus de acerto/dano entram automaticamente ao criar ataques a partir desta arma. Efeitos situacionais ficam registrados para consulta.</p></div>`;
+}
 function buildAttackFromItem(sheet,item){
   const attr=weaponAttackAttribute(item,sheet);
   const mods=itemModificationBonuses(item);
@@ -5518,7 +5633,7 @@ function renderItemModificationChooser(){
     <span>${esc((m.applies||[]).join(', '))}${m.grade?` • ${esc(m.grade)}`:''}</span>
     <small>${existing.has(m.name)?'Já aplicada':'Clique para ver detalhes'}</small>
   </button>`).join('') || '<p class="muted">Nenhuma maldição/modificação encontrada.</p>';
-  if($('#itemModDetails')) $('#itemModDetails').innerHTML = selected ? `<div class="mod-detail-card"><h3>${esc(selected.name)}</h3><p class="muted">${esc((selected.applies||[]).join(', '))} • ${esc(selected.grade||'')} • Pré-req.: ${esc(selected.prereq||'—')}</p><p><b>Efeito:</b> ${esc(selected.properties||'—')}${selected.damageBonus?` • <b>Dano:</b> ${selected.damageBonus>0?'+':''}${selected.damageBonus}`:''}${selected.attackBonus?` • <b>Acerto:</b> ${selected.attackBonus>0?'+':''}${selected.attackBonus}`:''}</p><p>${esc(selected.text||'')}</p>${selectedAlready?'<p class="reason">Este encantamento já está aplicado neste item.</p>':''}</div>` : '<p class="muted">Selecione um encantamento/modificação na lista para ver os detalhes.</p>';
+  if($('#itemModDetails')) $('#itemModDetails').innerHTML = selected ? `<div class="mod-detail-card"><h3>${esc(selected.name)}</h3><p class="muted">${esc((selected.applies||[]).join(', '))} • ${esc(selected.grade||'')} • Pré-req.: ${esc(selected.prereq||'—')}</p><p><b>Melhoria na arma/item:</b> ${esc(selected.properties||'—')}${selected.damageBonus?` • <b>Dano:</b> ${selected.damageBonus>0?'+':''}${selected.damageBonus}`:''}${selected.attackBonus?` • <b>Acerto:</b> ${selected.attackBonus>0?'+':''}${selected.attackBonus}`:''}</p><p>${esc(selected.text||'')}</p>${selectedAlready?'<p class="reason">Este encantamento já está aplicado neste item.</p>':''}</div>` : '<p class="muted">Selecione um encantamento/modificação na lista para ver os detalhes.</p>';
   const addBtn=$('#addSelectedItemMod');
   if(addBtn){ addBtn.disabled = !selected || selectedAlready; addBtn.textContent = selectedAlready ? 'Já aplicado' : 'Adicionar encantamento selecionado'; }
   $$('[data-select-item-mod]').forEach(btn=>btn.onclick=()=>{ selectedItemModLibraryIndex=Number(btn.dataset.selectItemMod); renderItemModificationChooser(); });
@@ -5530,11 +5645,27 @@ function row(kind,x,i){
     const detailsId=`itemDetails_${i}`;
     const spaces=Number(x.qty||1)*Number(x.weight||0);
     const essential=[x.category||'Item', x.damage&&x.damage!=='—'?`Dano ${x.damage}`:'', x.cost!==undefined && x.cost!==''?`Custo ${x.cost}`:'', spaces?`${spaces} espaço(s)`:'' ].filter(Boolean);
-    return `<div class="mini-row item-card"><div class="item-compact"><button class="item-toggle" data-toggle-item-details="${i}" aria-label="Ver detalhes">⌄</button><div><strong>${esc(x.name||'Item sem nome')}</strong><div class="row-head">${essential.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${(x.modifications||[]).length?`<span class="badge">${(x.modifications||[]).length} encant.</span>`:''}</div></div></div><div class="item-details hidden" id="${detailsId}"><div class="form-grid"><label>Nome<input data-row="items" data-i="${i}" data-field="name" placeholder="Item" value="${esc(x.name)}"></label><label>Categoria<input data-row="items" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label><label>Custo<input data-row="items" data-i="${i}" data-field="cost" value="${esc(x.cost??'')}"></label><label>Qtd.<input data-row="items" data-i="${i}" data-field="qty" type="number" value="${x.qty||1}"></label><label>Espaços<input data-row="items" data-i="${i}" data-field="weight" type="number" step="0.5" value="${x.weight||0}"></label><label>Grau/Ferramenta amaldiçoada<input data-row="items" data-i="${i}" data-field="grade" placeholder="Ex.: Terceiro, Segundo, Especial" value="${esc(x.grade||'')}"></label><label>Cargas<input data-row="items" data-i="${i}" data-field="enchantmentCharges" placeholder="Ex.: igual ao BT" value="${esc(x.enchantmentCharges??'')}"></label><label>Dano/efeito<input data-row="items" data-i="${i}" data-field="damage" value="${esc(x.damage||'')}"></label><label class="full">Propriedades<input data-row="items" data-i="${i}" data-field="properties" value="${esc(x.properties||'')}"></label></div><div class="mod-box"><strong>Maldições / modificações</strong>${modsHtml}</div><textarea data-row="items" data-i="${i}" data-field="uniqueAbility" placeholder="Habilidade única, caso seja Grau Especial">${esc(x.uniqueAbility||'')}</textarea><textarea data-row="items" data-i="${i}" data-field="text" placeholder="Descrição, efeitos e observações">${esc(x.text||'')}</textarea><div class="row-actions"><button data-open-item-mod="${i}">Adicionar encantamentos</button>${cleanDiceExpression(x.damage||'')?`<button data-create-attack-from-item="${i}">Criar ataque</button>`:''}<button data-del="items" data-i="${i}">Remover</button></div></div></div>`; }
+    return `<div class="mini-row item-card"><div class="item-compact"><button class="item-toggle" data-toggle-item-details="${i}" aria-label="Ver detalhes">⌄</button><div><strong>${esc(x.name||'Item sem nome')}</strong><div class="row-head">${essential.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${(x.modifications||[]).length?`<span class="badge">${(x.modifications||[]).length} encant.</span>`:''}</div></div></div><div class="item-details hidden" id="${detailsId}"><div class="form-grid"><label>Nome<input data-row="items" data-i="${i}" data-field="name" placeholder="Item" value="${esc(x.name)}"></label><label>Categoria<input data-row="items" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label><label>Custo<input data-row="items" data-i="${i}" data-field="cost" value="${esc(x.cost??'')}"></label><label>Qtd.<input data-row="items" data-i="${i}" data-field="qty" type="number" value="${x.qty||1}"></label><label>Espaços<input data-row="items" data-i="${i}" data-field="weight" type="number" step="0.5" value="${x.weight||0}"></label><label>Grau/Ferramenta amaldiçoada<input data-row="items" data-i="${i}" data-field="grade" placeholder="Ex.: Terceiro, Segundo, Especial" value="${esc(x.grade||'')}"></label><label>Cargas<input data-row="items" data-i="${i}" data-field="enchantmentCharges" placeholder="Ex.: igual ao BT" value="${esc(x.enchantmentCharges??'')}"></label><label>Dano/efeito<input data-row="items" data-i="${i}" data-field="damage" value="${esc(x.damage||'')}"></label><label class="full">Propriedades<input data-row="items" data-i="${i}" data-field="properties" value="${esc(x.properties||'')}"></label></div><div class="mod-box"><strong>Maldições / modificações</strong>${modsHtml}${itemEffectiveBonusesHtml(x)}</div><textarea data-row="items" data-i="${i}" data-field="uniqueAbility" placeholder="Habilidade única, caso seja Grau Especial">${esc(x.uniqueAbility||'')}</textarea><textarea data-row="items" data-i="${i}" data-field="text" placeholder="Descrição, efeitos e observações">${esc(x.text||'')}</textarea><div class="row-actions"><button data-open-item-mod="${i}">Adicionar encantamentos</button>${cleanDiceExpression(x.damage||'')?`<button data-create-attack-from-item="${i}">Criar ataque</button>`:''}<button data-del="items" data-i="${i}">Remover</button></div></div></div>`; }
   if(kind==='attacks') return `<div class="mini-row"><input data-row="attacks" data-i="${i}" data-field="name" placeholder="Nome do ataque" value="${esc(x.name)}"><div class="form-grid"><label>Rolagem de acerto<input data-row="attacks" data-i="${i}" data-field="test" placeholder="Ex.: 1d20+5" value="${esc(x.test||'1d20')}"></label><label>Rolagem de dano<input data-row="attacks" data-i="${i}" data-field="damage" placeholder="Ex.: 1d8+3 ou 1d6 Ct + 1d6 Pf" value="${esc(x.damage||'1d8')}"></label></div><textarea data-row="attacks" data-i="${i}" data-field="notes" placeholder="Notas">${esc(x.notes)}</textarea><div class="row-actions"><button data-roll-attack-hit="${i}">Rolar acerto</button><button data-roll-attack-damage="${i}">Rolar dano</button><button data-del="attacks" data-i="${i}">Remover</button></div></div>`;
   if(kind==='techniques') { const summary=[x.tech||'Feitiço', x.level!==''&&x.level!==undefined?`Nível ${x.level}`:'', x.action||'', x.cost?`Custo ${x.cost}`:''].filter(Boolean); const preview=String(x.text||'').replace(/\s+/g,' ').trim().slice(0,150); const detailsId=`techDetails_${i}`; return `<div class="mini-row compact-card"><div class="compact-summary"><div><strong>${esc(x.name||'Feitiço sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${x.prepared?`<span class="badge good">Preparado</span>`:''}${x.signature?`<span class="badge soft">Marca registrada</span>`:''}</div>${preview?`<p class="muted">${esc(preview)}${String(x.text||'').length>150?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-tech-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="compact-details hidden" id="${detailsId}"><input data-row="techniques" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><input data-row="techniques" data-i="${i}" data-field="tech" placeholder="Técnica vinculada" value="${esc(x.tech||'')}"><input data-row="techniques" data-i="${i}" data-field="level" placeholder="Nível" value="${esc(x.level)}"><input data-row="techniques" data-i="${i}" data-field="action" placeholder="Conjuração" value="${esc(x.action||'')}"><input data-row="techniques" data-i="${i}" data-field="range" placeholder="Alcance" value="${esc(x.range||'')}"><input data-row="techniques" data-i="${i}" data-field="target" placeholder="Alvo" value="${esc(x.target||'')}"><input data-row="techniques" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><input data-row="techniques" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="techniques" data-i="${i}" data-field="damage" placeholder="Dano/cura. Ex.: 4d8+3" value="${esc(x.damage||'')}"><input data-row="techniques" data-i="${i}" data-field="resistance" placeholder="Teste de resistência" value="${esc(x.resistance||'')}"></div><div class="actions-inline tight"><label class="checkline"><input data-tech-toggle="prepared" data-i="${i}" type="checkbox" ${x.prepared?'checked':''}> Preparado</label><label class="checkline"><input data-tech-toggle="signature" data-i="${i}" type="checkbox" ${x.signature?'checked':''}> Marca registrada</label>${x.damage?`<button data-roll-tech-damage="${i}">Rolar dano/cura</button>`:''}<button data-roll-tech-cd="${i}">Mostrar CD</button></div><textarea data-row="techniques" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="techniques" data-i="${i}">Remover</button></div></div>`; }
-  if(kind==='abilities') { const opts=Array.isArray(x.options)?x.options:[]; const selected=Array.isArray(x.selectedOptions)?x.selectedOptions:[]; const optsHtml=opts.length?`<div class="option-box"><strong>Escolhas desta habilidade</strong><p class="muted">Marque as opções/efeitos escolhidos para esta habilidade.</p>${opts.map((op,oi)=>`<button class="choice-pill ${selected.includes(op)?'active':''}" data-ability-option="${i}" data-option-index="${oi}">${esc(op)}</button>`).join('')}</div>`:''; const summary=[abilityLevelLabel(x.level), x.class||'', x.kind||''].filter(Boolean); const preview=String(x.text||'').replace(/\s+/g,' ').trim().slice(0,170); const detailsId=`abilityDetails_${i}`; return `<div class="mini-row ability-card"><div class="ability-summary"><div><strong>${esc(x.name||'Habilidade sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}</div>${preview?`<p class="muted">${esc(preview)}${String(x.text||'').length>170?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-ability-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="ability-details hidden" id="${detailsId}"><input data-row="abilities" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="abilities" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level)}" placeholder="Livre"></label><label>Classe<input data-row="abilities" data-i="${i}" data-field="class" value="${esc(x.class)}" placeholder="Opcional"></label></div>${optsHtml}<textarea data-row="abilities" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="abilities" data-i="${i}">Remover</button></div></div>`; }
-  if(kind==='talents') { const preview=String(x.text||'').replace(/\s+/g,' ').trim().slice(0,170); const summary=[x.category||'Talento', x.level?`Nível ${x.level}`:''].filter(Boolean); return `<div class="mini-row ability-card"><div class="ability-summary"><div><strong>${esc(x.name||'Talento sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}</div>${preview?`<p class="muted">${esc(preview)}${String(x.text||'').length>170?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-talent-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="ability-details hidden" id="talentDetails_${i}"><input data-row="talents" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="talents" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label><label>Categoria<input data-row="talents" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label></div><textarea data-row="talents" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="talents" data-i="${i}">Remover</button></div></div>`; }
+  if(kind==='abilities') {
+    const opts=Array.isArray(x.options)?x.options:[];
+    const selected=Array.isArray(x.selectedOptions)?x.selectedOptions:[];
+    const parts=splitRequirementAndDescription(x);
+    const optsHtml=opts.length?`<div class="option-box"><strong>Escolhas desta habilidade</strong><p class="muted">Marque as opções/efeitos escolhidos para esta habilidade.</p>${opts.map((op,oi)=>`<button class="choice-pill ${selected.includes(op)?'active':''}" data-ability-option="${i}" data-option-index="${oi}">${esc(op)}</button>`).join('')}</div>`:'';
+    const summary=[abilityLevelLabel(x.level), x.class||'', x.kind||''].filter(Boolean);
+    const preview=parts.desc.replace(/\s+/g,' ').trim().slice(0,170);
+    const effects=effectBadgesForEntry(x);
+    const detailsId=`abilityDetails_${i}`;
+    return `<div class="mini-row ability-card"><div class="ability-summary"><div><strong>${esc(x.name||'Habilidade sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${effects.map(v=>`<span class="badge good">${esc(v)}</span>`).join('')}</div>${preview?`<p class="muted">${esc(preview)}${parts.desc.length>170?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-ability-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="ability-details hidden" id="${detailsId}"><input data-row="abilities" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="abilities" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level)}" placeholder="Livre"></label><label>Classe<input data-row="abilities" data-i="${i}" data-field="class" value="${esc(x.class)}" placeholder="Opcional"></label></div><div class="rule-block"><strong>Pré-requisito</strong><p>${esc(parts.prereq||'—')}</p></div><div class="rule-block"><strong>Descrição</strong><p>${esc(parts.desc)}</p></div>${effects.length?`<div class="effect-box"><strong>Bônus permanente aplicado</strong><div class="tag-list">${effects.map(v=>`<span class="badge good">${esc(v)}</span>`).join('')}</div><p class="muted">Esse bônus entra nos cálculos da ficha. Bônus temporários/situacionais ficam só na descrição.</p></div>`:''}${optsHtml}<textarea data-row="abilities" data-i="${i}" data-field="text" placeholder="Descrição">${esc(cleanSheetRuleText(x.text))}</textarea><button data-del="abilities" data-i="${i}">Remover</button></div></div>`;
+  }
+  if(kind==='talents') {
+    const parts=splitRequirementAndDescription(x);
+    const preview=parts.desc.replace(/\s+/g,' ').trim().slice(0,170);
+    const effects=effectBadgesForEntry(x);
+    const summary=[x.category||'Talento', x.level?`Nível ${x.level}`:''].filter(Boolean);
+    return `<div class="mini-row ability-card"><div class="ability-summary"><div><strong>${esc(x.name||'Talento sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${effects.map(v=>`<span class="badge good">${esc(v)}</span>`).join('')}</div>${preview?`<p class="muted">${esc(preview)}${parts.desc.length>170?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-talent-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="ability-details hidden" id="talentDetails_${i}"><input data-row="talents" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><div class="form-grid"><label>Nível necessário<input data-row="talents" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label><label>Categoria<input data-row="talents" data-i="${i}" data-field="category" value="${esc(x.category||'')}"></label></div><div class="rule-block"><strong>Pré-requisito</strong><p>${esc(parts.prereq||'—')}</p></div><div class="rule-block"><strong>Descrição</strong><p>${esc(parts.desc)}</p></div>${effects.length?`<div class="effect-box"><strong>Bônus permanente aplicado</strong><div class="tag-list">${effects.map(v=>`<span class="badge good">${esc(v)}</span>`).join('')}</div><p class="muted">Esse bônus entra nos cálculos da ficha. Bônus temporários/situacionais ficam só na descrição.</p></div>`:''}<textarea data-row="talents" data-i="${i}" data-field="text" placeholder="Descrição">${esc(cleanSheetRuleText(x.text))}</textarea><button data-del="talents" data-i="${i}">Remover</button></div></div>`;
+  }
   if(kind==='invocations') { const detailsId=`invocationDetails_${i}`; const summary=[x.type||'Invocação', x.grade||'', x.hp?`PV ${x.hpCurrent||x.hp}/${x.hp}`:'', x.defense?`Def ${x.defense}`:''].filter(Boolean); const preview=String(x.traits||x.text||'').replace(/\s+/g,' ').trim().slice(0,150); return `<div class="mini-row compact-card"><div class="compact-summary"><div><strong>${esc(x.name||'Invocação sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${x.active?`<span class="badge good">Ativa</span>`:''}${x.companion?`<span class="badge soft">Companheira</span>`:''}</div>${preview?`<p class="muted">${esc(preview)}${String(x.traits||x.text||'').length>150?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-invocation-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="compact-details hidden" id="${detailsId}"><input data-row="invocations" data-i="${i}" data-field="name" placeholder="Nome da invocação" value="${esc(x.name)}"><div class="form-grid"><input data-row="invocations" data-i="${i}" data-field="type" placeholder="Tipo: Shikigami, Marionete..." value="${esc(x.type||'')}"><input data-row="invocations" data-i="${i}" data-field="grade" placeholder="Grau" value="${esc(x.grade||'')}"><input data-row="invocations" data-i="${i}" data-field="cost" placeholder="Custo de invocação/manutenção" value="${esc(x.cost||'')}"><input data-row="invocations" data-i="${i}" data-field="hp" placeholder="PV máximo" value="${esc(x.hp||'')}"><input data-row="invocations" data-i="${i}" data-field="hpCurrent" placeholder="PV atual" value="${esc(x.hpCurrent||'')}"><input data-row="invocations" data-i="${i}" data-field="defense" placeholder="Defesa" value="${esc(x.defense||'')}"><input data-row="invocations" data-i="${i}" data-field="movement" placeholder="Deslocamento" value="${esc(x.movement||'')}"><input data-row="invocations" data-i="${i}" data-field="actions" placeholder="Ações/comandos" value="${esc(x.actions||'')}"></div><div class="actions-inline tight"><label class="checkline"><input data-invocation-toggle="active" data-i="${i}" type="checkbox" ${x.active?'checked':''}> Ativa em campo</label><label class="checkline"><input data-invocation-toggle="companion" data-i="${i}" type="checkbox" ${x.companion?'checked':''}> Companheira amaldiçoada</label></div><textarea data-row="invocations" data-i="${i}" data-field="traits" placeholder="Características, resistências, sentidos, habilidades passivas">${esc(x.traits||'')}</textarea><textarea data-row="invocations" data-i="${i}" data-field="text" placeholder="Ataques, ações, regras especiais e observações">${esc(x.text||'')}</textarea><button data-del="invocations" data-i="${i}">Remover</button></div></div>`; }
   if(kind==='domains') { const detailsId=`domainDetails_${i}`; const summary=[x.type||'Domínio', x.technique||'', x.cost?`Custo ${x.cost}`:'', x.area||''].filter(Boolean); const preview=String(x.text||'').replace(/\s+/g,' ').trim().slice(0,150); return `<div class="mini-row compact-card"><div class="compact-summary"><div><strong>${esc(x.name||'Expansão sem nome')}</strong><div class="row-head">${summary.map(v=>`<span class="badge soft">${esc(v)}</span>`).join('')}${x.level?`<span class="badge soft">Nível ${esc(x.level)}</span>`:''}</div>${preview?`<p class="muted">${esc(preview)}${String(x.text||'').length>150?'...':''}</p>`:''}</div><button class="item-toggle" data-toggle-domain-details="${i}" aria-label="Ver detalhes">⌄</button></div><div class="compact-details hidden" id="${detailsId}"><input data-row="domains" data-i="${i}" data-field="name" placeholder="Nome da expansão" value="${esc(x.name)}"><div class="form-grid"><input data-row="domains" data-i="${i}" data-field="technique" placeholder="Técnica vinculada" value="${esc(x.technique||'')}"><input data-row="domains" data-i="${i}" data-field="type" placeholder="Tipo" value="${esc(x.type||'')}"><input data-row="domains" data-i="${i}" data-field="cost" placeholder="Custo" value="${esc(x.cost||'')}"><input data-row="domains" data-i="${i}" data-field="area" placeholder="Área" value="${esc(x.area||'')}"><input data-row="domains" data-i="${i}" data-field="duration" placeholder="Duração" value="${esc(x.duration||'')}"><label>Nível necessário<input data-row="domains" data-i="${i}" data-field="level" type="number" min="1" max="20" value="${esc(x.level||'')}"></label></div><textarea data-row="domains" data-i="${i}" data-field="text" placeholder="Efeitos, acerto garantido, regras e observações">${esc(x.text)}</textarea><button data-del="domains" data-i="${i}">Remover</button></div></div>`; }
   return `<div class="mini-row"><input data-row="${kind}" data-i="${i}" data-field="name" placeholder="Nome" value="${esc(x.name)}"><textarea data-row="${kind}" data-i="${i}" data-field="text" placeholder="Descrição">${esc(x.text)}</textarea><button data-del="${kind}" data-i="${i}">Remover</button></div>`;
@@ -5560,7 +5691,7 @@ function renderOriginTalentGrant(sheet){
   if(!grant){ box.innerHTML=''; return; }
   const talents=TALENT_LIBRARY.filter(t=>!(sheet.talents||[]).some(x=>x.name===t.name));
   box.innerHTML = `<div class="rule-card accent"><h3>${esc(grant.title)}</h3><p>${esc(grant.text)}</p><div class="choice-grid">${talents.map((t,i)=>`<button data-origin-talent="${esc(t.name)}"><strong>${esc(t.name)}</strong><small>${esc(t.category||'Geral')} • Nv. ${talentReqLevel(t)} • ${esc(t.prereq||'—')}</small></button>`).join('') || '<p class="muted">Todos os talentos da biblioteca já foram adicionados.</p>'}</div></div>`;
-  $$('[data-origin-talent]', box).forEach(btn=>btn.onclick=()=>{ const t=TALENT_LIBRARY.find(x=>x.name===btn.dataset.originTalent); if(!t) return; sheet.talents.push({name:t.name, level:talentReqLevel(t), category:t.category||'Geral', text:`Talento adicional da origem ${sheet.origin}.\nPré-requisito: ${t.prereq||'—'}\n\n${t.text}`}); save(); renderRows(sheet); });
+  $$('[data-origin-talent]', box).forEach(btn=>btn.onclick=()=>{ const t=TALENT_LIBRARY.find(x=>x.name===btn.dataset.originTalent); if(!t) return; sheet.talents.push({name:t.name, level:talentReqLevel(t), category:t.category||'Geral', text:cleanSheetRuleText(`Pré-requisito: ${t.prereq||'—'}\n\n${t.text}`)}); save(); renderRows(sheet); });
 }
 function renderOriginRefinement(sheet){
   const box=$('#originRefinementPanel'); if(!box) return;
@@ -5752,7 +5883,7 @@ function renderAbilityChooser(){
     const badges = abilityRequirementBadges(sheet,a).map(t=>`<span class="mini-badge ${String(t).startsWith('Falta')||String(t).includes('Bloqueada')?'bad':'ok'}">${esc(t)}</span>`).join('');
     return `<div class="library-card ${res.ok?'':'unavailable'}"><h3>${esc(a.name)}</h3><p class="muted">${esc(a.class)} • ${esc(a.kind || 'Escolha')} • requisito: nível ${req}${prereq}</p><div class="req-badges">${badges}</div><p>${esc(a.text)}</p><p class="reason">${esc(res.reason)}</p><button data-add-ability-lib="${i}" ${res.ok?'':'disabled'}>Adicionar</button></div>`;
   }).join('') || '<p class="muted">Nenhuma habilidade neste filtro.</p>';
-  $$('[data-add-ability-lib]').forEach(btn=>btn.onclick=()=>{ const a=ABILITY_LIBRARY[Number(btn.dataset.addAbilityLib)]; const req=abilityReqLevel(a); sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Escolha', text:`${a.prereq?'Pré-requisito: '+a.prereq+'\n\n':''}${a.text}`, options:a.options||[], selectedOptions:[]}); save(); renderRows(sheet); renderAbilityChooser(); });
+  $$('[data-add-ability-lib]').forEach(btn=>btn.onclick=()=>{ const a=ABILITY_LIBRARY[Number(btn.dataset.addAbilityLib)]; const req=abilityReqLevel(a); sheet.abilities.push({name:a.name, class:a.class, level:req, kind:a.kind || 'Escolha', text:cleanSheetRuleText(`${a.prereq?'Pré-requisito: '+a.prereq+'\n\n':''}${a.text}`), options:a.options||[], selectedOptions:[]}); save(); renderRows(sheet); renderAbilityChooser(); });
 }
 
 function renderAptitudeChooser(){
@@ -5803,7 +5934,7 @@ function renderTalentChooser(){
     return true;
   });
   $('#talentChooser').innerHTML = data.map(({t,i})=>{ const res=canUseTalent(sheet,t); return `<div class="library-card ${res.ok?'':'unavailable'}"><h3>${esc(t.name)}</h3><p class="muted">${esc(t.category||'Geral')} • nível ${talentReqLevel(t)} • ${esc(t.prereq||'—')}</p><p>${esc(t.text)}</p><p class="reason">${esc(res.reason)}</p><button data-add-talent-lib="${i}" ${res.ok?'':'disabled'}>Adicionar</button></div>`; }).join('') || '<p class="muted">Nenhum talento neste filtro.</p>';
-  $$('[data-add-talent-lib]').forEach(btn=>btn.onclick=()=>{ const t=TALENT_LIBRARY[Number(btn.dataset.addTalentLib)]; sheet.talents.push({name:t.name, level:talentReqLevel(t), category:t.category||'Geral', text:`Pré-requisito: ${t.prereq||'—'}\n\n${t.text}`}); save(); renderRows(sheet); renderTalentChooser(); });
+  $$('[data-add-talent-lib]').forEach(btn=>btn.onclick=()=>{ const t=TALENT_LIBRARY[Number(btn.dataset.addTalentLib)]; sheet.talents.push({name:t.name, level:talentReqLevel(t), category:t.category||'Geral', text:cleanSheetRuleText(`Pré-requisito: ${t.prereq||'—'}\n\n${t.text}`)}); save(); renderRows(sheet); renderTalentChooser(); });
 }
 
 function renderItemChooser(){

@@ -99,3 +99,16 @@ button.primary,.primary{background:linear-gradient(135deg,#5b000c,#8f0b17)}
 .nav button.active,.subnav button.active{background:#2b080d;border-color:#8f0b17}
 .level-tabs button.active{background:linear-gradient(135deg,#5b000c,#8f0b17);border-color:rgba(255,255,255,.24)}
 .choice:hover,.choice.active{border-color:#8f0b17;background:#25080c}
+
+/* v0.48: cartões de efeito e descrição limpa */
+.rule-block,.effect-box{
+  border:1px solid rgba(190,18,60,.35);
+  background:rgba(20,0,8,.55);
+  border-radius:14px;
+  padding:.8rem;
+  margin:.65rem 0;
+}
+.rule-block strong,.effect-box strong{display:block;margin-bottom:.35rem;color:#fff;}
+.rule-block p,.effect-box p{margin:.25rem 0;white-space:pre-wrap;}
+.badge.good{background:rgba(22,101,52,.55);border-color:rgba(34,197,94,.35);color:#dcfce7;}
+.mod-detail-card .muted{line-height:1.45;}
