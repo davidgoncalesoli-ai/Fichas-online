@@ -367,17 +367,17 @@ body:not(.home-active) .home-bg{display:none;}
   .landing-title::after{transform:translateX(-50%) translate(7px,10px)}
 }
 
-/* v0.57/v0.58 - home com título em imagem e fundo deitado */
+/* v0.59 - home refinada com fundo visível e sombra em pincel */
 .home-bg{
   position:absolute;
-  inset:-6%;
+  inset:-4%;
   background-image:url("assets/home-bg-landscape.jpg");
   background-repeat:no-repeat;
   background-size:cover;
   background-position:center center;
-  filter:blur(5px) saturate(1.15) contrast(1.05) brightness(.70);
-  transform:scale(1.10);
-  opacity:.92;
+  filter:blur(2.2px) saturate(1.10) contrast(1.03) brightness(.74);
+  transform:scale(1.06);
+  opacity:.96;
   z-index:0;
 }
 .landing-center{
@@ -392,10 +392,11 @@ body:not(.home-active) .home-bg{display:none;}
 }
 .landing-title{
   position:relative;
+  isolation:isolate;
   margin:0;
-  width:min(92vw, 820px);
-  height:clamp(90px, 15vw, 170px);
-  background-image:url("assets/exorcizados-title-v2.png");
+  width:min(92vw, 860px);
+  height:clamp(92px, 15vw, 178px);
+  background-image:url("assets/exorcizados-title-clean.png");
   background-repeat:no-repeat;
   background-position:center;
   background-size:contain;
@@ -403,18 +404,174 @@ body:not(.home-active) .home-bg{display:none;}
   font-size:0 !important;
   line-height:1;
   text-shadow:none !important;
-  filter:drop-shadow(0 0 0 #000) drop-shadow(4px 0 0 #000) drop-shadow(-4px 0 0 #000) drop-shadow(0 4px 0 #000) drop-shadow(0 -4px 0 #000) drop-shadow(3px 3px 0 #000) drop-shadow(-3px 3px 0 #000) drop-shadow(3px -3px 0 #000) drop-shadow(-3px -3px 0 #000) drop-shadow(0 16px 28px rgba(0,0,0,.85)) drop-shadow(0 0 42px rgba(115,0,12,.78));
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.42)) drop-shadow(0 0 18px rgba(115,0,12,.45));
 }
-.landing-title::before,
-.landing-title::after{
-  display:none !important;
+.landing-title::before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(88vw, 760px);
+  height:clamp(84px, 11vw, 148px);
+  background-image:url("assets/title-brush.png");
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:contain;
+  opacity:.98;
+  z-index:-1;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.32));
 }
+.landing-title::after{display:none !important;}
 .landing-main-action,
 .landing-secondary-action{
   font-weight:900;
   letter-spacing:.02em;
 }
 @media(max-width:720px){
-  .home-bg{inset:-10%; transform:scale(1.18); background-position:center center;}
+  .home-bg{inset:-8%; transform:scale(1.1); background-position:center center; filter:blur(1.6px) saturate(1.08) contrast(1.02) brightness(.76);}
   .landing-title{width:94vw;height:clamp(74px,24vw,128px);}
+  .landing-title::before{width:min(88vw, 460px); height:min(88vw, 460px);}
+}
+
+
+/* v0.61 - correção navegação home/fichas */
+.home-landing.tab{
+  display:none !important;
+}
+.home-landing.tab.active{
+  display:grid !important;
+}
+body:not(.home-active) .home-landing{
+  display:none !important;
+}
+
+
+/* v0.62 - home cleaner */
+.home-landing{
+  background:linear-gradient(180deg,#120002 0%, #170003 46%, #140002 100%);
+}
+.home-landing::before{
+  background:linear-gradient(180deg, rgba(5,0,0,.22), rgba(16,0,2,.28) 62%, rgba(12,0,1,.34) 100%) !important;
+}
+.home-landing::after{display:none !important; content:none !important;}
+.home-bg{
+  inset:0 !important;
+  background-image:url("assets/home-bg-landscape.jpg") !important;
+  background-repeat:no-repeat !important;
+  background-size:cover !important;
+  background-position:center center !important;
+  filter:saturate(1.08) contrast(1.04) brightness(.72) !important;
+  transform:none !important;
+  opacity:.82 !important;
+}
+.landing-center{
+  min-height:100vh;
+  width:min(100%, 1400px) !important;
+  padding:2rem 2rem 3rem;
+  align-content:center;
+}
+#homeQuickNav{display:none !important;}
+.landing-actions{
+  gap:.75rem;
+  margin-top:.25rem;
+}
+.landing-main-action,
+.landing-secondary-action{
+  min-width:170px;
+}
+.landing-brand-strip{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:2rem;
+  display:grid;
+  justify-items:center;
+  gap:.2rem;
+  text-align:center;
+  z-index:3;
+}
+.landing-brand-strip .eyebrow{
+  margin:0;
+  color:#d31928;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  font-size:.78rem;
+  font-weight:900;
+}
+.landing-brand-strip h3{
+  margin:0;
+  font-size:clamp(1.75rem, 3vw, 2.4rem);
+  line-height:1;
+}
+.landing-brand-strip span{
+  color:var(--muted);
+  font-size:1.25rem;
+}
+@media(max-width:720px){
+  .landing-brand-strip{bottom:1.2rem;}
+  .landing-brand-strip span{font-size:1rem;}
+}
+
+
+/* v0.63 - home title sem fundo e navegação inferior */
+.landing-title::before,
+.landing-title::after{
+  display:none !important;
+  content:none !important;
+  background:none !important;
+}
+.landing-title{
+  filter:drop-shadow(0 8px 18px rgba(0,0,0,.30)) drop-shadow(0 0 12px rgba(115,0,12,.28)) !important;
+}
+.home-quick-nav-bottom{
+  display:flex !important;
+  gap:.75rem;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:.85rem;
+}
+.home-quick-nav-bottom button{
+  background:rgba(19,0,2,.72);
+  color:var(--text);
+  border:1px solid rgba(201,24,36,.45);
+  border-radius:999px;
+  padding:.72rem 1rem;
+  font-weight:700;
+  cursor:pointer;
+}
+.home-quick-nav-bottom button:hover{
+  border-color:rgba(255,76,93,.8);
+  background:rgba(45,0,6,.82);
+}
+.landing-brand-strip{
+  gap:.28rem;
+  bottom:1.4rem;
+}
+.landing-brand-strip span{
+  margin-bottom:.15rem;
+}
+@media(max-width:720px){
+  .home-quick-nav-bottom{gap:.55rem;margin-top:.65rem;}
+  .home-quick-nav-bottom button{padding:.62rem .9rem;font-size:.95rem;}
+}
+
+
+/* v0.64 - correção botões inferiores e preparo para GIF */
+.home-bg{
+  background-image:url("assets/home-bg.gif"), url("assets/home-bg-landscape.jpg") !important;
+}
+#homeQuickNav.home-quick-nav-bottom,
+body:not(.has-sheets) #homeQuickNav.home-quick-nav-bottom,
+body.has-sheets #homeQuickNav.home-quick-nav-bottom{
+  display:flex !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+.landing-brand-strip #homeQuickNav.home-quick-nav-bottom{
+  display:flex !important;
+  margin-top:.85rem;
+}
+.landing-brand-strip{
+  z-index:5;
 }
