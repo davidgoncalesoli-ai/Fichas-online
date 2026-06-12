@@ -23,6 +23,25 @@ const esc = (v='') => String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<'
 function norm(v=''){ return String(v ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim(); }
 const makeId = () => crypto.randomUUID ? crypto.randomUUID() : String(Date.now()+Math.random());
 
+// Estado principal da aplicação. Mantém compatibilidade com chaves antigas e novas do localStorage.
+let sheets = readJsonStorage(['exorcizados_sheets','fem_sheets','femSheets','fem-ficha-online-sheets'], []);
+if(!Array.isArray(sheets)) sheets = [];
+let activeId = readJsonStorage(['exorcizados_active','fem_active','femActive','fem-ficha-online-active'], null);
+function save(){
+  safeStorage.set('exorcizados_sheets', JSON.stringify(sheets));
+  safeStorage.set('exorcizados_active', JSON.stringify(activeId));
+  // chaves antigas preservadas para migração suave entre versões
+  safeStorage.set('fem_sheets', JSON.stringify(sheets));
+  safeStorage.set('fem_active', JSON.stringify(activeId));
+}
+function current(){
+  if(activeId){
+    const found = sheets.find(s => s && s.id === activeId);
+    if(found) return found;
+  }
+  return sheets[0] || null;
+}
+
 const ATTRS = ['Força','Destreza','Constituição','Inteligência','Sabedoria','Presença'];
 const ATTR_KEY = {FOR:'Força', DES:'Destreza', CON:'Constituição', INT:'Inteligência', SAB:'Sabedoria', PRE:'Presença'};
 const SKILLS = [
