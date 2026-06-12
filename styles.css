@@ -169,3 +169,59 @@ button.primary,.primary{background:linear-gradient(135deg,#5b000c,#8f0b17)}
   .hp-card{grid-column:span 1;}
   .progress-card{min-height:auto;}
 }
+
+
+/* v0.55 — cards mais largos e estáveis */
+.progress-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr)) !important;
+  gap:14px !important;
+  align-items:stretch;
+}
+.progress-card,.rule-card,.calc-card,.library-card,.ability-card,.item-card,.mini-row{
+  min-width:190px;
+  padding:1.05rem !important;
+  line-height:1.45;
+}
+.progress-card strong,.rule-card h3,.library-card h3{
+  line-height:1.2;
+}
+.progress-card span{
+  display:block;
+  letter-spacing:.04em;
+  max-width:100%;
+}
+#abilityProgress .progress-card{
+  min-height:128px;
+}
+#abilityProgress .progress-card.action{
+  display:grid;
+  align-content:start;
+  gap:.65rem;
+}
+#invocationSummary{
+  width:100%;
+}
+#invocationSummary > .rule-card{
+  grid-column:1 / -1;
+  width:100%;
+  max-width:none;
+}
+#invocationSummary .stat-grid.compact{
+  grid-template-columns:repeat(auto-fit,minmax(140px,1fr)) !important;
+}
+#invocationSummary .actions-inline{
+  display:flex;
+  flex-wrap:wrap;
+  gap:.6rem;
+}
+.mod-detail-card p:last-of-type{
+  line-height:1.5;
+}
+.mod-detail-card .muted + p + p{
+  color:var(--text);
+}
+@media(max-width:760px){
+  .progress-card,.rule-card,.calc-card,.library-card,.ability-card,.item-card,.mini-row{min-width:0;}
+  .progress-grid{grid-template-columns:1fr !important;}
+}

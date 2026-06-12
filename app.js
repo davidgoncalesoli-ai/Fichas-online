@@ -4795,41 +4795,41 @@ function enrichLibraryDescriptionsV39() {
   "Invocação Personalizada": "Modelo livre para invocação criada pela técnica, talento ou decisão do narrador. Preencha função, custo, PV, defesa, ataques e comandos."
 };
   const enchantPatches = {
-  "Afiada": "Encantamento/modificação Afiada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Amplificadora": "Encantamento/modificação Amplificadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Armazenadora": "Encantamento/modificação Armazenadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Balanceada": "Encantamento/modificação Balanceada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Canalizadora": "Encantamento/modificação Canalizadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Cano Alongado": "Encantamento/modificação Cano Alongado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Certeira": "Encantamento/modificação Certeira. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Compartimento": "Encantamento/modificação Compartimento. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Complementar": "Encantamento/modificação Complementar. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Cruel": "Aumenta letalidade do golpe. Na ficha, já pode ser tratado como bônus direto de dano se a mesa permitir.",
-  "Defensora": "Encantamento/modificação Defensora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Destruidora": "Encantamento/modificação Destruidora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Discreta": "Encantamento/modificação Discreta. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Drenadora": "Encantamento/modificação Drenadora. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Elemental": "Adiciona dano ou efeito elemental. Registre o elemento escolhido e se ele troca ou soma dano.",
-  "Harmonizada": "Encantamento/modificação Harmonizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Horrenda": "Encantamento/modificação Horrenda. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Longa": "Encantamento/modificação Longa. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Otimizada": "Encantamento/modificação Otimizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Penetrante": "Encantamento/modificação Penetrante. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Poderosa": "Aumenta força geral do ataque. Na ficha pode ser bônus direto de dano quando aplicável.",
-  "Potente": "Encantamento/modificação Potente. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Precisa": "Aumenta precisão. Na ficha pode entrar como bônus direto de acerto se a regra da mesa permitir.",
-  "Reluzente": "Encantamento/modificação Reluzente. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Retorno": "Permite a arma voltar ao usuário ou ser recuperada com facilidade. Registre ação, alcance e condição para retornar.",
-  "Sintonizada": "Encantamento/modificação Sintonizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Avassalador": "Encantamento/modificação Avassalador. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Bloqueador": "Encantamento/modificação Bloqueador. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Espinhoso": "Encantamento/modificação Espinhoso. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Reforçado": "Encantamento/modificação Reforçado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Blindado": "Encantamento/modificação Blindado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Furtivo": "Encantamento/modificação Furtivo. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Material Pesado": "Encantamento/modificação Material Pesado. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso.",
-  "Maldição Personalizada": "Encantamento/modificação Maldição Personalizada. Use esta entrada para registrar o efeito aplicado ao equipamento, conferindo tipo compatível, pré-requisito, bônus direto e observações de uso."
-};
+  "Afiada": "Concentra energia amaldiçoada no fio ou na ponta da arma, tornando ferimentos críticos mais graves e cortes/perfurações mais letais.",
+  "Amplificadora": "Canaliza melhor a energia do usuário através da arma, facilitando técnicas, golpes imbuídos ou efeitos que dependam de condução amaldiçoada.",
+  "Armazenadora": "Permite guardar energia, carga ou efeito dentro do item para ser liberado depois, conforme o limite definido pelo narrador.",
+  "Balanceada": "Ajusta peso, empunhadura e fluxo de energia da arma, tornando o manejo mais estável e confiável.",
+  "Canalizadora": "Transforma a arma em um bom condutor de energia amaldiçoada, útil para golpes reforçados, feitiços canalizados ou técnicas que usam a arma como foco.",
+  "Cano Alongado": "Modificação voltada a armas de disparo, aumentando estabilidade e alcance efetivo em ataques à distância.",
+  "Certeira": "A arma guia melhor o golpe ou disparo, aumentando a precisão de ataques feitos com ela.",
+  "Compartimento": "Adiciona um espaço oculto ou funcional ao equipamento para guardar pequenos itens, cargas, munições ou componentes.",
+  "Complementar": "Modificação de apoio que melhora o uso do item junto de outro equipamento, estilo de luta ou técnica compatível.",
+  "Cruel": "Aumenta a violência do impacto, corte ou perfuração, fazendo os golpes causarem mais dano quando acertam.",
+  "Defensora": "Permite usar o item para se proteger melhor, aparar golpes ou reforçar a postura defensiva quando aplicável.",
+  "Destruidora": "Especializada em quebrar proteção, objeto, armadura ou barreira física, conforme a situação da mesa.",
+  "Discreta": "Torna o item mais fácil de ocultar, sacar sem chamar atenção ou usar sem revelar imediatamente sua natureza amaldiçoada.",
+  "Drenadora": "O item puxa energia, vitalidade ou força do alvo quando o efeito apropriado é ativado, conforme a regra definida pelo narrador.",
+  "Elemental": "Imbui o item com um elemento escolhido, adicionando dano ou efeito elemental aos ataques compatíveis.",
+  "Harmonizada": "O item responde melhor ao usuário sintonizado, reduzindo conflito de energia e facilitando usos repetidos.",
+  "Horrenda": "A aparência ou presença amaldiçoada do item causa pressão, medo ou desconforto, podendo ajudar em intimidação ou efeitos narrativos.",
+  "Longa": "Aumenta o alcance, extensão ou área de ameaça do item, quando o formato do equipamento permitir.",
+  "Otimizada": "Remove desperdício de movimento, peso ou energia, deixando o uso do equipamento mais eficiente.",
+  "Penetrante": "Foca o impacto em atravessar defesa, armadura ou resistência, tornando golpes mais difíceis de absorver.",
+  "Poderosa": "Reforça a potência geral da arma, aumentando o dano direto causado pelos ataques.",
+  "Potente": "Aumenta a força do efeito principal do item, melhorando impacto, pressão, empurrão ou dano conforme o equipamento.",
+  "Precisa": "Melhora equilíbrio e mira, concedendo mais controle em ataques e manobras feitas com o item.",
+  "Reluzente": "O item emite presença, brilho ou energia evidente, podendo iluminar, sinalizar ou impressionar conforme a cena.",
+  "Retorno": "Permite recuperar a arma após arremesso ou afastamento, fazendo-a voltar ao usuário dentro das condições definidas.",
+  "Sintonizada": "O item se vincula ao usuário, respondendo melhor à sua energia e podendo exigir sintonia para liberar o efeito completo.",
+  "Avassalador": "Aumenta a pressão ofensiva do equipamento, favorecendo golpes pesados, quebras ou ataques de impacto dominante.",
+  "Bloqueador": "Fortalece a capacidade de bloquear, aparar ou conter ataques recebidos com o item.",
+  "Espinhoso": "Adiciona partes agressivas ao equipamento, causando dano ou punição em contato, agarrão ou bloqueio próximo.",
+  "Reforçado": "Aumenta durabilidade e resistência estrutural do item, tornando-o mais difícil de quebrar ou inutilizar.",
+  "Blindado": "Reforça uniformes, escudos ou proteções, melhorando resistência contra ataques diretos.",
+  "Furtivo": "Reduz ruído, brilho ou rastros do equipamento, facilitando aproximação, ocultação ou uso discreto.",
+  "Material Pesado": "Usa material mais denso ou robusto, aumentando impacto e resistência, mas podendo dificultar manuseio.",
+  "Maldição Personalizada": "Encantamento criado para a campanha. Preencha o efeito, pré-requisito, bônus e limitações combinadas com o narrador."
+}
   const domainPatches = {
   "Expansão de Domínio Incompleta": "Forma inicial ou instável de domínio. Registre área, custo, efeito principal e quais limitações impedem acerto garantido completo.",
   "Expansão de Domínio Completa": "Manifestação completa do domínio interno. Registre aparência, área, técnica vinculada, efeito de acerto garantido, custo e condições para sustentar.",
@@ -4876,8 +4876,7 @@ function enrichLibraryDescriptionsV39() {
 
   ITEM_ENCHANTMENT_LIBRARY.forEach(m => {
     if(enchantPatches[m.name]) m.text = enchantPatches[m.name];
-    const meta = ['Tipo: '+(m.type||'geral'), m.prereq ? 'Pré-requisito: '+m.prereq : '', m.attackBonus ? 'Bônus de acerto: '+(m.attackBonus>0?'+':'')+m.attackBonus : '', m.damageBonus ? 'Bônus de dano: '+(m.damageBonus>0?'+':'')+m.damageBonus : ''].filter(Boolean).join(' • ');
-    m.text = (meta ? meta + '.\n\n' : '') + String(m.text||'').trim() + '\n\nAplicação: adicione ao item, confira se o tipo de equipamento é compatível e ajuste ataques derivados se o efeito alterar acerto, dano, alcance ou propriedade.';
+    m.text = String(m.text||'').replace(/Tipo:.*?(?:Aplicação:.*)?$/gis,'').replace(/Encantamento\/modificação\s+[^.]+\.\s*/i,'').trim();
   });
 
   DOMAIN_LIBRARY.forEach(d => {
@@ -4909,12 +4908,13 @@ function enrichLibraryDescriptionsV39() {
       a.text = `${kind} de ${a.class||'especialização'} desbloqueada no nível ${level}. Use este campo para registrar o efeito oficial da habilidade, pré-requisitos, custo, ação e limitações. Se a habilidade tiver escolhas internas, marque as opções dentro da ficha.`;
     }
     const req = a.prereq ? 'Pré-requisito: ' + a.prereq + '.\n\n' : '';
-    if(!String(a.text||'').includes('Resumo de ficha:')) a.text = req + String(a.text||'').trim() + '\n\nResumo de ficha: confira nível, especialização e pré-requisitos antes de usar; registre custo, ação, gatilho e usos por descanso/cena quando existirem.';
+    a.text = (req + String(a.text||'').replace(/Resumo de ficha:.*$/gis,'').trim()).trim();
   });
 }
 enrichLibraryDescriptionsV39();
 
 const RULES = [
+  {title:'v0.55', text:'Encantamentos limpos, sem bloco genérico de tipo/aplicação, e cards de resumo mais largos e estáveis visualmente.'},
   {title:'Automação atual', text:'PV, PE/Estamina, Defesa, Atenção, Iniciativa, CD e perícias são calculados a partir de nível, atributos, classe e treinamento.'},
   {title:'v0.7', text:'Habilidades separadas por abas de nível.'},
   {title:'v0.8', text:'Aba de habilidades corrigida para nível necessário de desbloqueio, com filtros por nível exigido.'},
