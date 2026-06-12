@@ -72,3 +72,6 @@
 .choice-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;margin-top:10px}
 .choice-grid button{text-align:left;display:flex;flex-direction:column;gap:4px}
 .rule-card.accent{border-color:rgba(99,102,241,.35);background:rgba(99,102,241,.08);margin-bottom:12px}
+
+.pill{display:inline-block;margin-left:.35rem;padding:.1rem .35rem;border:1px solid rgba(255,255,255,.18);border-radius:999px;font-size:.72rem;color:#d9b8ff;background:rgba(132,70,180,.15)}
+.choice-grid.compact{grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:.55rem}.choice-grid.compact .choice{padding:.7rem}.choice.disabled{opacity:.55;cursor:not-allowed}.scroll-box{max-height:290px;overflow:auto;padding-right:.25rem}.pill-row{display:flex;gap:.4rem;flex-wrap:wrap;margin:.5rem 0}.switch-line{display:flex;align-items:center;gap:.6rem;margin-top:1rem;font-weight:700}.switch-line input{width:auto}

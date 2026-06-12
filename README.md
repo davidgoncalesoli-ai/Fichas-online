@@ -1,4 +1,4 @@
-# F&M Ficha Online v0.29
+# F&M Ficha Online v0.31
 
 # F&M Ficha Online v0.16
 
@@ -25,7 +25,7 @@ Ainda há itens com descrição estrutural/resumida. A meta continua ser cadastr
 - Próxima frente: completar textos e pré-requisitos das habilidades oficiais.
 
 
-## v0.29
+## v0.31
 
 - Biblioteca de técnicas inatas ampliada.
 - Biblioteca de feitiços/habilidades de técnica ampliada por técnica.
@@ -39,19 +39,31 @@ Ainda há itens com descrição estrutural/resumida. A meta continua ser cadastr
 - Ataques criados a partir de armas consideram bônus simples de acerto/dano das modificações cadastradas.
 
 
-## v0.29
+## v0.31
 - Atributos pós-criação agora aumentam apenas por pontos de evolução.
 - Modificadores temporários ficam separados dos atributos permanentes.
 
 
-## v0.29
+## v0.31
 
 - Refinamento dos pré-requisitos de habilidades.
 - Biblioteca de habilidades agora identifica requisitos por nível, classe, perícia treinada/mestre, atributo mínimo e habilidades prévias citadas no pré-requisito.
 - Cards de habilidade exibem marcadores visuais de requisitos atendidos e faltantes.
 
 
-## v0.29
+## v0.31
 - Revisão de descrições provisórias das habilidades automáticas e principais.
 - Novo painel de pré-requisitos pendentes nas habilidades adicionadas.
 - A ficha agora avisa quando uma habilidade cadastrada ficou incompatível com nível, classe, perícia, atributo, aptidão ou habilidade exigida.
+
+
+## v0.31
+- Refinamento das origens: painel dedicado por origem, clãs para Herdado, anatomias para Feto Amaldiçoado Híbrido, núcleos para Corpo Amaldiçoado Mutante e avisos/benefícios de Sem Técnica, Derivado, Inato e Restringido.
+
+
+## v0.31
+- Bônus de origem agora são aplicados separadamente dos pontos de evolução.
+- Origem Inato/Derivado/Feto/Herdado permite escolher bônus +2/+1.
+- Restringido aplica bônus físicos e pontos físicos extras.
+- Sem Técnica e Corpo Amaldiçoado Mutante possuem distribuição própria de pontos de origem.
+- A aba Status mostra Base + Evolução + Origem + Temporário, evitando somar bônus duas vezes.

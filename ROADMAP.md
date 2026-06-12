@@ -42,3 +42,11 @@
 - Revisão de descrições provisórias das habilidades automáticas e principais.
 - Novo painel de pré-requisitos pendentes nas habilidades adicionadas.
 - A ficha agora avisa quando uma habilidade cadastrada ficou incompatível com nível, classe, perícia, atributo, aptidão ou habilidade exigida.
+
+
+## v0.30
+- Origens refinadas com escolhas e resumos mecânicos. Próximo passo: automatizar aplicação de bônus de atributo e treinamentos por origem sem duplicidade.
+
+## Próximo
+- Refinar treinamentos automáticos por origem/clã.
+- Aplicar escolhas de origem em perícias, talentos e técnicas iniciais.

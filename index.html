@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>F&M Ficha Online - v0.29</title>
+  <title>F&M Ficha Online - v0.34</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -11,7 +11,7 @@
     <div class="brand">
       <p class="eyebrow">Feiticeiros & Maldições</p>
       <h1>Ficha Online</h1>
-      <span class="version">v0.23 — atributos por evolução e modificadores temporários</span>
+      <span class="version">v0.34 — criação guiada por classe, treinamentos e equipamento inicial</span>
     </div>
     <nav class="nav">
       <button data-tab="home" class="active">Início</button>
@@ -27,14 +27,14 @@
         <div>
           <p class="eyebrow">Projeto pessoal</p>
           <h2>Agora a ficha começa a ficar compartilhável e organizada.</h2>
-          <p>A v0.23 adiciona evolução de atributos por pontos de nível e modificadores temporários separados, sem permitir editar atributos livremente após a criação.</p>
+          <p>A v0.34 melhora o assistente de criação com escolhas iniciais de especialização, perícias, habilidades automáticas e equipamentos.</p>
           <div class="actions-inline">
             <button id="startCreate" class="primary">+ Criar ficha</button>
             <button id="goSheets">Ver fichas</button>
           </div>
         </div>
         <aside class="hero-panel">
-          <strong>v0.13 entrega</strong>
+          <strong>v0.34 entrega</strong>
           <span>✓ Cálculo de PV/PE</span>
           <span>✓ Perícias automáticas</span>
           <span>✓ BT por nível</span>
@@ -147,6 +147,7 @@
                 <div class="section-title"><h2>Atributos</h2><small>Modificadores recalculados em tempo real. Use d20 para testes de status.</small></div>
                 <div id="attributes" class="attribute-grid"></div>
               </article>
+              <div id="originRefinementPanel"></div>
               <article class="card">
                 <div class="section-title"><h2>Resumo de evolução</h2><small>Mostra o que desbloqueia conforme o nível.</small></div>
                 <div id="levelSummary" class="rule-grid"></div>

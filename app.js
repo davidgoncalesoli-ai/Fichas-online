@@ -33,6 +33,16 @@ const SKILLS = [
   ['Luta','Força',false], ['Pontaria','Destreza',false], ['Fortitude','Constituição',false], ['Reflexos','Destreza',false], ['Astúcia','Inteligência',false], ['Vontade','Sabedoria',false]
 ];
 
+
+const RANK_ORDER = {none:0, trained:1, master:2};
+function betterRank(a='none', b='none'){
+  return (RANK_ORDER[b]||0) > (RANK_ORDER[a]||0) ? b : a;
+}
+function rankLabel(rank){
+  return rank==='master' ? 'Mestre' : rank==='trained' ? 'Treinado' : 'Sem treino';
+}
+function allSkillNames(){ return SKILLS.map(s=>s[0]); }
+
 const APTITUDE_KEYS = [
   {key:'aura', name:'Aura', sigla:'AU', desc:'Compreensão e refinamento da própria energia amaldiçoada.'},
   {key:'controle', name:'Controle e Leitura', sigla:'CL', desc:'Controle bruto da energia, leitura de fluxos e percepção amaldiçoada.'},
@@ -1353,6 +1363,189 @@ const ORIGINS = [
   {name:'Corpo Amaldiçoado Mutante', desc:'Existência artificial/mutante com regras próprias.'}
 ];
 
+
+const CLANS = {
+  'Clã Gojo': {attrs:['Inteligência','Sabedoria'], trainingOptions:['Feitiçaria','Percepção','Intuição'], trainings:'Treinado em 2 entre Feitiçaria, Percepção e Intuição, ou especialista em 1.', techniques:'Seis Olhos, Ilimitado', feature:'Potencial Lendário: +1 PE em todo nível par. Recebe 1 Feitiço adicional no 1º nível e nos níveis 5, 10, 15 e 20.'},
+  'Clã Inumaki': {attrs:['Inteligência','Presença'], trainingOptions:['Feitiçaria','Percepção','Intuição'], trainings:'Treinado em 2 entre Feitiçaria, Percepção e Intuição, ou especialista em 1.', techniques:'Fala Amaldiçoada', feature:'Olhos de Cobra e Presas: usos iguais ao BT para comandar uma ação bônus de aliado como reação; recupera no descanso longo.'},
+  'Clã Kamo': {attrs:['Constituição','Sabedoria'], trainingOptions:['Atletismo','Medicina','Persuasão'], trainings:'Treinado em 2 entre Atletismo, Medicina e Persuasão, ou especialista em 1.', techniques:'Manipulação Sanguínea', feature:'Valor do Sangue: +1 PV máximo por nível; a partir do nível 10 soma CON ao total de vida. Ao rolar vida abaixo da média, pode rerrolar e ficar com o maior.'},
+  'Clã Zenin': {attrs:['Qualquer'], trainingOptions:'any', trainings:'Treinado em 2 perícias quaisquer, ou especialista em 1.', techniques:'Dez Sombras, Projeção', feature:'Foco no Poder: escolha Feitiços Focados no nível 1 e nos níveis 5, 10, 15 e 20; cada um recebe melhoria de dano, cura, alcance ou CD.'}
+};
+const ANATOMY_FEATURES = [
+  {name:'Alma Maldita', text:'Reduz pela metade dano na alma antes do teste de Integridade; no nível 15, anula. Usos por dia aumentam nos níveis 6, 12 e 18.'},
+  {name:'Anatomia Incompreensível', text:'Chance de ignorar dano adicional de crítico ou ataque furtivo: 25%; no nível 15, 50%.'},
+  {name:'Arma Natural', text:'Recebe ataque natural 1d8 cortante, perfurante ou impacto com Fineza e Enérgica; conta como desarmado.'},
+  {name:'Articulações Extensas', text:'Alcance dos ataques corpo a corpo aumenta em 1,5m.'},
+  {name:'Braços Extras', text:'+2 em Prestidigitação e, com duas mãos livres, em Atletismo; recebe par adicional de mãos.'},
+  {name:'Capacidade de Voo', text:'Como ação livre, gasta 1 PE para transformar deslocamento de caminhada em voo por uma rodada.'},
+  {name:'Carapaça Mutante', text:'RD contra danos físicos igual ao BT; no nível 10, resistência a um tipo de dano físico escolhido.'},
+  {name:'Corpo Especializado', text:'Escolha uma perícia: recebe 1d4 de bônus nela.'},
+  {name:'Desenvolvimento Exagerado', text:'Aumenta categoria de tamanho em 1 e recebe +1 PV por nível.'},
+  {name:'Devorador de Energia', text:'Ao passar em TR contra Feitiço, recebe 1 PE temporário cumulativo.'},
+  {name:'Instinto Sanguinário', text:'Adiciona BT na Iniciativa; em combate, também adiciona BT na Atenção.'},
+  {name:'Olhos Sombrios', text:'Recebe Visão no Escuro, treino em Percepção e +2 nela; no nível 12 ignora escuridão leve e total.'},
+  {name:'Pernas Extras', text:'Deslocamento +4,5m e ignora terreno difícil no solo.'},
+  {name:'Presença Nefasta', text:'Hostis que o veem pela primeira vez fazem TR de Vontade contra CD Amaldiçoada; falha amedronta por 1 rodada, sucesso abala por 1 rodada.'},
+  {name:'Sangue Tóxico', text:'Ao sofrer dano corpo a corpo, atacante perde vida igual ao modificador de Constituição.'}
+];
+function originChoicesDefault(){ return { plus2:'', plus1:'', physicalA:'', physicalB:'', clan:'Clã Gojo', auraAptitude:'', originAttrAlloc:{}, trainingMode:'trained2', originTrained:['',''], originMaster:'', anatomy:[], anatomySkill:'', semTecnicaNotes:'', semTecnicaBenefit1:'', semTecnicaBenefit10:'', corePrimary:'Núcleo 1', coreActive:'Núcleo 1', cores:[{name:'Núcleo 1', concept:'Primário', specialization:''},{name:'Núcleo 2', concept:'', specialization:''},{name:'Núcleo 3', concept:'', specialization:''}] }; }
+function clampOriginAlloc(sheet){
+  sheet.originChoices = sheet.originChoices || originChoicesDefault();
+  const oc = sheet.originChoices;
+  oc.originAttrAlloc = oc.originAttrAlloc || {};
+  ATTRS.forEach(a=>{ oc.originAttrAlloc[a] = Math.max(0, Number(oc.originAttrAlloc[a]||0)); });
+  const cfg = originAllocConfig(sheet);
+  if(!cfg.total){ ATTRS.forEach(a=>oc.originAttrAlloc[a]=0); return; }
+  let used = 0;
+  ATTRS.forEach(a=>{
+    if(!cfg.allowed.includes(a)) oc.originAttrAlloc[a]=0;
+    oc.originAttrAlloc[a] = Math.min(cfg.maxPerAttr, oc.originAttrAlloc[a]);
+    used += oc.originAttrAlloc[a];
+  });
+  if(used > cfg.total){
+    for(const a of ATTRS.slice().reverse()){
+      const cut = Math.min(oc.originAttrAlloc[a], used-cfg.total);
+      oc.originAttrAlloc[a] -= cut;
+      used -= cut;
+      if(used<=cfg.total) break;
+    }
+  }
+}
+function originAllocConfig(sheet){
+  if(sheet.origin==='Sem Técnica') return {total:4, maxPerAttr:3, allowed:ATTRS, label:'Pontos adicionais de Sem Técnica'};
+  if(sheet.origin==='Corpo Amaldiçoado Mutante') return {total:2, maxPerAttr:2, allowed:ATTRS, label:'Pontos adicionais do Corpo Amaldiçoado Mutante'};
+  return {total:0, maxPerAttr:0, allowed:[], label:''};
+}
+function clanAllowedAttributes(sheet){
+  const clan = CLANS[sheet.originChoices?.clan] || CLANS['Clã Gojo'];
+  return clan.attrs.includes('Qualquer') ? ATTRS : clan.attrs.filter(a=>ATTRS.includes(a));
+}
+function originAttributeBonus(sheet, attr){
+  const oc = sheet.originChoices || originChoicesDefault();
+  let bonus = 0;
+  if(['Inato','Derivado','Feto Amaldiçoado Híbrido'].includes(sheet.origin)){
+    if(oc.plus2===attr) bonus += 2;
+    if(oc.plus1===attr && oc.plus1!==oc.plus2) bonus += 1;
+  }
+  if(sheet.origin==='Herdado'){
+    if(oc.plus2===attr) bonus += 2;
+    if(oc.plus1===attr && oc.plus1!==oc.plus2) bonus += 1;
+  }
+  if(sheet.origin==='Restringido'){
+    if(['Força','Destreza','Constituição'].includes(attr)) bonus += 1;
+    if(oc.physicalA===attr) bonus += 1;
+    if(oc.physicalB===attr) bonus += 1;
+  }
+  if(sheet.origin==='Sem Técnica' || sheet.origin==='Corpo Amaldiçoado Mutante'){
+    bonus += Number(oc.originAttrAlloc?.[attr] || 0);
+  }
+  return bonus;
+}
+function originBonusText(sheet){
+  const parts = ATTRS.map(a=>[a,originAttributeBonus(sheet,a)]).filter(x=>x[1]>0).map(([a,b])=>`${a} +${b}`);
+  return parts.length ? parts.join(' • ') : 'Nenhum bônus de origem aplicado ainda.';
+}
+
+
+function originTrainingConfig(sheet){
+  const oc=sheet.originChoices || originChoicesDefault();
+  if(sheet.origin==='Herdado'){
+    const clan=CLANS[oc.clan] || CLANS['Clã Gojo'];
+    const options = clan.trainingOptions==='any' ? allSkillNames() : clan.trainingOptions;
+    return {kind:'choice2orMaster', title:`Treinamentos de ${oc.clan || 'clã'}`, text:clan.trainings, options};
+  }
+  if(sheet.origin==='Sem Técnica'){
+    return {kind:'trained2', title:'Estudos Dedicados', text:'Escolha 2 perícias para receber treinamento pela origem Sem Técnica.', options:allSkillNames()};
+  }
+  return null;
+}
+function cleanOriginTrainingChoices(sheet){
+  const oc=sheet.originChoices ||= originChoicesDefault();
+  const cfg=originTrainingConfig(sheet);
+  if(!cfg){ oc.trainingMode='trained2'; oc.originTrained=['','']; oc.originMaster=''; return; }
+  oc.trainingMode = oc.trainingMode || 'trained2';
+  oc.originTrained = Array.isArray(oc.originTrained) ? oc.originTrained.slice(0,2) : ['',''];
+  while(oc.originTrained.length<2) oc.originTrained.push('');
+  const allowed=cfg.options || [];
+  oc.originTrained = oc.originTrained.map(v=>allowed.includes(v)?v:'');
+  if(!allowed.includes(oc.originMaster)) oc.originMaster='';
+  if(cfg.kind==='trained2') oc.trainingMode='trained2';
+}
+function originSkillAwards(sheet){
+  const awards={ranks:{}, extras:{}, notes:[]};
+  const oc=sheet.originChoices || originChoicesDefault();
+  const cfg=originTrainingConfig(sheet);
+  if(cfg){
+    const mode = oc.trainingMode || 'trained2';
+    if(mode==='master1' && cfg.kind==='choice2orMaster' && oc.originMaster){
+      awards.ranks[oc.originMaster]='master';
+      awards.notes.push(`${cfg.title}: ${oc.originMaster} como especialista/mestre.`);
+    } else {
+      [...new Set((oc.originTrained||[]).filter(Boolean))].slice(0,2).forEach(sk=>{ awards.ranks[sk]='trained'; });
+      const picked=[...new Set((oc.originTrained||[]).filter(Boolean))].slice(0,2);
+      if(picked.length) awards.notes.push(`${cfg.title}: treinado em ${picked.join(' e ')}.`);
+    }
+  }
+  if(sheet.origin==='Feto Amaldiçoado Híbrido' && Array.isArray(oc.anatomy)){
+    if(oc.anatomy.includes('Olhos Sombrios')){ awards.ranks['Percepção']=betterRank(awards.ranks['Percepção']||'none','trained'); awards.extras['Percepção']=(awards.extras['Percepção']||0)+2; awards.notes.push('Olhos Sombrios: Percepção treinada e +2.'); }
+    if(oc.anatomy.includes('Braços Extras')){ awards.extras['Prestidigitação']=(awards.extras['Prestidigitação']||0)+2; awards.extras['Atletismo']=(awards.extras['Atletismo']||0)+2; awards.notes.push('Braços Extras: +2 em Prestidigitação e Atletismo quando aplicável.'); }
+    if(oc.anatomy.includes('Corpo Especializado') && oc.anatomySkill){ awards.extras[oc.anatomySkill]=(awards.extras[oc.anatomySkill]||0)+2; awards.notes.push(`Corpo Especializado: bônus manual em ${oc.anatomySkill}.`); }
+  }
+  return awards;
+}
+function originSkillRank(sheet, skill){ return originSkillAwards(sheet).ranks?.[skill] || 'none'; }
+function originSkillExtra(sheet, skill){ return Number(originSkillAwards(sheet).extras?.[skill] || 0); }
+function effectiveSkillRank(sheet, skill){ return betterRank(sheet.skillRanks?.[skill] || 'none', originSkillRank(sheet, skill)); }
+function originTrainingSummary(sheet){
+  const notes=originSkillAwards(sheet).notes;
+  return notes.length ? notes.join(' • ') : 'Nenhum treinamento de origem aplicado ainda.';
+}
+
+function originFeatureCards(sheet){
+  const lvl=Number(sheet.level||1), bt=trainingBonus(lvl), con=attrMod(sheet,'Constituição');
+  if(sheet.origin==='Inato') return [
+    ['Bônus em Atributo','Aumenta um atributo em +2 e outro em +1. Registre abaixo quais foram escolhidos.'],
+    ['Talento Natural', lvl>=4?'Recebe 1 Talento no 1º nível e pode receber um talento adicional uma vez a partir do 4º nível.':'Recebe 1 Talento no 1º nível. No 4º nível poderá escolher um talento adicional uma vez.'],
+    ['Marca Registrada','Recebe um Feitiço adicional com custo reduzido em 1 PE. Marque esse feitiço como Marca Registrada na aba Técnicas.']
+  ];
+  if(sheet.origin==='Herdado'){
+    const c=CLANS[sheet.originChoices?.clan]||CLANS['Clã Gojo'];
+    return [['Bônus em Atributo',`Depende do clã escolhido: ${c.attrs.join(' / ')}.`],['Treinamentos de Clã',c.trainings],['Herança de Clã',`${c.techniques}. ${c.feature}`]];
+  }
+  if(sheet.origin==='Derivado') return [
+    ['Bônus em Atributo','Aumenta um atributo em +2 e outro em +1.'],
+    ['Energia Antinatural',`Recebe uma Aptidão de Aura que atenda aos requisitos. Em combate, uma vez por dia, pode recuperar ${bt*2} PE como Ação Bônus.`],
+    ['Desenvolvimento Inesperado',`A cada 4 níveis recebe 1 ponto de atributo adicional e aumenta o limite do atributo escolhido em 1. Pontos extras pelo nível atual: ${Math.floor(lvl/4)}.`]
+  ];
+  if(sheet.origin==='Restringido') return [
+    ['Bônus em Atributo','FOR, DES e CON +1; recebe 2 pontos extras para distribuir entre atributos físicos.'],
+    ['Físico Abençoado','Deslocamento +3m, imunidade a doenças mundanas, vantagem contra venenos e melhora a cura em descanso curto.'],
+    ['Ápice Corporal Humano',`Limite de FOR/DES/CON é 30. A cada 6 níveis, escolha um deles para receber +2. Escolhas disponíveis pelo nível atual: ${Math.floor(lvl/6)}.`],
+    ['Resiliência Imediata',`Usos por descanso longo: ${bt}. Ao receber dano, pode reduzir ${Math.max(1,Math.floor(lvl/2))*5} de dano ou evitar um desmembramento.`]
+  ];
+  if(sheet.origin==='Feto Amaldiçoado Híbrido') return [
+    ['Bônus em Atributo','Aumenta um atributo em +2 e outro em +1.'],
+    ['Herança Maldita','Cura por energia reversa recebida é reduzida pela metade; se usar habilidade de cura de energia reversa em si, trata como energia amaldiçoada e gasta 2 PE.'],
+    ['Físico Amaldiçoado',`Recebe características de anatomia. Quantidade pelo nível atual: ${anatomySlots(sheet)}.`],
+    ['Vigor Maldito',`Como Ação Bônus, cura ${fetoVigorBase(lvl)} + CON (${con}) PV. Usos por descanso longo: ${fetoVigorUses(lvl)}.`]
+  ];
+  if(sheet.origin==='Sem Técnica') return [
+    ['Bônus em Atributo','Recebe 4 pontos adicionais para distribuir entre atributos, máximo de 3 no mesmo atributo.'],
+    ['Estudos Dedicados','Torna-se treinado em 2 perícias à escolha.'],
+    ['Empenho Implacável','Recebe benefícios em níveis específicos: talento/aptidão, bônus em perícias/ataques/TR, habilidades extras e Novo Estilo da Sombra.'],
+    ['Restrição','Não possui técnica, não tem acesso a Feitiços e não pode ser Especialista em Técnica.']
+  ];
+  if(sheet.origin==='Corpo Amaldiçoado Mutante') return [
+    ['Bônus em Atributo','Recebe 2 pontos adicionais para distribuir entre atributos.'],
+    ['Forma de Vida Sintética','Imune a dano venenoso e condição envenenado, mas não recebe efeitos de refeições nem itens de Medicina.'],
+    ['Mutação Abrupta','Começa com três núcleos; deve escolher um núcleo primário e pode alternar núcleo ativo em combate como Ação Bônus.'],
+    ['Núcleos Múltiplos','Núcleos compartilham vários dados, mas podem realocar atributos, ter Feitiços próprios e habilidades/aptidões versáteis em níveis pares.']
+  ];
+  return [];
+}
+function anatomySlots(sheet){ return 1 + Math.floor(Number(sheet.level||1)/5); }
+function fetoVigorUses(lvl){ return 1 + (lvl>=4?1:0) + (lvl>=8?1:0) + (lvl>=12?1:0); }
+function fetoVigorBase(lvl){ return 5 + (lvl>=4?5:0) + (lvl>=8?5:0) + (lvl>=12?5:0); }
+
 const CLASSES = {
   'Lutador': {hp1:12, hpFixed:6, pe:4, peKeyOnce:false, keys:['Força','Destreza'], trainings:'Armas simples, armas marciais e escudo leve. TR Fortitude ou Reflexos. Ofício, Atletismo ou Acrobacia e mais 3 perícias.', defaultSkills:['Ofício','Atletismo'], baseAbilities:['Corpo Treinado','Empolgação']},
   'Especialista em Combate': {hp1:12, hpFixed:6, pe:4, peKeyOnce:false, keys:['Força','Destreza','Sabedoria'], trainings:'Todas as armas e escudos. TR Fortitude ou Reflexos. Duas Ofício, Atletismo ou Acrobacia e mais 3 perícias.', defaultSkills:['Ofício','Atletismo'], baseAbilities:['Repertório do Especialista','Arte do Combate']},
@@ -1361,6 +1554,78 @@ const CLASSES = {
   'Suporte': {hp1:10, hpFixed:5, pe:5, peKeyOnce:true, keys:['Presença','Sabedoria'], trainings:'Armas simples e escudos. TR Astúcia ou Vontade. Duas Ofício, Medicina, Prestidigitação e mais 3 perícias.', defaultSkills:['Ofício','Medicina','Prestidigitação'], baseAbilities:['Suporte em Combate']},
   'Restringido': {hp1:16, hpFixed:7, pe:0, stamina:4, peKeyOnce:false, keys:['Força','Destreza','Constituição','Inteligência','Sabedoria','Presença'], trainings:'Todas as armas e escudos. TR Fortitude e Reflexos. Ofício e mais 4 perícias, exceto Feitiçaria.', defaultSkills:['Ofício','Atletismo','Luta'], baseAbilities:['Restrito pelos Céus','Arsenal Vivo','Uso Rápido','Resiliência Imediata']}
 };
+
+
+function creationChoicesDefault(){
+  return { applyBaseAbilities:true, applySuggestedSkills:false, saves:[], trained:[], equipmentA:'', equipmentB:'', uniform:'', kit:'' };
+}
+function ensureCreationChoices(sheet){
+  sheet.creationChoices = {...creationChoicesDefault(), ...(sheet.creationChoices||{})};
+  sheet.creationChoices.saves = Array.isArray(sheet.creationChoices.saves) ? sheet.creationChoices.saves : [];
+  sheet.creationChoices.trained = Array.isArray(sheet.creationChoices.trained) ? sheet.creationChoices.trained : [];
+  return sheet.creationChoices;
+}
+function classSaveOptions(clsName){
+  if(clsName==='Restringido') return {mode:'fixed', options:['Fortitude','Reflexos'], text:'Restringido começa treinado em Fortitude e Reflexos.'};
+  if(['Especialista em Técnica','Controlador','Suporte'].includes(clsName)) return {mode:'one', options:['Astúcia','Vontade'], text:'Escolha um teste de resistência para treinamento inicial.'};
+  return {mode:'one', options:['Fortitude','Reflexos'], text:'Escolha um teste de resistência para treinamento inicial.'};
+}
+function classSkillOptions(clsName){
+  if(clsName==='Lutador') return {required:4, fixed:[], options:['Ofício','Atletismo','Acrobacia',...allSkillNames()], text:'Escolha Ofício, Atletismo ou Acrobacia e mais 3 perícias. A lista permite qualquer perícia para facilitar ajustes da mesa.'};
+  if(clsName==='Especialista em Combate') return {required:5, fixed:[], options:['Ofício','Atletismo','Acrobacia',...allSkillNames()], text:'Escolha duas opções entre Ofício/Atletismo/Acrobacia e mais 3 perícias.'};
+  if(clsName==='Especialista em Técnica') return {required:4, fixed:[], options:['Ofício','Feitiçaria','Ocultismo',...allSkillNames()], text:'Escolha duas entre Ofício, Feitiçaria e Ocultismo e mais 2 perícias.'};
+  if(clsName==='Controlador') return {required:5, fixed:['Ofício','Percepção','Persuasão'], options:allSkillNames(), text:'Ofício, Percepção e Persuasão são sugeridas; escolha mais 2 perícias.'};
+  if(clsName==='Suporte') return {required:5, fixed:[], options:['Ofício','Medicina','Prestidigitação',...allSkillNames()], text:'Escolha duas entre Ofício, Medicina e Prestidigitação e mais 3 perícias.'};
+  if(clsName==='Restringido') return {required:5, fixed:['Ofício'], options:allSkillNames().filter(x=>x!=='Feitiçaria'), text:'Ofício e mais 4 perícias, exceto Feitiçaria.'};
+  return {required:3, fixed:[], options:allSkillNames(), text:'Escolha perícias iniciais.'};
+}
+function uniqueOptions(list){ return [...new Set(list.filter(Boolean))]; }
+function applyCreationTrainingChoices(sheet){
+  const cc=ensureCreationChoices(sheet);
+  const saves=classSaveOptions(sheet.specialization);
+  if(saves.mode==='fixed') saves.options.forEach(s=>{ if(sheet.skillRanks[s]) sheet.skillRanks[s]='trained'; });
+  else (cc.saves||[]).slice(0,1).forEach(s=>{ if(sheet.skillRanks[s]) sheet.skillRanks[s]='trained'; });
+  const cfg=classSkillOptions(sheet.specialization);
+  [...(cfg.fixed||[]), ...(cc.trained||[])].forEach(s=>{ if(sheet.skillRanks[s]) sheet.skillRanks[s]='trained'; });
+  if(sheet.specialization==='Restringido') sheet.skillRanks['Feitiçaria']='none';
+  return sheet;
+}
+function startingEquipmentPools(){
+  const cost1 = ITEM_LIBRARY.filter(it=>String(it.cost).trim()==='1' && !/uniforme|kit/i.test(it.category||''));
+  const uniforms = ITEM_LIBRARY.filter(it=>/uniforme/i.test(it.category||it.name||''));
+  const kits = ITEM_LIBRARY.filter(it=>/kit/i.test(it.category||it.name||''));
+  return {cost1, uniforms, kits};
+}
+function addItemFromLibraryByName(sheet,name){
+  if(!name) return;
+  const it=ITEM_LIBRARY.find(x=>x.name===name);
+  if(!it) return;
+  const already = sheet.items.some(x=>x.name===it.name && x.category===it.category);
+  if(already) return;
+  sheet.items.push({name:it.name, category:it.category, cost:it.cost, qty:it.qty||1, weight:it.weight||0, damage:it.damage||'', properties:it.properties||'', grade:'', enchantmentCharges:'', uniqueAbility:'', modifications:[], text:it.text||''});
+}
+function applyCreationEquipment(sheet){
+  const cc=ensureCreationChoices(sheet);
+  [cc.equipmentA, cc.equipmentB, cc.uniform, cc.kit].forEach(name=>addItemFromLibraryByName(sheet,name));
+  return sheet;
+}
+function addBaseAbilitiesIfWanted(sheet){
+  const cc=ensureCreationChoices(sheet);
+  if(cc.applyBaseAbilities!==false) addBaseAbilities(sheet);
+  return sheet;
+}
+function validateWizardStep(){
+  if(wizardStep===0 && !String(wizardData.name||'').trim()) return 'Dê um nome para a ficha antes de continuar.';
+  if(wizardStep===2 && !wizardData.specialization) return 'Escolha uma especialização.';
+  if(wizardStep===3){
+    const cc=ensureCreationChoices(wizardData), saves=classSaveOptions(wizardData.specialization), cfg=classSkillOptions(wizardData.specialization);
+    if(saves.mode==='one' && !cc.saves?.[0]) return 'Escolha o teste de resistência inicial da especialização.';
+    const picked=uniqueOptions([...(cfg.fixed||[]), ...(cc.trained||[])]);
+    if(picked.length < cfg.required) return `Escolha ${cfg.required} perícias iniciais no total. Faltam ${cfg.required-picked.length}.`;
+  }
+  if(wizardStep===5 && !attributeAssignmentComplete(wizardData)) return 'Distribua todos os seis valores de atributo antes de finalizar.';
+  return '';
+}
 
 const ABILITY_LIBRARY = [
   {
@@ -4185,7 +4450,7 @@ let abilityKindFilter = 'all';
 let activeItemModIndex = null;
 let selectedItemModLibraryIndex = null;
 const ABILITY_UNLOCK_TABS = [1,2,4,6,8,10,12,14,16,18,20];
-const wizardSteps = ['Identidade','Origem','Especialização','Atributos','Treinamentos','Resumo'];
+const wizardSteps = ['Identidade','Origem','Especialização','Treinamentos','Equipamento inicial','Atributos','Resumo'];
 
 function mod(v){ return Math.floor((Number(v||10)-10)/2); }
 function sgn(v){ return v>=0 ? '+'+v : String(v); }
@@ -4230,7 +4495,7 @@ function attributeBaseValue(sheet, attr){
   return Number(sheet.attributes?.[attr] || 10);
 }
 function attributeTempValue(sheet, attr){ return Number(sheet.attributeTempMods?.[attr] || 0); }
-function effectiveAttribute(sheet, attr){ return Number(sheet.attributes?.[attr] || 10) + attributeTempValue(sheet, attr); }
+function effectiveAttribute(sheet, attr){ return Number(sheet.attributes?.[attr] || 10) + originAttributeBonus(sheet, attr) + attributeTempValue(sheet, attr); }
 function attrMod(sheet, attr){ return mod(effectiveAttribute(sheet, attr)); }
 function attributePointsTotal(sheet){ return Math.max(0, Math.floor(Number(sheet.level||1)/4) * 2); }
 function attributePointsSpent(sheet){ return ATTRS.reduce((sum,a)=>sum + Math.max(0, Number(sheet.attributes?.[a]||10) - attributeBaseValue(sheet,a)), 0); }
@@ -4238,18 +4503,27 @@ function attributePointsLeft(sheet){ return attributePointsTotal(sheet) - attrib
 function itemSpacesUsed(sheet){ return (sheet.items||[]).reduce((sum,it)=>sum + Number(it.qty||1)*Number(it.weight||0),0); }
 function loadLimit(sheet){ return Math.max(0, 8 + (attrMod(sheet,'Força') * 2)); }
 function loadState(sheet){ const used=itemSpacesUsed(sheet); const limit=loadLimit(sheet); const max=limit*2; const overloaded=used>limit; const impossible=used>max; return {used,limit,max,overloaded,impossible, defensePenalty:overloaded?-5:0, movementPenalty:overloaded?-4.5:0}; }
-function skillTotal(sheet, skill){ const rank=sheet.skillRanks?.[skill.name] || 'none'; const extra=Number(sheet.skillExtras?.[skill.name]||0); return attrMod(sheet, skill.attr) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
+function skillTotal(sheet, skill){ const rank=effectiveSkillRank(sheet, skill.name); const extra=Number(sheet.skillExtras?.[skill.name]||0) + originSkillExtra(sheet, skill.name); return attrMod(sheet, skill.attr) + halfLevel(sheet.level) + trainValue(sheet.level, rank) + extra; }
 function current(){ return sheets.find(s=>s.id===activeId); }
 function save(){ safeStorage.set('femSheetsV13', JSON.stringify(sheets)); if(activeId) safeStorage.set('femActiveV13', activeId); }
 function blankSheet(){
   const skillRanks={}, skillExtras={}; SKILLS.forEach(([name])=>{ skillRanks[name]='none'; skillExtras[name]=0; });
-  return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeBase:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeTempMods:{'Força':0,'Destreza':0,'Constituição':0,'Inteligência':0,'Sabedoria':0,'Presença':0}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], attacks:[], items:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
+  return { id:makeId(), name:'', player:'', level:1, grade:'4º Grau', origin:'Inato', specialization:'Lutador', innateTechnique:'', innateTechniqueText:'', keyAttribute:'Força', hp:0, hpMax:0, pe:0, peMax:0, defense:10, attention:10, initiative:0, movement:9, dc:10, attributes:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeBase:{'Força':10,'Destreza':10,'Constituição':10,'Inteligência':10,'Sabedoria':10,'Presença':10}, attributeTempMods:{'Força':0,'Destreza':0,'Constituição':0,'Inteligência':0,'Sabedoria':0,'Presença':0}, attributeMethod:'rolling', attributeRolls:[], attributeAssignments:{}, originChoices:originChoicesDefault(), skillRanks, skillExtras, aptitudeLevels:{aura:0,controle:0,barreira:0,dominio:0,reversa:0}, aptitudeChoices:[], abilities:[], talents:[], techniques:[], domains:[], attacks:[], items:[], traits:'', ideals:'', bonds:'', complications:'', innateDomain:'', notes:'', automationNotes:'' };
 }
 function normalize(sheet){
   const base=blankSheet();
-  sheet = {...base, ...sheet, attributes:{...base.attributes, ...(sheet.attributes||{})}, attributeBase:{...base.attributeBase, ...(sheet.attributeBase||{})}, attributeTempMods:{...base.attributeTempMods, ...(sheet.attributeTempMods||{})}, attributeAssignments:{...base.attributeAssignments, ...(sheet.attributeAssignments||{})}, skillRanks:{...base.skillRanks, ...(sheet.skillRanks||{})}, skillExtras:{...base.skillExtras, ...(sheet.skillExtras||{})}, aptitudeLevels:{...base.aptitudeLevels, ...(sheet.aptitudeLevels||{})}};
+  sheet = {...base, ...sheet, attributes:{...base.attributes, ...(sheet.attributes||{})}, attributeBase:{...base.attributeBase, ...(sheet.attributeBase||{})}, attributeTempMods:{...base.attributeTempMods, ...(sheet.attributeTempMods||{})}, attributeAssignments:{...base.attributeAssignments, ...(sheet.attributeAssignments||{})}, skillRanks:{...base.skillRanks, ...(sheet.skillRanks||{})}, skillExtras:{...base.skillExtras, ...(sheet.skillExtras||{})}, aptitudeLevels:{...base.aptitudeLevels, ...(sheet.aptitudeLevels||{})}, originChoices:{...originChoicesDefault(), ...(sheet.originChoices||{})}};
   if(!sheet.attributeBase || ATTRS.some(a=>sheet.attributeBase[a]===undefined)){ sheet.attributeBase=sheet.attributeBase||{}; ATTRS.forEach(a=>{ if(sheet.attributeBase[a]===undefined) sheet.attributeBase[a]=attributeAssignmentComplete(sheet)?Number(sheet.attributeAssignments[a]):Number(sheet.attributes[a]||10); }); }
   if(!sheet.attributeTempMods) sheet.attributeTempMods={}; ATTRS.forEach(a=>{ if(sheet.attributeTempMods[a]===undefined) sheet.attributeTempMods[a]=0; });
+  if(!sheet.originChoices.originAttrAlloc) sheet.originChoices.originAttrAlloc={}; ATTRS.forEach(a=>{ if(sheet.originChoices.originAttrAlloc[a]===undefined) sheet.originChoices.originAttrAlloc[a]=0; });
+  if(!Array.isArray(sheet.originChoices.originTrained)) sheet.originChoices.originTrained=['',''];
+  while(sheet.originChoices.originTrained.length<2) sheet.originChoices.originTrained.push('');
+  if(sheet.originChoices.trainingMode===undefined) sheet.originChoices.trainingMode='trained2';
+  if(sheet.originChoices.originMaster===undefined) sheet.originChoices.originMaster='';
+  if(sheet.originChoices.anatomySkill===undefined) sheet.originChoices.anatomySkill='';
+  clampOriginAlloc(sheet); cleanOriginTrainingChoices(sheet);
+  if(!Array.isArray(sheet.originChoices.cores)) sheet.originChoices.cores=originChoicesDefault().cores;
+  sheet.originChoices.cores = sheet.originChoices.cores.slice(0,3); while(sheet.originChoices.cores.length<3) sheet.originChoices.cores.push({name:`Núcleo ${sheet.originChoices.cores.length+1}`, concept:'', specialization:''});
   sheet.attributeRolls = Array.isArray(sheet.attributeRolls) ? sheet.attributeRolls : [];
   ['abilities','talents','techniques','domains','attacks','items','aptitudeChoices'].forEach(k=>sheet[k]=Array.isArray(sheet[k])?sheet[k]:[]);
   sheet.domains = sheet.domains.map(d=>({name:d.name||'', type:d.type||'', technique:d.technique||'', level:d.level ?? '', cost:d.cost||'', area:d.area||'', duration:d.duration||'', text:d.text||''}));
@@ -4267,7 +4541,10 @@ function applyAutoValues(sheet, opts={keepCurrent:true}){
   const hp = Math.max(1, cls.hp1 + con + (Math.max(1, sheet.level)-1)*(cls.hpFixed + con));
   let pe = cls.pe ? cls.pe * sheet.level : (cls.stamina ? cls.stamina * sheet.level : 0);
   if(cls.peKeyOnce) pe += key;
-  sheet.hpMax = hp;
+  if(sheet.origin==='Herdado' && sheet.originChoices?.clan==='Clã Gojo') pe += Math.floor(Number(sheet.level||1)/2);
+  let hpAdjusted = hp;
+  if(sheet.origin==='Herdado' && sheet.originChoices?.clan==='Clã Kamo') hpAdjusted += Number(sheet.level||1) + (Number(sheet.level||1)>=10 ? attrMod(sheet,'Constituição') : 0);
+  sheet.hpMax = hpAdjusted;
   sheet.peMax = Math.max(0, pe);
   if(!opts.keepCurrent || !sheet.hp) sheet.hp = hp;
   if(!opts.keepCurrent || !sheet.pe) sheet.pe = sheet.peMax;
@@ -4277,6 +4554,7 @@ function applyAutoValues(sheet, opts={keepCurrent:true}){
   sheet.attention = 10 + skillTotal(sheet, {name:'Percepção', attr:'Sabedoria'});
   sheet.initiative = skillTotal(sheet, {name:'Reflexos', attr:'Destreza'});
   sheet.movement = sheet.origin==='Restringido' || sheet.specialization==='Restringido' ? 12 : 9;
+  if(sheet.origin==='Sem Técnica' && sheet.specialization==='Especialista em Técnica'){ sheet.automationNotes = 'Origem Sem Técnica não pode ter a especialização Especialista em Técnica. Troque a especialização para corrigir.'; }
   const load = loadState(sheet);
   if(load.overloaded){
     sheet.defense = Math.max(0, sheet.defense + load.defensePenalty);
@@ -4287,6 +4565,7 @@ function applyAutoValues(sheet, opts={keepCurrent:true}){
   auto.push(`PV sugerido: ${cls.hp1}+CON no 1º nível; depois ${cls.hpFixed}+CON por nível.`);
   auto.push(cls.stamina ? `Estamina sugerida: ${cls.stamina} por nível.` : `PE sugerido: ${cls.pe} por nível${cls.peKeyOnce ? ' + modificador do atributo-chave uma vez' : ''}.`);
   auto.push(`Treinamentos da especialização: ${cls.trainings}`);
+  auto.push(`Treinamentos de origem: ${originTrainingSummary(sheet)}`);
   auto.push(`Aptidões: ${aptitudePointsSpent(sheet)}/${aptitudePointsTotal(sheet)} pontos usados.`);
   if(load.overloaded) auto.push(`Carga: sobrecarregado (${load.used}/${load.limit} espaços). Penalidade automática: -5 Defesa e -4,5m deslocamento.`);
   sheet.automationNotes = auto.join('\n');
@@ -4329,7 +4608,7 @@ function renderEditor(){
   fillSelect('#classSelect', Object.keys(CLASSES), sheet.specialization);
   fillSelect('#keyAttributeSelect', (CLASSES[sheet.specialization]||CLASSES.Lutador).keys, sheet.keyAttribute);
   $$('[data-bind]').forEach(el=>{ const key=el.dataset.bind; if(el.value !== String(sheet[key] ?? '')) el.value = sheet[key] ?? ''; el.oninput=()=>{ sheet[key] = el.type==='number' ? Number(el.value) : el.value; if(['level','origin','specialization','keyAttribute'].includes(key)){ applyAutoValues(sheet,{keepCurrent:false}); } save(); renderEditor(); }; });
-  renderAttributes(sheet); renderCalcCards(sheet); renderLevelSummary(sheet); renderAptitudes(sheet); renderSkills(sheet); renderRows(sheet); renderTechLibrary();
+  renderAttributes(sheet); renderOriginRefinement(sheet); renderCalcCards(sheet); renderLevelSummary(sheet); renderAptitudes(sheet); renderSkills(sheet); renderRows(sheet); renderTechLibrary();
 }
 function fillSelect(sel, values, selected){ const el=$(sel); if(!el) return; el.innerHTML=values.map(v=>`<option ${v===selected?'selected':''}>${esc(v)}</option>`).join(''); }
 function renderAttributes(sheet){
@@ -4338,6 +4617,7 @@ function renderAttributes(sheet){
     const base=attributeBaseValue(sheet,a);
     const current=Number(sheet.attributes?.[a]||base);
     const inc=Math.max(0,current-base);
+    const origin=originAttributeBonus(sheet,a);
     const temp=attributeTempValue(sheet,a);
     const eff=effectiveAttribute(sheet,a);
     const canUp=left>0;
@@ -4345,7 +4625,7 @@ function renderAttributes(sheet){
     return `<div class="attr-box">
       <strong>${a}</strong>
       <div class="attr-main"><span class="attr-score">${eff}</span><small>Mod. <b>${sgn(mod(eff))}</b></small></div>
-      <small>Base ${base} + evolução ${inc}${temp?` + temp. ${sgn(temp)}`:''}</small>
+      <small>Base ${base} + evolução ${inc}${origin?` + origem ${sgn(origin)}`:''}${temp?` + temp. ${sgn(temp)}`:''}</small>
       <div class="attr-controls"><button data-attr-down="${a}" ${canDown?'':'disabled'}>-</button><button data-attr-up="${a}" ${canUp?'':'disabled'}>+</button></div>
       <button data-roll-attr="${a}">Rolar d20 ${sgn(mod(eff))}</button>
     </div>`;
@@ -4357,7 +4637,8 @@ function renderAttributes(sheet){
   $('#attributes').innerHTML = `
     <div class="attribute-points full">
       <strong>Pontos de atributo:</strong> <span>${Math.max(0,left)} disponíveis</span> <small>(${spent}/${total} usados)</small>
-      <p class="muted">Depois da criação, os atributos só aumentam gastando pontos ganhos por nível. Os valores temporários ficam separados abaixo.</p>
+      <p class="muted">Depois da criação, os atributos só aumentam gastando pontos ganhos por nível. Bônus de origem e modificadores temporários ficam separados e não consomem esses pontos.</p>
+      <p class="muted"><strong>Bônus de origem:</strong> ${esc(originBonusText(sheet))}</p>
     </div>
     ${rows}
     <div class="temp-mods full">
@@ -4405,8 +4686,10 @@ function renderAptitudes(sheet){
 
 function renderSkills(sheet){
   $('#skills').innerHTML=SKILLS.map(([name,attr,req])=>{
-    const rank=sheet.skillRanks[name]||'none', extra=sheet.skillExtras[name]||0, total=skillTotal(sheet,{name,attr});
-    return `<div class="skill-row"><strong>${name}${req?' *':''}</strong><span>${attr} ${sgn(attrMod(sheet, attr))}</span><select data-skill-rank="${name}"><option value="none" ${rank==='none'?'selected':''}>Sem treino</option><option value="trained" ${rank==='trained'?'selected':''}>Treinado</option><option value="master" ${rank==='master'?'selected':''}>Mestre</option></select><input data-skill-extra="${name}" type="number" value="${extra}" title="Bônus extra"><span class="skill-total">${sgn(total)}</span><button data-roll-skill="${name}">d20</button></div>`;
+    const manualRank=sheet.skillRanks[name]||'none', effRank=effectiveSkillRank(sheet,name), originRank=originSkillRank(sheet,name);
+    const manualExtra=sheet.skillExtras[name]||0, oExtra=originSkillExtra(sheet,name), total=skillTotal(sheet,{name,attr});
+    const originTag = originRank!=='none' || oExtra ? `<small class="pill">Origem: ${rankLabel(originRank)}${oExtra?` ${sgn(oExtra)}`:''}</small>` : '';
+    return `<div class="skill-row"><strong>${name}${req?' *':''}${originTag}</strong><span>${attr} ${sgn(attrMod(sheet, attr))}</span><select data-skill-rank="${name}"><option value="none" ${manualRank==='none'?'selected':''}>Sem treino</option><option value="trained" ${manualRank==='trained'?'selected':''}>Treinado</option><option value="master" ${manualRank==='master'?'selected':''}>Mestre</option></select><input data-skill-extra="${name}" type="number" value="${manualExtra}" title="Bônus extra manual"><span class="skill-total" title="Rank efetivo: ${rankLabel(effRank)}${oExtra?` • bônus de origem ${sgn(oExtra)}`:''}">${sgn(total)}</span><button data-roll-skill="${name}">d20</button></div>`;
   }).join('');
   $$('[data-skill-rank]').forEach(el=>el.oninput=()=>{ sheet.skillRanks[el.dataset.skillRank]=el.value; applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); });
   $$('[data-skill-extra]').forEach(el=>el.oninput=()=>{ sheet.skillExtras[el.dataset.skillExtra]=Number(el.value||0); applyAutoValues(sheet,{keepCurrent:true}); save(); renderEditor(); });
@@ -4734,8 +5017,14 @@ function talentHasNoRequirement(t){
   const prereq=String(t.prereq||'—').trim();
   return talentReqLevel(t)<=1 && (!t.req || Object.keys(t.req).length===0) && (prereq==='—' || prereq==='' || prereq.toLowerCase()==='sem requisito');
 }
+function talentHasNoRequirement(t){
+  const prereq=String(t.prereq||'—').trim();
+  return talentReqLevel(t)<=1 && (!t.req || Object.keys(t.req).length===0) && (prereq==='—' || prereq==='' || prereq.toLowerCase()==='sem requisito');
+}
 function originTalentGrant(sheet){
-  if(sheet.origin==='Herdado') return {title:'Talento adicional da origem Herdado', text:'Escolha um talento sem pré-requisitos para registrar o benefício inicial da origem.'};
+  if(sheet.origin==='Inato') return {title:'Talento Natural da origem Inato', text:'Escolha um talento sem pré-requisitos para registrar o talento recebido no 1º nível.'};
+  if(sheet.origin==='Herdado') return {title:'Talento adicional da origem Herdado', text:'Escolha um talento sem pré-requisitos, se a sua mesa estiver usando este benefício para Herdado.'};
+  if(sheet.origin==='Sem Técnica') return {title:'Empenho Implacável — nível 1', text:'No nível 1, Sem Técnica escolhe um talento ou aptidão. Aqui você pode registrar um talento sem pré-requisitos.'};
   return null;
 }
 function renderOriginTalentGrant(sheet){
@@ -4744,11 +5033,71 @@ function renderOriginTalentGrant(sheet){
   if(!grant){ box.innerHTML=''; return; }
   const talents=TALENT_LIBRARY.filter(talentHasNoRequirement).filter(t=>!(sheet.talents||[]).some(x=>x.name===t.name));
   box.innerHTML = `<div class="rule-card accent"><h3>${esc(grant.title)}</h3><p>${esc(grant.text)}</p><div class="choice-grid">${talents.map((t,i)=>`<button data-origin-talent="${esc(t.name)}"><strong>${esc(t.name)}</strong><small>${esc(t.category||'Geral')}</small></button>`).join('') || '<p class="muted">Todos os talentos sem requisito já foram adicionados.</p>'}</div></div>`;
-  $$('[data-origin-talent]', box).forEach(btn=>btn.onclick=()=>{ const t=TALENT_LIBRARY.find(x=>x.name===btn.dataset.originTalent); if(!t) return; sheet.talents.push({name:t.name, level:talentReqLevel(t), category:t.category||'Geral', text:`Talento adicional da origem ${sheet.origin}.
-Pré-requisito: ${t.prereq||'—'}
-
-${t.text}`}); save(); renderRows(sheet); });
+  $$('[data-origin-talent]', box).forEach(btn=>btn.onclick=()=>{ const t=TALENT_LIBRARY.find(x=>x.name===btn.dataset.originTalent); if(!t) return; sheet.talents.push({name:t.name, level:talentReqLevel(t), category:t.category||'Geral', text:`Talento adicional da origem ${sheet.origin}.\nPré-requisito: ${t.prereq||'—'}\n\n${t.text}`}); save(); renderRows(sheet); });
 }
+function renderOriginRefinement(sheet){
+  const box=$('#originRefinementPanel'); if(!box) return;
+  const oc=sheet.originChoices ||= originChoicesDefault();
+  clampOriginAlloc(sheet);
+  const cards=originFeatureCards(sheet).map(([t,b])=>`<div class="rule-card"><h3>${esc(t)}</h3><p>${esc(b)}</p></div>`).join('');
+  let controls='';
+  const attrSelect = (field,label,opts=ATTRS)=>`<label>${label}<select data-origin-choice="${field}"><option value="">Escolha...</option>${opts.map(a=>`<option value="${esc(a)}" ${oc[field]===a?'selected':''}>${esc(a)}</option>`).join('')}</select></label>`;
+  const originAllocControls = () => {
+    const cfg = originAllocConfig(sheet);
+    if(!cfg.total) return '';
+    const used = ATTRS.reduce((sum,a)=>sum+Number(oc.originAttrAlloc?.[a]||0),0);
+    return `<div class="rule-card accent full"><h3>${esc(cfg.label)}</h3><p class="muted">Distribua ${cfg.total} ponto(s). Usados: ${used}/${cfg.total}. Máximo por atributo: ${cfg.maxPerAttr}.</p><div class="choice-grid compact">${ATTRS.map(a=>{ const val=Number(oc.originAttrAlloc?.[a]||0); const canUp=cfg.allowed.includes(a) && used<cfg.total && val<cfg.maxPerAttr; const canDown=val>0; return `<div class="choice-card"><strong>${esc(a)}</strong><span class="badge soft">+${val}</span><div class="attr-controls"><button data-origin-alloc-down="${esc(a)}" ${canDown?'':'disabled'}>-</button><button data-origin-alloc-up="${esc(a)}" ${canUp?'':'disabled'}>+</button></div></div>`; }).join('')}</div></div>`;
+  };
+  const originTrainingControls = () => {
+    cleanOriginTrainingChoices(sheet);
+    const cfg = originTrainingConfig(sheet);
+    if(!cfg) return '';
+    const opts = cfg.options || [];
+    const optHtml = ['<option value="">Escolha...</option>'].concat(opts.map(sk=>`<option value="${esc(sk)}">${esc(sk)}</option>`)).join('');
+    const selectHtml = (idx,label)=>`<label>${label}<select data-origin-trained="${idx}">${optHtml.replace(`value="${esc(oc.originTrained?.[idx]||'')}"`, `value="${esc(oc.originTrained?.[idx]||'')}" selected`)}</select></label>`;
+    const masterHtml = `<label>Perícia especialista/mestre<select data-origin-master>${optHtml.replace(`value="${esc(oc.originMaster||'')}"`, `value="${esc(oc.originMaster||'')}" selected`)}</select></label>`;
+    const modeHtml = cfg.kind==='choice2orMaster' ? `<label>Modo de treinamento<select data-origin-training-mode><option value="trained2" ${oc.trainingMode==='trained2'?'selected':''}>2 perícias treinadas</option><option value="master1" ${oc.trainingMode==='master1'?'selected':''}>1 perícia especialista/mestre</option></select></label>` : '';
+    const fields = oc.trainingMode==='master1' && cfg.kind==='choice2orMaster' ? masterHtml : `${selectHtml(0,'Perícia treinada 1')}${selectHtml(1,'Perícia treinada 2')}`;
+    return `<div class="rule-card accent full"><h3>${esc(cfg.title)}</h3><p>${esc(cfg.text)}</p><div class="form-grid">${modeHtml}${fields}</div><p class="muted"><strong>Aplicado:</strong> ${esc(originTrainingSummary(sheet))}</p></div>`;
+  };
+  if(['Inato','Derivado','Feto Amaldiçoado Híbrido'].includes(sheet.origin)){
+    controls += `<div class="form-grid">${attrSelect('plus2','Bônus +2')}${attrSelect('plus1','Bônus +1')}</div>`;
+  }
+  if(sheet.origin==='Herdado'){
+    const clan=CLANS[oc.clan]||CLANS['Clã Gojo'];
+    const allowed = clanAllowedAttributes(sheet);
+    controls += `<div class="form-grid"><label>Clã<select data-origin-choice="clan">${Object.keys(CLANS).map(c=>`<option value="${esc(c)}" ${oc.clan===c?'selected':''}>${esc(c)}</option>`).join('')}</select></label><label>Técnicas herdadas<input value="${esc(clan.techniques)}" readonly></label>${attrSelect('plus2','Bônus +2 do clã',allowed)}${attrSelect('plus1','Bônus +1 do clã',allowed)}</div><div class="rule-card accent"><h3>${esc(oc.clan||'Clã')}</h3><p><strong>Atributos permitidos:</strong> ${esc(allowed.join(' / '))}</p><p><strong>Treinamentos:</strong> ${esc(clan.trainings)}</p><p>${esc(clan.feature)}</p></div>` + originTrainingControls();
+  }
+  if(sheet.origin==='Restringido'){
+    controls += `<div class="form-grid">${attrSelect('physicalA','Ponto físico extra 1',['Força','Destreza','Constituição'])}${attrSelect('physicalB','Ponto físico extra 2',['Força','Destreza','Constituição'])}</div>`;
+  }
+  if(sheet.origin==='Derivado'){
+    controls += `<div class="form-grid"><label>Aptidão de Aura recebida<input data-origin-choice="auraAptitude" value="${esc(oc.auraAptitude||'')}" placeholder="Ex.: Aura Elemental"></label></div>`;
+  }
+  if(sheet.origin==='Feto Amaldiçoado Híbrido'){
+    const slots=anatomySlots(sheet); const selected=Array.isArray(oc.anatomy)?oc.anatomy:[];
+    controls += `<div class="rule-card accent"><h3>Anatomias escolhidas</h3><p class="muted">Você pode escolher ${slots}. Marcadas: ${selected.length}/${slots}.</p><div class="choice-grid compact">${ANATOMY_FEATURES.map(f=>`<button class="${selected.includes(f.name)?'active':''}" data-anatomy="${esc(f.name)}"><strong>${esc(f.name)}</strong><small>${esc(f.text)}</small></button>`).join('')}</div>${selected.includes('Corpo Especializado')?`<label>Perícia do Corpo Especializado<select data-origin-choice="anatomySkill"><option value="">Escolha...</option>${allSkillNames().map(sk=>`<option value="${esc(sk)}" ${oc.anatomySkill===sk?'selected':''}>${esc(sk)}</option>`).join('')}</select></label>`:''}<p class="muted"><strong>Bônus de anatomia/perícia:</strong> ${esc(originTrainingSummary(sheet))}</p></div>`;
+  }
+  if(sheet.origin==='Sem Técnica'){
+    controls += originAllocControls();
+    controls += originTrainingControls();
+    controls += `<div class="rule-card accent"><h3>Empenho Implacável</h3><p>Nv. 1: talento ou aptidão. Nv. 3: bônus +1 em 2 perícias e 1 ataque/TR. Nv. 4: Novo Estilo da Sombra + Domínio Simples. Nv. 6: habilidade extra. Nv. 10: talento ou aptidão. Nv. 13/17: bônus maiores. Nv. 19: habilidade e talento adicionais.</p><textarea data-origin-choice="semTecnicaNotes" placeholder="Anote aqui escolhas de perícias, ataques/TR e benefícios por nível">${esc(oc.semTecnicaNotes||'')}</textarea></div>`;
+  }
+  if(sheet.origin==='Corpo Amaldiçoado Mutante'){
+    controls += originAllocControls();
+    controls += `<div class="rule-card accent"><h3>Núcleos múltiplos</h3><p class="muted">Registre os 3 núcleos, escolha o primário e o ativo.</p><div class="form-grid"><label>Núcleo primário<select data-origin-choice="corePrimary">${oc.cores.map(c=>`<option ${oc.corePrimary===c.name?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label><label>Núcleo ativo<select data-origin-choice="coreActive">${oc.cores.map(c=>`<option ${oc.coreActive===c.name?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label></div>${oc.cores.map((c,i)=>`<div class="mini-row"><input data-core-i="${i}" data-core-field="name" value="${esc(c.name)}" placeholder="Nome do núcleo"><input data-core-i="${i}" data-core-field="concept" value="${esc(c.concept||'')}" placeholder="Conceito/foco"><input data-core-i="${i}" data-core-field="specialization" value="${esc(c.specialization||'')}" placeholder="Especialização do núcleo"></div>`).join('')}</div>`;
+  }
+  box.innerHTML=`<article class="card"><div class="section-title"><h2>Origem — ${esc(sheet.origin)}</h2><small>Benefícios e escolhas próprias da origem.</small></div><div class="rule-grid">${cards}</div><div class="rule-card accent"><h3>Bônus aplicados aos atributos</h3><p>${esc(originBonusText(sheet))}</p><p class="muted">Esses bônus são calculados separadamente da evolução, então não gastam pontos de atributo e não duplicam se você mudar a origem.</p></div>${controls}</article>`;
+  $$('[data-origin-choice]', box).forEach(el=>{ el.oninput=()=>{ const k=el.dataset.originChoice; oc[k]=el.value; if(k==='clan'){ const allowed=clanAllowedAttributes(sheet); if(!allowed.includes(oc.plus2)) oc.plus2=''; if(!allowed.includes(oc.plus1)) oc.plus1=''; } applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); }; });
+  $$('[data-origin-training-mode]', box).forEach(el=>{ el.oninput=()=>{ oc.trainingMode=el.value; save(); renderEditor(); }; });
+  $$('[data-origin-trained]', box).forEach(el=>{ el.oninput=()=>{ const idx=Number(el.dataset.originTrained); oc.originTrained=Array.isArray(oc.originTrained)?oc.originTrained:['','']; oc.originTrained[idx]=el.value; cleanOriginTrainingChoices(sheet); applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); }; });
+  $$('[data-origin-master]', box).forEach(el=>{ el.oninput=()=>{ oc.originMaster=el.value; cleanOriginTrainingChoices(sheet); applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); }; });
+  $$('[data-origin-alloc-up]', box).forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.originAllocUp; const cfg=originAllocConfig(sheet); const used=ATTRS.reduce((sum,x)=>sum+Number(oc.originAttrAlloc?.[x]||0),0); oc.originAttrAlloc=oc.originAttrAlloc||{}; if(used<cfg.total && Number(oc.originAttrAlloc[a]||0)<cfg.maxPerAttr){ oc.originAttrAlloc[a]=Number(oc.originAttrAlloc[a]||0)+1; clampOriginAlloc(sheet); applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); } });
+  $$('[data-origin-alloc-down]', box).forEach(btn=>btn.onclick=()=>{ const a=btn.dataset.originAllocDown; oc.originAttrAlloc=oc.originAttrAlloc||{}; if(Number(oc.originAttrAlloc[a]||0)>0){ oc.originAttrAlloc[a]=Number(oc.originAttrAlloc[a])-1; clampOriginAlloc(sheet); applyAutoValues(sheet,{keepCurrent:false}); save(); renderEditor(); } });
+  $$('[data-anatomy]', box).forEach(btn=>btn.onclick=()=>{ const name=btn.dataset.anatomy; const slots=anatomySlots(sheet); const arr=oc.anatomy ||= []; const ix=arr.indexOf(name); if(ix>=0) arr.splice(ix,1); else if(arr.length<slots) arr.push(name); save(); renderEditor(); });
+  $$('[data-core-i]', box).forEach(el=>{ el.oninput=()=>{ const i=Number(el.dataset.coreI), f=el.dataset.coreField; oc.cores[i][f]=el.value; if(f==='name'){ if(i===0 && !oc.corePrimary) oc.corePrimary=el.value; if(i===0 && !oc.coreActive) oc.coreActive=el.value; } save(); renderEditor(); }; });
+}
+
 function renderRows(sheet){
   applyAutoValues(sheet);
   renderAbilityProgress(sheet);
@@ -4860,8 +5209,8 @@ function renderAptitudeChooser(){
 }
 
 function talentReqLevel(t){ return Number(t.level || t.requiredLevel || 1); }
-function isSkillTrained(sheet, skill){ return (sheet.skillRanks?.[skill] || 'none') !== 'none'; }
-function isSkillMaster(sheet, skill){ return (sheet.skillRanks?.[skill] || 'none') === 'master'; }
+function isSkillTrained(sheet, skill){ return effectiveSkillRank(sheet, skill) !== 'none'; }
+function isSkillMaster(sheet, skill){ return effectiveSkillRank(sheet, skill) === 'master'; }
 function talentKnownCount(sheet, fragment){ return (sheet.talents||[]).filter(x=>String(x.name||'').toLowerCase().includes(String(fragment||'').toLowerCase())).length; }
 function canUseTalent(sheet,t){
   const reasons=[];
@@ -4924,40 +5273,60 @@ function renderDomainChooser(){
 function renderRules(){ $('#rulesSummary').innerHTML = RULES.map(r=>`<div class="rule-card"><h3>${esc(r.title)}</h3><p>${esc(r.text)}</p></div>`).join(''); }
 function renderAll(){ renderSheetList(); renderEditor(); renderRules(); }
 
-function openWizard(existing=false){ wizardData = existing && current() ? structuredClone(current()) : blankSheet(); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); wizardStep=0; renderWizard(); $('#wizard').showModal(); }
+function openWizard(existing=false){ wizardData = existing && current() ? structuredClone(current()) : blankSheet(); ensureCreationChoices(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); wizardStep=0; renderWizard(); $('#wizard').showModal(); }
 function renderWizard(){
   $('#wizardTitle').textContent=`${wizardStep+1}. ${wizardSteps[wizardStep]}`;
   $('#wizardProgress').style.width=`${((wizardStep+1)/wizardSteps.length)*100}%`;
   $('#wizardBack').disabled=wizardStep===0;
   $('#wizardNext').textContent=wizardStep===wizardSteps.length-1?'Salvar ficha':'Próximo';
+  ensureCreationChoices(wizardData);
   let html='';
   if(wizardStep===0) html=`<div class="form-grid"><label>Nome do personagem<input id="wName" value="${esc(wizardData.name)}" placeholder="Ex.: Aoi Nakamura"></label><label>Nome do jogador<input id="wPlayer" value="${esc(wizardData.player)}"></label><label>Nível inicial<input id="wLevel" type="number" min="1" max="20" value="${wizardData.level||1}"></label><label>Técnica inata, se já souber<input id="wTechnique" value="${esc(wizardData.innateTechnique)}" placeholder="Pode deixar em branco"></label></div>`;
-  if(wizardStep===1) html=`<p class="muted">Escolha a origem. Algumas regras especiais ainda serão detalhadas em versões futuras.</p><div class="choice-grid">${ORIGINS.map(o=>`<div class="choice ${wizardData.origin===o.name?'active':''}" data-w-origin="${o.name}"><strong>${o.name}</strong><span>${o.desc}</span></div>`).join('')}</div>`;
-  if(wizardStep===2) html=`<p class="muted">A especialização define PV, PE/Estamina, treinamentos e atributo-chave.</p><div class="choice-grid">${Object.entries(CLASSES).map(([name,c])=>`<div class="choice ${wizardData.specialization===name?'active':''}" data-w-class="${name}"><strong>${name}</strong><span>PV ${c.hp1} + CON • ${c.stamina?'Estamina '+c.stamina+'/nível':'PE '+c.pe+'/nível'} • ${c.keys.join(' ou ')}</span></div>`).join('')}</div><label style="margin-top:1rem">Atributo-chave<select id="wKey">${(CLASSES[wizardData.specialization]?.keys||[]).map(k=>`<option ${wizardData.keyAttribute===k?'selected':''}>${k}</option>`).join('')}</select></label>`;
-  if(wizardStep===3){ const pool=attributePoolValues(wizardData); const hasPool=pool.length===6; const chips=hasPool ? (wizardData.attributeRolls||[]).map((r,i)=>`<span class="roll-chip">${i+1}: <b>${r.total}</b> <small>${r.fixed?'fixo':r.rolls.join(', ')}</small></span>`).join('') : '<p class="muted">Clique em rolar ou usar valores fixos para gerar os 6 valores disponíveis.</p>'; html=`<p class="muted">Método de atributos: você gera 6 valores e só pode distribuir exatamente esses valores. A rolagem usa 4d6, descarta o menor e soma os 3 restantes.</p><div class="actions-inline"><button type="button" id="rollAttrs" class="primary">Rolar atributos 4d6</button><button type="button" id="useFixed">Usar valores fixos</button><button type="button" id="clearAttrs">Limpar distribuição</button></div><div class="roll-pool">${chips}</div><div class="attribute-grid">${ATTRS.map(a=>{ const current=wizardData.attributeAssignments?.[a] ?? ''; const used=usedAttributeValues(wizardData,a); const options=['<option value="">Escolher</option>'].concat(pool.map((v,idx)=>{ const disabled=countValue(used,v) >= countValue(pool,v) && Number(current)!==v; return `<option value="${v}" ${Number(current)===v?'selected':''} ${disabled?'disabled':''}>${v} ${disabled?'— usado':''}</option>`; })).join(''); const val=current!==''?Number(current):10; return `<div class="attr-box"><strong>${a}</strong><select class="wAttrSelect" data-w-attr="${a}" ${hasPool?'':'disabled'}>${options}</select><small><span>Mod.</span><b>${sgn(mod(val))}</b></small></div>`; }).join('')}</div><p class="muted">Valores repetidos funcionam normalmente quando a rolagem gerar números iguais; cada número é tratado como um espaço disponível.</p>`; }
-  if(wizardStep===4) html=`<p class="muted">Aplique uma sugestão inicial de perícias conforme a especialização. Depois você ajusta livremente na aba Perícias.</p><div class="rule-card"><h3>${esc(wizardData.specialization)}</h3><p>${esc((CLASSES[wizardData.specialization]||CLASSES.Lutador).trainings)}</p></div><button id="wApplySkills" class="primary wide" type="button">Aplicar perícias sugeridas</button><div id="wSkillPreview" class="rule-grid" style="margin-top:1rem"></div>`;
-  if(wizardStep===5){ const preview=applyAutoValues(structuredClone(wizardData),{keepCurrent:false}); html=`<div class="card"><h3>${esc(preview.name || 'Sem nome')}</h3><p class="muted">${esc(preview.origin)} • ${esc(preview.specialization)} • ${esc(preview.innateTechnique || 'Sem técnica definida')}</p><p><span class="badge">PV ${preview.hpMax}</span> <span class="badge">${CLASSES[preview.specialization]?.stamina?'Estamina':'PE'} ${preview.peMax}</span> <span class="badge">BT +${trainingBonus(preview.level)}</span> <span class="badge">CD ${preview.dc}</span> <span class="badge">${preview.grade}</span></p></div><p class="muted">Ao salvar, a ficha continua editável por abas.</p>`; }
+  if(wizardStep===1) html=`<p class="muted">Escolha a origem. As escolhas detalhadas da origem continuam ajustáveis no painel de Status.</p><div class="choice-grid">${ORIGINS.map(o=>`<div class="choice ${wizardData.origin===o.name?'active':''}" data-w-origin="${o.name}"><strong>${o.name}</strong><span>${o.desc}</span></div>`).join('')}</div>`;
+  if(wizardStep===2){
+    const cls=CLASSES[wizardData.specialization]||CLASSES.Lutador;
+    html=`<p class="muted">A especialização define PV, PE/Estamina, treinamentos, atributo-chave e habilidades automáticas iniciais.</p><div class="choice-grid">${Object.entries(CLASSES).map(([name,c])=>`<div class="choice ${wizardData.specialization===name?'active':''}" data-w-class="${name}"><strong>${name}</strong><span>PV ${c.hp1} + CON • ${c.stamina?'Estamina '+c.stamina+'/nível':'PE '+c.pe+'/nível'} • ${c.keys.join(' ou ')}</span></div>`).join('')}</div><label style="margin-top:1rem">Atributo-chave<select id="wKey">${(cls.keys||[]).map(k=>`<option ${wizardData.keyAttribute===k?'selected':''}>${k}</option>`).join('')}</select></label><div class="rule-grid" style="margin-top:1rem">${(cls.baseAbilities||[]).map(n=>{ const lib=ABILITY_LIBRARY.find(a=>a.name===n); return `<div class="rule-card"><h3>${esc(n)}</h3><p class="muted">Automática inicial</p><p>${esc(lib?.text||'Habilidade automática da especialização.')}</p></div>`; }).join('')}</div><label class="switch-line"><input id="wApplyBaseAbilities" type="checkbox" ${ensureCreationChoices(wizardData).applyBaseAbilities!==false?'checked':''}> Adicionar habilidades automáticas iniciais ao finalizar</label>`;
+  }
+  if(wizardStep===3){
+    const cc=ensureCreationChoices(wizardData), saves=classSaveOptions(wizardData.specialization), cfg=classSkillOptions(wizardData.specialization);
+    const picked=uniqueOptions([...(cfg.fixed||[]), ...(cc.trained||[])]);
+    const saveHtml = saves.mode==='fixed' ? `<p class="muted">${esc(saves.text)}</p><div class="pill-row">${saves.options.map(s=>`<span class="badge">${esc(s)}</span>`).join('')}</div>` : `<p class="muted">${esc(saves.text)}</p><div class="choice-grid compact">${saves.options.map(s=>`<div class="choice ${cc.saves?.includes(s)?'active':''}" data-w-save="${s}"><strong>${s}</strong><span>Teste de resistência</span></div>`).join('')}</div>`;
+    html=`<p class="muted">Escolha os treinamentos iniciais da especialização. Você pode ajustar depois na aba Perícias, mas o assistente já cria uma ficha jogável.</p><div class="rule-card"><h3>Testes de resistência</h3>${saveHtml}</div><div class="rule-card"><h3>Perícias da especialização</h3><p>${esc(cfg.text)}</p><p><b>${picked.length}/${cfg.required}</b> selecionadas no total.</p><div class="pill-row">${(cfg.fixed||[]).map(s=>`<span class="badge">${esc(s)} fixo</span>`).join('')}</div><div class="choice-grid compact scroll-box">${uniqueOptions(cfg.options).map(s=>`<div class="choice ${cc.trained?.includes(s)?'active':''} ${(cfg.fixed||[]).includes(s)?'disabled':''}" data-w-skill="${s}"><strong>${s}</strong><span>${(cfg.fixed||[]).includes(s)?'fixo':'perícia'}</span></div>`).join('')}</div></div><div id="wSkillPreview" class="rule-grid"></div>`;
+  }
+  if(wizardStep===4){
+    const cc=ensureCreationChoices(wizardData), pools=startingEquipmentPools();
+    const opt=(list,val)=>`<option value="">Escolher</option>${list.map(it=>`<option value="${esc(it.name)}" ${val===it.name?'selected':''}>${esc(it.name)}${it.damage?' — '+esc(it.damage):''}</option>`).join('')}`;
+    html=`<p class="muted">Monte o equipamento inicial de forma rápida. O inventário continua editável depois.</p><div class="form-grid"><label>Equipamento custo 1<select id="wEquipA">${opt(pools.cost1,cc.equipmentA)}</select></label><label>Outro equipamento custo 1<select id="wEquipB">${opt(pools.cost1,cc.equipmentB)}</select></label><label>Uniforme<select id="wUniform">${opt(pools.uniforms,cc.uniform)}</select></label><label>Kit de ferramentas<select id="wKit">${opt(pools.kits,cc.kit)}</select></label></div><p class="muted">Ao finalizar, os itens escolhidos são adicionados ao inventário sem duplicar itens já existentes.</p>`;
+  }
+  if(wizardStep===5){ const pool=attributePoolValues(wizardData); const hasPool=pool.length===6; const chips=hasPool ? (wizardData.attributeRolls||[]).map((r,i)=>`<span class="roll-chip">${i+1}: <b>${r.total}</b> <small>${r.fixed?'fixo':r.rolls.join(', ')}</small></span>`).join('') : '<p class="muted">Clique em rolar ou usar valores fixos para gerar os 6 valores disponíveis.</p>'; html=`<p class="muted">Método de atributos: você gera 6 valores e só pode distribuir exatamente esses valores. A rolagem usa 4d6, descarta o menor e soma os 3 restantes.</p><div class="actions-inline"><button type="button" id="rollAttrs" class="primary">Rolar atributos 4d6</button><button type="button" id="useFixed">Usar valores fixos</button><button type="button" id="clearAttrs">Limpar distribuição</button></div><div class="roll-pool">${chips}</div><div class="attribute-grid">${ATTRS.map(a=>{ const current=wizardData.attributeAssignments?.[a] ?? ''; const used=usedAttributeValues(wizardData,a); const options=['<option value="">Escolher</option>'].concat(pool.map((v)=>{ const disabled=countValue(used,v) >= countValue(pool,v) && Number(current)!==v; return `<option value="${v}" ${Number(current)===v?'selected':''} ${disabled?'disabled':''}>${v} ${disabled?'— usado':''}</option>`; })).join(''); const val=current!==''?Number(current):10; return `<div class="attr-box"><strong>${a}</strong><select class="wAttrSelect" data-w-attr="${a}" ${hasPool?'':'disabled'}>${options}</select><small><span>Mod.</span><b>${sgn(mod(val))}</b></small></div>`; }).join('')}</div><p class="muted">Valores repetidos funcionam normalmente quando a rolagem gerar números iguais; cada número é tratado como um espaço disponível.</p>`; }
+  if(wizardStep===6){ const preview=applyAutoValues(structuredClone(wizardData),{keepCurrent:false}); const cc=ensureCreationChoices(wizardData); html=`<div class="card"><h3>${esc(preview.name || 'Sem nome')}</h3><p class="muted">${esc(preview.origin)} • ${esc(preview.specialization)} • ${esc(preview.innateTechnique || 'Sem técnica definida')}</p><p><span class="badge">PV ${preview.hpMax}</span> <span class="badge">${CLASSES[preview.specialization]?.stamina?'Estamina':'PE'} ${preview.peMax}</span> <span class="badge">BT +${trainingBonus(preview.level)}</span> <span class="badge">CD ${preview.dc}</span> <span class="badge">${preview.grade}</span></p></div><div class="rule-grid"><div class="rule-card"><h3>Habilidades iniciais</h3><p>${cc.applyBaseAbilities!==false?'Serão adicionadas automaticamente.':'Não serão adicionadas automaticamente.'}</p></div><div class="rule-card"><h3>Equipamento inicial</h3><p>${[cc.equipmentA,cc.equipmentB,cc.uniform,cc.kit].filter(Boolean).map(esc).join(' • ') || 'Nenhum equipamento escolhido.'}</p></div></div><p class="muted">Ao salvar, a ficha continua editável por abas.</p>`; }
   $('#wizardBody').innerHTML=html; bindWizardStep();
 }
 function collectWizard(){
+  ensureCreationChoices(wizardData);
   if(wizardStep===0){ wizardData.name=$('#wName').value; wizardData.player=$('#wPlayer').value; wizardData.level=Number($('#wLevel').value||1); wizardData.innateTechnique=$('#wTechnique').value; }
-  if(wizardStep===2){ wizardData.keyAttribute=$('#wKey')?.value || wizardData.keyAttribute; }
-  if(wizardStep===3){ $$('.wAttrSelect').forEach(i=>{ wizardData.attributeAssignments[i.dataset.wAttr]=i.value===''?'':Number(i.value); }); syncAttributesFromAssignments(wizardData); }
+  if(wizardStep===2){ wizardData.keyAttribute=$('#wKey')?.value || wizardData.keyAttribute; wizardData.creationChoices.applyBaseAbilities = !!$('#wApplyBaseAbilities')?.checked; }
+  if(wizardStep===4){ const cc=ensureCreationChoices(wizardData); cc.equipmentA=$('#wEquipA')?.value||''; cc.equipmentB=$('#wEquipB')?.value||''; cc.uniform=$('#wUniform')?.value||''; cc.kit=$('#wKit')?.value||''; }
+  if(wizardStep===5){ $$('.wAttrSelect').forEach(i=>{ wizardData.attributeAssignments[i.dataset.wAttr]=i.value===''?'':Number(i.value); }); syncAttributesFromAssignments(wizardData); }
   wizardData=applyAutoValues(wizardData,{keepCurrent:false});
 }
 function bindWizardStep(){
+  ensureCreationChoices(wizardData);
   $$('[data-w-origin]').forEach(c=>c.onclick=()=>{ wizardData.origin=c.dataset.wOrigin; if(wizardData.origin==='Restringido') wizardData.specialization='Restringido'; renderWizard(); });
-  $$('[data-w-class]').forEach(c=>c.onclick=()=>{ wizardData.specialization=c.dataset.wClass; wizardData.keyAttribute=(CLASSES[wizardData.specialization]||CLASSES.Lutador).keys[0]; renderWizard(); });
+  $$('[data-w-class]').forEach(c=>c.onclick=()=>{ wizardData.specialization=c.dataset.wClass; wizardData.keyAttribute=(CLASSES[wizardData.specialization]||CLASSES.Lutador).keys[0]; wizardData.creationChoices.saves=[]; wizardData.creationChoices.trained=[]; renderWizard(); });
   $('#wKey')?.addEventListener('input',e=>wizardData.keyAttribute=e.target.value);
+  $('#wApplyBaseAbilities')?.addEventListener('change',e=>{ wizardData.creationChoices.applyBaseAbilities=e.target.checked; });
+  $$('[data-w-save]').forEach(c=>c.onclick=()=>{ wizardData.creationChoices.saves=[c.dataset.wSave]; renderWizard(); });
+  $$('[data-w-skill]').forEach(c=>c.onclick=()=>{ const skill=c.dataset.wSkill; const cfg=classSkillOptions(wizardData.specialization); if((cfg.fixed||[]).includes(skill)) return; const arr=wizardData.creationChoices.trained||[]; if(arr.includes(skill)) wizardData.creationChoices.trained=arr.filter(x=>x!==skill); else wizardData.creationChoices.trained=[...arr,skill]; renderWizard(); });
+  ['wEquipA','wEquipB','wUniform','wKit'].forEach(id=>$('#'+id)?.addEventListener('change',e=>{ const cc=ensureCreationChoices(wizardData); const map={wEquipA:'equipmentA',wEquipB:'equipmentB',wUniform:'uniform',wKit:'kit'}; cc[map[id]]=e.target.value; }));
   $('#rollAttrs')?.addEventListener('click',()=>{ wizardData.attributeMethod='rolling'; wizardData.attributeRolls=rollAttributeSet(); wizardData.attributeAssignments={}; renderWizard(); });
   $('#useFixed')?.addEventListener('click',()=>{ wizardData.attributeMethod='fixed'; wizardData.attributeRolls=fixedAttributeSet(); wizardData.attributeAssignments={}; renderWizard(); });
   $('#clearAttrs')?.addEventListener('click',()=>{ wizardData.attributeAssignments={}; renderWizard(); });
   $$('.wAttrSelect').forEach(sel=>sel.oninput=()=>{ wizardData.attributeAssignments[sel.dataset.wAttr]=sel.value===''?'':Number(sel.value); syncAttributesFromAssignments(wizardData); renderWizard(); });
-  $('#wApplySkills')?.addEventListener('click',()=>{ wizardData=applyDefaultSkills(wizardData); renderWizardSkillPreview(); });
   renderWizardSkillPreview();
 }
 function renderWizardSkillPreview(){ const el=$('#wSkillPreview'); if(!el) return; const trained=Object.entries(wizardData.skillRanks||{}).filter(([,v])=>v!=='none').map(([k,v])=>`${k}: ${v==='master'?'Mestre':'Treinado'}`); el.innerHTML=trained.length?trained.map(t=>`<div class="rule-card"><p>${esc(t)}</p></div>`).join(''):'<p class="muted">Nenhuma sugestão aplicada ainda.</p>'; }
-function finishWizard(){ collectWizard(); syncAttributesFromAssignments(wizardData); wizardData.attributeBase=wizardData.attributeBase||{}; ATTRS.forEach(a=>{ if(wizardData.attributeBase[a]===undefined) wizardData.attributeBase[a]=Number(wizardData.attributes[a]||10); }); wizardData.attributeTempMods=wizardData.attributeTempMods||{}; ATTRS.forEach(a=>{ if(wizardData.attributeTempMods[a]===undefined) wizardData.attributeTempMods[a]=0; }); addBaseAbilities(wizardData); const idx=sheets.findIndex(s=>s.id===wizardData.id); if(idx>=0) sheets[idx]=wizardData; else sheets.push(wizardData); activeId=wizardData.id; save(); $('#wizard').close(); activateTab('fichas'); renderAll(); }
+function finishWizard(){ collectWizard(); syncAttributesFromAssignments(wizardData); wizardData.attributeBase=wizardData.attributeBase||{}; ATTRS.forEach(a=>{ if(wizardData.attributeBase[a]===undefined) wizardData.attributeBase[a]=Number(wizardData.attributes[a]||10); }); wizardData.attributeTempMods=wizardData.attributeTempMods||{}; ATTRS.forEach(a=>{ if(wizardData.attributeTempMods[a]===undefined) wizardData.attributeTempMods[a]=0; }); applyCreationTrainingChoices(wizardData); addBaseAbilitiesIfWanted(wizardData); applyCreationEquipment(wizardData); wizardData=applyAutoValues(wizardData,{keepCurrent:false}); const idx=sheets.findIndex(s=>s.id===wizardData.id); if(idx>=0) sheets[idx]=wizardData; else sheets.push(wizardData); activeId=wizardData.id; save(); $('#wizard').close(); activateTab('fichas'); renderAll(); }
 
 function normalizeDiceExpression(expr){
   return String(expr||'')
